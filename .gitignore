@@ -1,0 +1,71 @@
+# ============================================
+# XeLaTeX + BibLaTeX + VS Code on macOS
+# ============================================
+
+# LaTeX intermediate & log files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.lol
+*.nav
+*.snm
+*.vrb
+main.idx 
+
+# Backup & temp files
+*~
+*.bak
+*.tmp
+*.sav
+*.old
+*.backup
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# VS Code project settings
+.vscode/
+.vscode-test/
+
+# latexmk-generated files
+latex.out/
+latexmkrc
+*.dvi
+*.ps
+*.xdv
+
+# minted & listings cache
+_minted*
+*.pyg
+
+# bibliography tools
+*.biber
+*.blx.bib
+
+# output folders (if any)
+build/
+out/
+output/
+
+# temporary TeX Workshop files
+*.synctex(busy)
+*.synctex.gz(busy)
+
+# Other editors / system cruft
+Thumbs.db
+ehthumbs.db
+Desktop.ini
