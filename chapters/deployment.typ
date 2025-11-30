@@ -1,0 +1,1 @@
+nasazení do nějaého prostředí
