@@ -40,14 +40,16 @@
 
 = Analýza současného stavu
 Efektivní digitalizace podnikových procesů vyžaduje důkladné porozumění stávajícímu stavu organizace, jejím procesům a specifickým potřebám. V souladu s metodikou procesního řízení dle Řepy @repa2007podnikove je prvním krokem identifikace a dokumentace klíčových procesů, jejich aktérů, vstupů, výstupů a rozhodovacích bodů. Teprve na základě této analýzy je možné formulovat požadavky na informační systém, který tyto procesy podpoří nebo nahradí.
-Tato kapitola se zabývá analýzou současného stavu procesů náboru a adaptace
-pracovníků v Krajské Zdravotní a.s. Nejprve je představena organizace a její
-specifika v kontextu řízení lidských zdrojů ve zdravotnictví. Následně jsou podrobně popsány klíčové procesy pomocí notace BPMN (Business Process Model
-and Notation), identifikována úzká místa a formulovány požadavky na digitalizaci ve formě funkcionálních a nefunkcionálních požadavků. 
+
+Tato kapitola se zabývá analýzou současného stavu procesů náboru a adaptace pracovníků v Krajské Zdravotní a.s. Nejprve je představena organizace a její specifika v kontextu řízení lidských zdrojů ve zdravotnictví. Následně jsou podrobně popsány klíčové procesy pomocí notace BPMN (Business Process Model and Notation), identifikována úzká místa a formulovány požadavky na digitalizaci ve formě funkcionálních a nefunkcionálních požadavků.
 
 #include "chapters/analysis.typ"
 
 = Existující softwarová řešení
+Před návrhem vlastního řešení je nezbytné provést systematickou rešerši existujících softwarových produktů a posoudit jejich vhodnost pro pokrytí definovaných požadavků. Cílem této kapitoly je analyzovat dostupné produkty z kategorie ATS (Applicant Tracking Systems), onboardingových platforem a integrovaných HR systémů, identifikovat jejich silné a slabé stránky v kontextu požadavků KZ a zdůvodnit rozhodnutí o vývoji vlastního řešení.
+
+Při hodnocení existujících řešení byla zohledněna kritéria pokrytí funkcionálních požadavků (DOPLNIT odkaz), české jazykové prostředí a lokalizace, cenová dostupnost, přizpůsobitelnost procesům zdravotnické organizace a možnost provozování na vlastní infrastruktuře (on-premise).
+
 #include "chapters/research.typ"
 
 = Návrh softwarové architektury

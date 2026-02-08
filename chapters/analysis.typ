@@ -1,7 +1,9 @@
 #import "../template/abbreviations.typ": abbr
 
 == Představení organizace
-#abbr("KZ", "Krajská zdravotní, a.s.") je akciová společnost vlastněná Ústeckým krajem, která představuje největšího poskytovatele lůžkové i ambulantní zdravotní péče v Ústeckém kraji. Jednalo se o *Nemocnici Děčín, o.z.*, *Masarykovu nemocnici v Ústí nad Labem, o.z.*, *Nemocnici Teplice, o.z.*, *Nemocnici Most, o.z.* a *Nemocnici Chomutov, o.z.* Společnost byla založena v roce 2007 sloučením pěti nemocnic do jediné právní entity. Hlavním cílem této konsolidace bylo dosažení provozních a ekonomických optimalizací, a to především v oblastech centrálního řízení, společného nákupu léčiv a zdravotnického materiálu a efektivního sdílení odborných personálních i technologických kapacit napříč celým regionem. V průběhu roku 2021 došlo k dalšímu strategickému rozšíření portfolia spravovaných zařízení, čímž se počet odštěpných závodů v rámci struktury #abbr("KZ", none) zvýšil na sedm. V dubnu 2021 byla do společnosti integrována *Nemocnice Litoměřice, o.z.*, a následně v červenci téhož roku převzala #abbr("KZ", none) správu nad zdravotnickým zařízením v Šluknovském výběžku, které nyní působí jako *#abbr("KZ", none) - Masarykova nemocnice v Ústí nad Labem, o.z. detašované pracoviště Rumburk*
+#abbr("KZ", "Krajská zdravotní, a.s.") je akciová společnost vlastněná Ústeckým krajem, která představuje největšího poskytovatele lůžkové i ambulantní zdravotní péče v Ústeckém kraji. Jednalo se o *Nemocnici Děčín, o.z.*, *Masarykovu nemocnici v Ústí nad Labem, o.z.*, *Nemocnici Teplice, o.z.*, *Nemocnici Most, o.z.* a *Nemocnici Chomutov, o.z.* Společnost byla založena v roce 2007 sloučením pěti nemocnic do jediné právní entity. Hlavním cílem této konsolidace bylo dosažení provozních a ekonomických optimalizací, a to především v oblastech centrálního řízení, společného nákupu léčiv a zdravotnického materiálu a efektivního sdílení odborných personálních i technologických kapacit napříč celým regionem. 
+
+V průběhu roku 2021 došlo k dalšímu strategickému rozšíření portfolia spravovaných zařízení, čímž se počet odštěpných závodů v rámci struktury #abbr("KZ", none) zvýšil na sedm. V dubnu 2021 byla do společnosti integrována *Nemocnice Litoměřice, o.z.*, a následně v červenci téhož roku převzala #abbr("KZ", none) správu nad zdravotnickým zařízením v Šluknovském výběžku, které nyní působí jako *#abbr("KZ", none) - Masarykova nemocnice v Ústí nad Labem, o.z. detašované pracoviště Rumburk*
 
 S celkovým počtem přesahujícím 11 tisíc zaměstnanců představuje #abbr("KZ", none) jednoho z největších poskytovatelů zdravotní péče v České Republice a jednoho z nejvýznamnějších zaměstnavatelů v Ústeckém kraji. Personální struktura je charakteristická vysokým podílem zdravotnických pracovníků (kategorie #abbr("LZ", "Lékaři a farmaceuti") a #abbr("NLZP", "Nelékařští zdravotničtí pracovníci")) s regulovanou odbornou způsobilostí, což klade specifické nároky na náborový a adaptační proces.
 
@@ -94,7 +96,7 @@ Neoptimální proces předávání informací mezi jednotlivými závody a centr
     [Idenitfikátor procesu:], [P01],
     [Název procesu:], [Vytvoření inzerátu pro pracovní pozici],
     [Zákazník:], [Vedoucí daného oddělení v odštěpném závodě],
-    [Vlastník procesu:], [Náborář, vedoucí oddělení],
+    [Vlastník procesu:], [Náborář, vedoucí daného oddělení v odštěpném závodě],
     [Účel:], [Vytvoření inzerátu na poptávanou pozici],
     [Produkt:], [Inzerát],
     [Technické prostředky:], [E-mail, webové stránky KZ,webové portály třetích strán, nemocniční nástěnky, socíální sítě],
@@ -117,9 +119,33 @@ Neoptimální proces předávání informací mezi jednotlivými závody a centr
 
 === Příjem a evidence přihlášek
 
-=== Proces náboru pracovníka — model procesu
+#figure(
+  table(
+    columns: 2,
+    stroke: 0.5pt + black,
+    fill: (col, row) => {
+      if col == 0 { rgb("#e8e8e8") }  
+      else { white }
+    },
+    align: (left, left),
+    [Idenitfikátor procesu:], [P02],
+    [Název procesu:], [Příjem přihlášek a výber kandidátů k oslovení],
+    [Zákazník:], [Vedoucí daného oddělení v odštěpném závodě],
+    [Vlastník procesu:], [Náborář, vedoucí daného oddělení v odštěpném závodě],
+    [Účel:], [Výběr kandidátů, jenž splňují požadavky obsazované pozice],
+    [Produkt:], [Kandidát pozvaný na pohovor],
+    [Technické prostředky:], [E-mail, telefon, tabulkový procesor, Webex],
+    [Metrika:], [Rychlost od vystavení inzerátu po oslovení kandidáta],
+    [Nedostatky:], [Neexistence centrální databáze uchazečů o pozici, neexistence databáze potencionálních zájemců o zaměstnání v KZ],
+  ),
+  caption: [Proces P02 - Příjem a výber kandidátů k oslovení]
+) <tab:proces-p02>
 
-=== Proces adaptace a onboardingu nových zaměstnanců
+=== Proces náboru pracovníka
+
+=== Proces zajištení vstupní agendy
+=== Proces adaptace nových zaměstnanců
+
 == Identifikace problémů a úzkých míst<kapitola-identifikcea-problemu>
 Na základě analýzy současného stavu procesů náboru a adaptace v KZ, konzultací s HR pracovníky jednotlivých nemocnic a pozorování reálného průběhu procesů byly identifikovány následující klíčové problémy. Problémy jsou kategorizovány podle oblastí dopadu a doplněny o kvalitativní hodnocení závažnosti.
 
