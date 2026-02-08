@@ -1,1 +1,3 @@
 - wtf, co to je s těmi zkratkami?? (podivej se jestli není nějaká nová verze toho templatu)
+- srovnat slova odštěpný závod, zařízení, atd. (někde to je v tom zajebaném organizačním řádu)
+- jak se cituje interní dokumentvole 
