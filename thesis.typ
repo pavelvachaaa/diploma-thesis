@@ -39,6 +39,12 @@
 #include "chapters/introduction.typ"
 
 = Analýza současného stavu
+Efektivní digitalizace podnikových procesů vyžaduje důkladné porozumění stávajícímu stavu organizace, jejím procesům a specifickým potřebám. V souladu s metodikou procesního řízení dle Řepy @repa2007podnikove je prvním krokem identifikace a dokumentace klíčových procesů, jejich aktérů, vstupů, výstupů a rozhodovacích bodů. Teprve na základě této analýzy je možné formulovat požadavky na informační systém, který tyto procesy podpoří nebo nahradí.
+Tato kapitola se zabývá analýzou současného stavu procesů náboru a adaptace
+pracovníků v Krajské Zdravotní a.s. Nejprve je představena organizace a její
+specifika v kontextu řízení lidských zdrojů ve zdravotnictví. Následně jsou podrobně popsány klíčové procesy pomocí notace BPMN (Business Process Model
+and Notation), identifikována úzká místa a formulovány požadavky na digitalizaci ve formě funkcionálních a nefunkcionálních požadavků. 
+
 #include "chapters/analysis.typ"
 
 = Existující softwarová řešení

@@ -1,0 +1,1 @@
+- wtf, co to je s těmi zkratkami?? (podivej se jestli není nějaká nová verze toho templatu)
