@@ -14,23 +14,26 @@ Tato struktura holdingu, tvořená odštěpnými závody, přináší z hlediska
 Řízení lidských zdrojů v prostředí #abbr("KZ", none) vykazuje řadu specifik, která jej odlišují od standardního korporátního modelu. Tato specifika přímo determinují požadavky na návrh a funkcionalitu personálního informačního systému, zejména v oblasti hlídání kvalifikací a zákonných termínů.
 
 *Kategorizace pracovníků.* Zaměstnanci #abbr("KZ", none) spadají do čtyř základních klasifikačních kategorií, z nichž každá má odlišné požadavky na kvalifikaci, dokumentaci a průběh adaptačního procesu:
+#figure(
+  table(
+  columns: (1.5fr, 2fr, 2fr),
+  inset: 7pt,
+  align: horizon,
+  fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
+  stroke: 0.5pt + gray,
 
-#table(
-columns: (1.5fr, 2fr, 2fr),
-inset: 7pt,
-align: horizon,
-fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
-stroke: 0.5pt + gray,
-[Kategorie (dle KS)], [Typické pozice v #abbr("KZ", none)], [Klíčová specifika pro #abbr("HR", none)],
+  [Kategorie (dle KS)], [Typické pozice v #abbr("KZ", none)], [Klíčová specifika pro #abbr("HR", none)],
 
-[#abbr("LZ", none)], [Atestovaní lékaři, lékaři v přípravě, farmaceuti], [Sledování specializačního vzdělávání (atestace), IPVZ, evidence v ČLK.],
+  [#abbr("LZ", none)], [Atestovaní lékaři, lékaři v přípravě, farmaceuti], [Sledování specializačního vzdělávání (atestace), IPVZ, evidence v ČLK.],
 
-[#abbr("NLZP", none)], [Všeobecné sestry, dětské sestry, porodní asistentky], [Odborná a specializovaná způsobilost, vzdělávání pod NCONZO.],
+  [#abbr("NLZP", none)], [Všeobecné sestry, dětské sestry, porodní asistentky], [Odborná a specializovaná způsobilost, vzdělávání pod NCONZO.],
 
-[Ostatní #abbr("NLZP", none) a JOP], [Radiologičtí asistenti, fyzioterapeuti, sanitáři, kliničtí psychologové], [Certifikované kurzy, akreditované stáže, specifické nároky na praxi.],
+  [Ostatní #abbr("NLZP", none) a JOP], [Radiologičtí asistenti, fyzioterapeuti, sanitáři, kliničtí psychologové], [Certifikované kurzy, akreditované stáže, specifické nároky na praxi.],
 
-[THP a Provoz], [Ekonomové, #abbr("IT", none) specialisté, údržba, stravovací provoz], [Zařazení dle Katalogu prací, standardní zákoník práce.],
-)
+  [THP a Provoz], [Ekonomové, #abbr("IT", none) specialisté, údržba, stravovací provoz], [Zařazení dle Katalogu prací, standardní zákoník práce.],
+
+  ),
+caption:"Klasifikace pozic v KZ")  <tab:zarazeni-zamestnancu>
 
 *Regulovaná odborná způsobilost.* Základním pilířem #abbr("HR", none) procesů v #abbr("KZ", none) je soulad s legislativním rámcem pro výkon zdravotnických povolání. Náborový proces a následná správa zaměstnanců se dělí podle dvou klíčových norem:
 
@@ -46,16 +49,94 @@ Informační systém by tedy měl být připraven tak, aby zajistil bezchybné, 
 
 *Vícestupňový adaptační proces.* Adaptace nového zdravotnického pracovníka zahrnuje kromě standardních organizačních záležitostí (přidělení přístupů, školení #abbr("BOZP", "Bezpečnost a ochrana zdraví při práci")) také specifické odborné komponenty, seznámení s nemocničním informačním systémem, hygienickými standardy, postupy při mimořádných událostech a specifiky konkrétního pracoviště. 
 
-== Současný stav procesů náboru pracovníků
+== Současný stav procesů náboru pracovníků<kapitola-soucasny-stav>
 Před zahájením digitalizace v KZ se správa uchazečů opírá o zažité postupy a běžné kancelářské nástroje, které však s postupným růstem organizace začínají narážet na své limity. V praxi to znamená, že většina agendy stojí a padá na "svaté dvojici" sdílených tabulek v Excelu a intenzivní e-mailové komunikaci. Tato technologická kombinace v praxi způsobuje, že nábor není plynulým procesem, ale spíše sérií izolovaných administrativních úkonů. TODO: Nazvat to něco jako administrativní ping pong mezi všemi
 
-=== Inzerce volných pozic
+Pro účely analýzy a následné digitalizace těchto procesů bylo provedeno jejich detailní mapování metodou strukturovaných rozhovorů s vedoucím personálního oddělení a s nábořáři pro jednotlivé odštěpné závody. Tito zaměstnanci poskytli jak formální dokumentaci (interní směrnice), tak slovní popis reálného průběhu procesů včetně neformálních postupů a praktických zkušeností.
+
+=== Inzerce volných pozice
+Aktuálně inzerce volných pracovních pozic je zajišťována prostřednictvím několika kanálů:
+
+- *Webové portály třetích stran* - Jobs.cz, Práce.cz (provozovatel LMC), portál MPSV
+- *Nemocniční nástěnky* - fyzické nástěnky v areálech nemocnic
+- *Webové stránky nemocnic* - statické stránky s omezenou aktualizací
+- *Sociální sítě* — Linkedin
+
+Absence vlastního kariérního portálu znamená, že uchazeči o zaměstnání nemají jednotný přístupový bod, kde by nalezli aktuální nabídky ze všech sedmi závodů, informace o benefitech, stipendijních programech a pracovním prostředí.
+
+Proces náboru nového zaměstnance začíná identifikací potřeby na úrovni jednotlivých oddělení zdravotnických zařízení. Vedoucí oddělení, identifikuje personální deficit způsobený odchodem zaměstnance do důchodu, dlouhodobou nemocí, přirozenou fluktuací, rodičovskou dovolenou nebo rozšířením kapacity oddělení.
+
+V první fázi vedoucí oddělení vyhodnotí, zda se jedná o standardní pozici (např. všeobecná sestra, sanitář), která spadá do jeho kompetence, nebo o specifickou pozici vyžadující schválení vyššího vedení. 
+
+Po rozhodnutí o zahájení náboru vedoucí oddělení kontaktuje centrální HR oddělení prostřednictvím e-mailu nebo telefonického hovoru. V této komunikaci specifikuje základní parametry pozice jako je název pracovní pozice, požadovaná kvalifikace, rozsah úvazku, předpokládaný nástup a případné specifické požadavky (např. praxe v oboru, znalost konkrétních postupů). Tato komunikace často probíhá neformálně a není standardizována, různí vedoucí poskytují různě detailní informace, což komplikuje následné vytvoření inzerátu.
+
+HR oddělení na základě těchto informací připravuje text inzerátu. Vedoucí oddělení obdrží návrh k připomínkování, což iniciuje další kolo e-mailové komunikace s požadavky na úpravy a doplnění. Tento iterativní proces schvalování může trvat několik dní až týdnů, během nichž pozice zůstává neobsazená a oddělení pracuje s personálním deficitem.
+
+Po schválení textu HR oddělení rozhoduje o výběru inzertních kanálů na základě typu pozice a dostupného rozpočtu. Vedoucí oddělení má nad tímto rozhodnutím minimální kontrolu a často se dozví, kde byla pozice inzerována, až zpětně. Nemá přehled o tom, kolik uchazečů se na pozici přihlásilo, jaká je jejich kvalifikace nebo v jaké fázi se výběrové řízení nachází, pokud o tyto informace aktivně nežádá.
+
+Následuje časově náročná manuální publikace inzerátu na jednotlivých platformách, kdy pracovník HR oddělení musí samostatně přihlásit se do administračního rozhraní portálu Jobs.cz a ručně vyplnit formulář s parametry pozice, poté opakovat totožný proces na portálu Práce.cz s mírně odlišnou strukturou formuláře, následně vložit inzerát na portál MPSV, který využívá odlišný systém kategorizace pracovních pozic, dále aktualizovat statickou webovou stránku nemocnice přes redakční systém, připravit grafickou podobu inzerátu pro fyzické nástěnky v nemocničních areálech a nakonec publikovat nabídku na Linkedin s odpovídajícím formátováním pro sociální síť.
+
+Každá z těchto platforem má vlastní strukturu dat a specifické požadavky na formát textu. Při aktualizaci inzerátu, například při prodloužení lhůty nebo úpravě požadavků, musí pracovník HR projít celým cyklem znovu na všech platformách. Absence centrálního systému pro správu inzerátů znamená, že neexistuje jednotný přehled o tom, kde všude je konkrétní pozice aktuálně inzerována, kdy vyprší platnost inzerátu a jaké jsou náklady na jednotlivé kanály.
+
+Neoptimální proces předávání informací mezi jednotlivými závody a centrálním HR oddělením společně s nízkou flexibilitou náborových procesů vedl k nekontrolovanému vzniku ad-hoc řešení. Několik odštěpných závodů vytvořilo vlastní neoficiální webové portály pro inzerci pracovních pozic, které nebyly centrálně schváleny ani spravovány. Tento rozptýlený proces s minimální transparentností a omezenou kontrolou vedoucího oddělení nad jednotlivými fázemi způsobuje frustaci a prodlužuje dobu obsazení pozice, což má přímý dopad na kvalitu poskytované péče a pracovní zatížení stávajících zaměstnanců oddělení.
+
+ TODO: Možná refaktor a do tabulky přidát field Logika a zredukovat tak text? Ale feeluju, že je poteřba zminit detailně jaký je to pain pro HR a vedoucí
+#figure(
+  table(
+    columns: 2,
+    stroke: 0.5pt + black,
+    fill: (col, row) => {
+      if col == 0 { rgb("#e8e8e8") }  
+      else { white }
+    },
+    align: (left, left),
+    
+    [Idenitfikátor procesu:], [P01],
+    [Název procesu:], [Vytvoření inzerátu pro pracovní pozici],
+    [Zákazník:], [Vedoucí daného oddělení v odštěpném závodě],
+    [Vlastník procesu:], [Náborář, vedoucí oddělení],
+    [Účel:], [Vytvoření inzerátu na poptávanou pozici],
+    [Produkt:], [Inzerát],
+    [Technické prostředky:], [E-mail, webové stránky KZ,webové portály třetích strán, nemocniční nástěnky, socíální sítě],
+    [Metrika:], [Rychlost od žádosti po vystavení inzerátu],
+    [Nedostatky:], [Manuální publikace inzerátu, již neaktuální inzeráty na portálech, nejednotý přehled o vydaných financích, dlouhé administrativní kolečko mezi vedoucím a náborářem],
+  ),
+  caption: [Proces P01 - Vystavení inzerátu]
+) <tab:proces-p01>
+
+#figure(
+  image(
+    "../procesy/p01_inzerce.svg",
+     width: 100%,
+     
+  ),
+  caption: [Diagram BPMN znázorňující proces od žádosti po vystavení inzerátu]
+) <obr:proces-p01>
+
+
 
 === Příjem a evidence přihlášek
 
 === Proces náboru pracovníka — model procesu
 
 === Proces adaptace a onboardingu nových zaměstnanců
-== Identifikace problémů a úzkých míst
+== Identifikace problémů a úzkých míst<kapitola-identifikcea-problemu>
+Na základě analýzy současného stavu procesů náboru a adaptace v KZ, konzultací s HR pracovníky jednotlivých nemocnic a pozorování reálného průběhu procesů byly identifikovány následující klíčové problémy. Problémy jsou kategorizovány podle oblastí dopadu a doplněny o kvalitativní hodnocení závažnosti.
+
+TODO strukturovat možná do dvou kapitol potom? (Problémy v oblasti evidence a problemy v oblasti procesů?)
+P1: Neefektivní papírová a tabulková agenda.
+P2: Chybějící centrální evidence uchazečů.
+P3: Neexistující evidence zájemců (ti co nenašli pozici, ale chtěli by)
+P4: Absence auditní stopy
+P5: Omezená možnost reportingu a analytiky.
 == Požadavky na digitalizaci procesů
+Na základě provedené analýzy procesů a identifikovaných problémů (@kapitola-identifikcea-problemu) lze formulovat klíčové požadavky na digitalizaci procesů náboru a adaptace. Každý požadavek je odůvodněn vazbou na identifikované problémy.
+
+
+Asi tabulka ve formátu požadavek, krátky popis, Cíl, souvislost s problémem ID
+TBA:
+R1: Multi-tenantní architektura
+R2: Veřejný kariérní portál
+R3: Interní administrační rozhraní 
+R4:Adaptační portál 
 == Specifikace funkcionálních a nefunkcionálních požadavků
