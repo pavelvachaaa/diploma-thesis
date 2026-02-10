@@ -48,7 +48,7 @@ Tato kapitola se zabývá analýzou současného stavu procesů náboru a adapta
 = Existující softwarová řešení
 Před návrhem vlastního řešení je nezbytné provést systematickou rešerši existujících softwarových produktů a posoudit jejich vhodnost pro pokrytí definovaných požadavků. Cílem této kapitoly je analyzovat dostupné produkty z kategorie ATS (Applicant Tracking Systems), onboardingových platforem a integrovaných HR systémů, identifikovat jejich silné a slabé stránky v kontextu požadavků KZ a zdůvodnit rozhodnutí o vývoji vlastního řešení.
 
-Při hodnocení existujících řešení byla zohledněna kritéria pokrytí funkcionálních požadavků (DOPLNIT odkaz), české jazykové prostředí a lokalizace, cenová dostupnost, přizpůsobitelnost procesům zdravotnické organizace a možnost provozování na vlastní infrastruktuře (on-premise).
+Při hodnocení existujících řešení byla zohledněna kritéria pokrytí požadavků na digitalizaci procesů (DOPLNIT odkaz), české jazykové prostředí a lokalizace, cenová dostupnost, přizpůsobitelnost procesům zdravotnické organizace a možnost provozování na vlastní infrastruktuře (on-premise).
 
 #include "chapters/research.typ"
 

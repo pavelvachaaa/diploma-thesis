@@ -88,7 +88,7 @@ Neoptimální proces předávání informací mezi jednotlivými závody a centr
     columns: 2,
     stroke: 0.5pt + black,
     fill: (col, row) => {
-      if col == 0 { rgb("#e8e8e8") }  
+      if col == 0 { rgb("#cecece") }  
       else { white }
     },
     align: (left, left),
@@ -116,15 +116,19 @@ Neoptimální proces předávání informací mezi jednotlivými závody a centr
 ) <obr:proces-p01>
 
 
+=== Příjem a výběr potenciálních uchazečů
+Fáze příjmu přihlášek je v současnosti poznamenána značnou škálou vstupních kanálů. Uchazeči reagují prostřednictvím pracovních portálů, e-mailů či osobních kontaktů na recepcích, což vyžaduje manuální konsolidaci dat náborářem do nestrukturovaných tabulek (MS Excel). Absence jednotné šablony a systematické konvence pro ukládání příloh v lokálních adresářích vede k nekonzistenci dat mezi jednotlivými pracovišti a komplikuje jejich následnou dohledatelnost.
 
-=== Příjem a evidence přihlášek
+Prvotní screening uchazečů probíhá formou *manuálního* ověřování formálních kvalifikačních předpokladů. U zdravotnických pozic musí náborář v každém životopise vyhledávat specifické údaje o dosaženém vzdělání a odborné způsobilosti, což při absenci automatizovaných filtrů představuje časově náročnou rutinu. Tento proces je navíc zatížen subjektivním faktorem a rizikem přehlédnutí klíčových informací. Následné předávání užšího výběru vedoucím oddělení probíhá e-mailovou cestou, což často vede k vícečetným komunikačním iteracím a prodlužuje celkovou dobu výběrového řízení.
+
+Kritickým nedostatkem stávajícího stavu je absence systematické databáze uchazečů (talent poolu). Informace o neúspěšných nebo proaktivních kandidátech zůstávají izolovány v e-mailových schránkách a nejsou využívány pro budoucí obsazování pozic. Tento stav nejenže zvyšuje náklady na opakovanou inzerci, ale v kombinaci s absencí standardizované komunikace negativně ovlivňuje budování značky zaměstnavatele (employer branding) a efektivitu strategického řízení lidských zdrojů.
 
 #figure(
   table(
     columns: 2,
     stroke: 0.5pt + black,
     fill: (col, row) => {
-      if col == 0 { rgb("#e8e8e8") }  
+      if col == 0 { rgb("#cecece") }  
       else { white }
     },
     align: (left, left),
@@ -141,13 +145,84 @@ Neoptimální proces předávání informací mezi jednotlivými závody a centr
   caption: [Proces P02 - Příjem a výber kandidátů k oslovení]
 ) <tab:proces-p02>
 
+
+TODO: Domyslet formátování ať to nejde zbytečně na další stránky
+#figure(
+  image(
+    "../procesy/p02_prijem_prihlasek.svg",
+     width: 100%, 
+     
+  ),
+  caption: [Diagram BPMN znázorňující proces od příjmutí přihlášky po pozvánku na pohovor]
+) <obr:proces-p02>
+
 === Proces náboru pracovníka
+Fáze osobního setkání a následného administrativního zajištění nástupu (preonboarding) je charakteristická vysokou mírou administrativní zátěže pro vedoucí pracovníky i HR oddělení. Proces je iniciován samotným pohovorem, kde probíhá kontrola odborných kompetencí a profesní historie uchazeče. Kritickým bodem procesu je nutnost fyzického doložení všech zákonem vyžadovaných dokladů (vzdělání, praxe, bezúhonnost), přičemž tato informace přišla e-mailem. V případě jejich absence dochází k okamžitému pozastavení procesu, což v praxi často vede k prodlevám v obsazování pozic.
+
+Po akceptaci kandidáta následuje fáze sběru osobních údajů a podpis souhlasu s jejich zpracováním (GDPR), což je nezbytný předpoklad pro evidenci v personálním systému a generování identifikačního čísla pracovníka.
+
+Závěrečná fáze procesu vyžaduje lékařskou prohlídku kandidáta, po které musí vlastnoručně dodat personálnímu oddělení a také zahrnuje přípravu pracovní smlouvy, která vyžaduje schválení a vlastnoruční podpis příslušného náměstka.
+
+#figure(
+table(
+columns: 2,
+stroke: 0.5pt + black,
+fill: (col, row) => {
+if col == 0 { rgb("#cecece") }
+
+else { white }
+},
+align: (left, left),
+[Identifikátor procesu:], [P03],
+[Název procesu:], [Pohovor a preonboarding],
+[Zákazník:], [Vedoucí dílčího oddělení nemocnice],
+[Vlastník procesu:], [Zaměstnanec HR, vedoucí dílčího oddělení],
+[Účel:], [Administrativní zajištění nástupu a podpis smluvní dokumentace],
+[Produkt:], [Smluvně zajištěný nový zaměstnanec],
+[Technické prostředky:], [E-mail, telefon, listinné dokumenty],
+[Metrika:], [Rychlost vyhotovení a finalizace smluvní dokumentace],
+[Nedostatky:], [manuální přenos dat mezi vedoucím a HR, riziko prodlev při schvalování dokumentace],
+),
+caption: [Proces P03 - Pohovor a preonboarding]
+) <tab:proces-p03>
+
+// #figure(
+// image(
+// "../procesy/p03_pohovor_preonboarding.svg",
+// width: 100%,
+// ),
+// caption: [Diagram BPMN znázorňující proces od pohovoru po seznámení s právy a povinnostmi]
+// ) obr:proces-p03
+
 
 === Proces zajištení vstupní agendy
+
 === Proces adaptace nových zaměstnanců
 
 == Identifikace problémů a úzkých míst<kapitola-identifikcea-problemu>
 Na základě analýzy současného stavu procesů náboru a adaptace v KZ, konzultací s HR pracovníky jednotlivých nemocnic a pozorování reálného průběhu procesů byly identifikovány následující klíčové problémy. Problémy jsou kategorizovány podle oblastí dopadu a doplněny o kvalitativní hodnocení závažnosti.
+
+#figure(
+  table(
+    columns: (auto, 1.5fr, auto, 2fr),
+    inset: 7pt,
+    align: horizon,
+    fill: (x, y) => if y == 0 { rgb("#cecece") } else { white },
+    stroke: 0.5pt + gray,
+    [ID], [Problém], [Závažnost], [Hlavní dopad],
+    [P1], [Tabulková a papírová agenda], [Vysoká], [Riziko ztráty dat, neefektivní práce],
+    [P2], [Chybějící evidence uchazečů], [Vysoká], [Ztráta kandidátů, nemožnost analytiky],
+    [P3], [Neexistující evidence zájemců], [Střední], [Ztráta potenciálních kandidátů],
+    [P4], [Absence auditní stopy], [Vysoká], [Právní rizika, GDPR, neschopnost auditu],
+    [P5], [Omezený reporting], [Střední], [Rozhodování bez datové opory],
+    [P6], [Komunikační smyčka], [Vysoká], [Prodloužení doby obsazení pozice],
+    [P7], [Manuální publikace], [Střední], [Časová náročnost, nekonzistence],
+    [P8], [Nestrukturované hodnocení], [Střední], [Subjektivní výběr],
+    [P9], [Nepřehledný stav vstupní agendy], [Vysoká], [Problémy při nástupu zaměstnance],
+    [P10], [Papírová adaptace], [Vysoká], [Nemožnost monitoringu a reportingu],
+  ),
+  caption: [Kvalitativní hodnocení závažnosti identifikovaných problémů]
+) <tab:zavaznost-problemu>
 
 TODO strukturovat možná do dvou kapitol potom? (Problémy v oblasti evidence a problemy v oblasti procesů?)
 P1: Neefektivní papírová a tabulková agenda.
@@ -165,4 +240,152 @@ R1: Multi-tenantní architektura
 R2: Veřejný kariérní portál
 R3: Interní administrační rozhraní 
 R4:Adaptační portál 
+
+== Požadavky na digitalizaci procesů
+Na základě provedené analýzy procesů a identifikovaných problémů (@kapitola-identifikcea-problemu) lze formulovat klíčové požadavky na digitalizaci procesů náboru a adaptace. Každý požadavek je odůvodněn vazbou na identifikované problémy.
+
+#figure(
+  table(
+    columns: (1fr, 2fr, 3fr, 3fr, 1fr),
+    inset: 7pt,
+    align: horizon,
+    fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
+    stroke: 0.5pt + gray,
+    [ID], [Požadavek], [Stručný popis], [Cíl], [Řeší],
+
+    [R1], [Multi-tenantní architektura], [Systém musí respektovat organizační strukturu KZ — odštěpné závody jako samostatní tenanti se sdílenou infrastrukturou a centrálním řízením], [Umožnit lokální operativu i centrální reporting], [P1, P2, P5],
+
+    [R2], [Veřejný kariérní portál], [Jednotný webový portál prezentující aktuální pracovní nabídky ze všech závodů KZ s možností online přihlášení a registrace zájemců], [Jednotný přístupový bod pro uchazeče, zlepšení employer brandingu], [P2, P3, P6, P7],
+
+    [R3], [Interní administrační rozhraní], [Webová aplikace pro správu inzerátů, evidenci uchazečů, řízení výběrového procesu, ověření kvalifikací a přípravu vstupní agendy], [Nahrazení tabulkové a e-mailové agendy centrálním systémem], [P1, P2, P4, P5, P6, P7, P8, P9],
+
+    [R4], [Adaptační portál], [Modul pro digitální správu adaptačních plánů s průběžným monitoringem, automatickými upomínkami a centrálním reportingem], [Nahrazení papírových adaptačních formulářů, umožnění průběžného monitoringu], [P1, P4, P5, P10],
+
+    [R5], [Integrace s NRZP], [Automatizované ověření odborné způsobilosti zdravotnických pracovníků prostřednictvím napojení na Národní registr zdravotnických pracovníků], [Eliminace manuálního ověřování kvalifikací, snížení rizika chyby], [P1, P4],
+
+    [R6], [Reporting a analytika], [Modul pro generování reportů a dashboardů o klíčových metrikách náborového procesu na úrovni závodů i celé organizace], [Datově podložené rozhodování managementu], [P5],
+  ),
+  caption: [Požadavky na digitalizaci a jejich vazba na identifikované problémy]
+) <tab:pozadavky-digitalizace>
+
 == Specifikace funkcionálních a nefunkcionálních požadavků
+Na základě formulovaných požadavků na digitalizaci (R1 až Rx) je v této sekci provedena jejich dekompozice na konkrétní funkcionální a nefunkcionální požadavky, které slouží jako vstup pro návrh softwarové architektury a implementaci systému.
+
+=== Funkcionální požadavky
+Funkcionální požadavky definují konkrétní chování systému, tedy co systém musí umožňovat svým uživatelům nebo jakých výstupů musí být schopen. Požadavky jsou kategorizovány podle oblastí systému a prioritizovány metodou MoSCoW (Must have, Should have, Could have, Won't have).
+
+#figure(
+  table(
+    columns: (auto, 2.5fr, auto, auto),
+    inset: 7pt,
+    align: left,
+    fill: (x, y) => if y == 0 { rgb("#cecece") } else { white },
+    stroke: 0.5pt + gray,
+    [ID], [Požadavek], [Priorita], [Vazba],
+
+    [F01], [Systém zobrazí veřejný seznam aktuálních pracovních nabídek ze všech odštěpných závodů KZ s možností filtrování podle závodu, kategorie pozice, typu úvazku a lokality], [Must], [R2],
+
+    [F02], [Uchazeč se může přihlásit na vybranou pozici prostřednictvím online formuláře s přiložením životopisu a dalších dokumentů], [Must], [R2],
+
+    [F03], [Systém umožní registraci zájemce o zaměstnání v KZ i bez vazby na konkrétní pozici (talent pool)], [Must], [R2, R3],
+
+    [F04], [Kariérní portál prezentuje informace o zaměstnavatelských benefitech, stipendijních programech a pracovním prostředí v KZ], [Should], [R2],
+
+    [F05], [Detail pracovní nabídky obsahuje strukturovaný popis pozice, požadavky na kvalifikaci, nabízené podmínky a kontaktní informace], [Must], [R2],
+  ),
+  caption: [Funkcionální požadavky — Kariérní portál]
+) <tab:fp-portal>
+
+
+#figure(
+  table(
+    columns: (auto, 2.5fr, auto, auto),
+    inset: 7pt,
+    align: horizon,
+    fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
+    stroke: 0.5pt + gray,
+    [ID], [Požadavek], [Priorita], [Vazba],
+
+    [TODO: máš to v poznámkách pod blaščáková]
+  ),
+  caption: [Funkcionální požadavky — Vstupní agenda a adaptace]
+) <tab:fp-adaptace>
+
+
+
+#figure(
+  table(
+    columns: (auto, 2.5fr, auto, auto),
+    inset: 7pt,
+    align: horizon,
+    fill: (x, y) => if y == 0 { rgb("#cecece") } else { white },
+    stroke: 0.5pt + gray,
+    [ID], [Požadavek], [Priorita], [Vazba],
+
+    [F20], [Systém umožní automatizované ověření odborné způsobilosti zdravotnických pracovníků prostřednictvím API napojení na NRZP], [Should], [R5],
+
+    [F21], [Systém upozorní náboráře v případě, že uchazeč nemá platný záznam v NRZP nebo jeho způsobilost je omezena], [Should], [R5],
+
+    [F22], [Systém eviduje výsledky ověření kvalifikací jako součást auditní stopy s časovým razítkem a identifikací zdroje ověření], [Must], [R3, R5],
+  ),
+  caption: [Funkcionální požadavky — Integrace a ověřování kvalifikací]
+) <tab:fp-integrace>
+
+
+#figure(
+  table(
+    columns: (auto, 2.5fr, auto, auto),
+    inset: 7pt,
+    align: horizon,
+    fill: (x, y) => if y == 0 { rgb("#cecece") } else { white },
+    stroke: 0.5pt + gray,
+    [ID], [Požadavek], [Priorita], [Vazba],
+
+    [F23], [Systém podporuje multi-tenantní model, kde každý odštěpný závod je samostatným tenantem s vlastními daty, uživateli a konfigurací], [Must], [R1],
+
+    [F24], [Uživatelé s rolí centrálního administrátora mají přístup k datům a reportům napříč všemi tenanty], [Must], [R1, R6],
+
+    [F25], [Systém poskytuje dashboardy s klíčovými metrikami (počet otevřených pozic, průměrná doba obsazení, poměr přihlášek/přijetí, stav adaptací) na úrovni závodu i celé organizace], [Should], [R6],
+
+    [F26], [Systém umožní export reportů do formátu PDF a CSV], [Could], [R6],
+  ),
+  caption: [Funkcionální požadavky — Reporting a multi-tenantní správa]
+) <tab:fp-reporting>
+
+
+
+=== Nefunkcionální požadavky
+
+Nefunkcionální požadavky definují kvalitativní vlastnosti systému, které nejsou přímo pozorovatelné jako konkrétní funkce, ale podstatně ovlivňují použitelnost, spolehlivost a udržitelnost systému.
+
+#figure(
+  table(
+    columns: (auto, auto, 2.5fr),
+    inset: 7pt,
+    align: horizon,
+    fill: (x, y) => if y == 0 { rgb("#cecece") } else { white },
+    stroke: 0.5pt + gray,
+    [ID], [Oblast], [Požadavek],
+
+    [NF01], [Bezpečnost], [Systém musí zajistit ochranu osobních údajů uchazečů a zaměstnanců v souladu s GDPR (nařízení 2016/679) a zákonem č. 110/2019 Sb. o zpracování osobních údajů],
+
+    [NF02], [Bezpečnost], [Autentizace uživatelů musí být zajištěna prostřednictvím protokolu OAuth 2.0 s integrací do existujícího SSO poskytovatele organizace],
+
+    [NF03], [Bezpečnost], [Systém musí implementovat přístup řízený rolemi (RBAC) s minimálně třemi úrovněmi — centrální administrátor, HR pracovník závodu, vedoucí oddělení],
+
+    [NF04], [Dostupnost], [Systém musí být dostupný minimálně DODEFINUJ VOLE času v pracovních dnech (DODEFINUJ VOLE)],
+
+    [NF05], [Výkon], [Odezva uživatelského rozhraní nesmí překročit 2 sekundy pro standardní operace (zobrazení seznamu, detail záznamu) při běžné zátěži],
+
+    [NF06], [Přístupnost], [Kariérní portál musí být responzivní a přístupný na mobilních zařízeních],
+
+    [NF07], [Nasaditelnost], [Systém musí být nasaditelný na infrastruktuře organizace (on-premise) prostřednictvím kontejnerizace (Docker)],
+
+    [NF08], [Udržitelnost], [Zdrojový kód musí být verzován v systému pro správu verzí (Git) a dokumentován v rozsahu umožňujícím předání jinému vývojovému týmu],
+
+    [NF09], [Lokalizace], [Veškerá uživatelská rozhraní musí být v českém jazyce; systém musí správně pracovat s českou diakritikou ve všech vrstvách (databáze, API, UI)],
+
+    [NF10], [Kompatibilita], [Kariérní portál musí být kompatibilní s aktuálními verzemi prohlížečů Chrome, Firefox, Safari a Edge],
+  ),
+  caption: [Nefunkcionální požadavky na systém]
+) <tab:nfp>
