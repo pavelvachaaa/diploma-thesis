@@ -56,7 +56,12 @@ Před zahájením digitalizace v KZ se správa uchazečů opírá o zažité pos
 
 Pro účely analýzy a následné digitalizace těchto procesů bylo provedeno jejich detailní mapování metodou strukturovaných rozhovorů s vedoucím personálního oddělení a s nábořáři pro jednotlivé odštěpné závody. Tito zaměstnanci poskytli jak formální dokumentaci (interní směrnice), tak slovní popis reálného průběhu procesů včetně neformálních postupů a praktických zkušeností.
 
-=== Inzerce volných pozice
+Pro zajištění terminologické konzistence jsou v této kapitole používány následující pojmy:
+- *Uchazeč* o zaměstnání je fyzická osoba, která reaguje na konkrétní zveřejněnou pracovní pozici a doručí zaměstnavateli svou přihlášku (životopis, motivační dopis nebo jinou formu reakce).
+- *Kandidát* je uchazeč, který prošel prvotním screeningem a byl vybrán do další fáze výběrového řízení (např. k osobnímu pohovoru nebo odbornému posouzení).
+- *Zájemce* o zaměstnání je osoba, která projeví zájem o zaměstnání v KZ bez vazby na konkrétní vyhlášenou pracovní pozici (tzv. talent pool).
+
+=== Proces inzerce volných pozice
 Aktuálně inzerce volných pracovních pozic je zajišťována prostřednictvím několika kanálů:
 
 - *Webové portály třetích stran* - Jobs.cz, Práce.cz (provozovatel LMC), portál MPSV
@@ -83,6 +88,8 @@ Každá z těchto platforem má vlastní strukturu dat a specifické požadavky 
 Neoptimální proces předávání informací mezi jednotlivými závody a centrálním HR oddělením společně s nízkou flexibilitou náborových procesů vedl k nekontrolovanému vzniku ad-hoc řešení. Několik odštěpných závodů vytvořilo vlastní neoficiální webové portály pro inzerci pracovních pozic, které nebyly centrálně schváleny ani spravovány. Tento rozptýlený proces s minimální transparentností a omezenou kontrolou vedoucího oddělení nad jednotlivými fázemi způsobuje frustaci a prodlužuje dobu obsazení pozice, což má přímý dopad na kvalitu poskytované péče a pracovní zatížení stávajících zaměstnanců oddělení.
 
  TODO: Možná refaktor a do tabulky přidát field Logika a zredukovat tak text? Ale feeluju, že je poteřba zminit detailně jaký je to pain pro HR a vedoucí
+
+ TODO2: Asi fakt zredukuji ten text
 #figure(
   table(
     columns: 2,
@@ -116,7 +123,7 @@ Neoptimální proces předávání informací mezi jednotlivými závody a centr
 ) <obr:proces-p01>
 
 
-=== Příjem a výběr potenciálních uchazečů
+=== Proces přijmu a výběru potenciálních kandidátu
 Fáze příjmu přihlášek je v současnosti poznamenána značnou škálou vstupních kanálů. Uchazeči reagují prostřednictvím pracovních portálů, e-mailů či osobních kontaktů na recepcích, což vyžaduje manuální konsolidaci dat náborářem do nestrukturovaných tabulek (MS Excel). Absence jednotné šablony a systematické konvence pro ukládání příloh v lokálních adresářích vede k nekonzistenci dat mezi jednotlivými pracovišti a komplikuje jejich následnou dohledatelnost.
 
 Prvotní screening uchazečů probíhá formou *manuálního* ověřování formálních kvalifikačních předpokladů. U zdravotnických pozic musí náborář v každém životopise vyhledávat specifické údaje o dosaženém vzdělání a odborné způsobilosti, což při absenci automatizovaných filtrů představuje časově náročnou rutinu. Tento proces je navíc zatížen subjektivním faktorem a rizikem přehlédnutí klíčových informací. Následné předávání užšího výběru vedoucím oddělení probíhá e-mailovou cestou, což často vede k vícečetným komunikačním iteracím a prodlužuje celkovou dobu výběrového řízení.
@@ -156,35 +163,40 @@ TODO: Domyslet formátování ať to nejde zbytečně na další stránky
   caption: [Diagram BPMN znázorňující proces od příjmutí přihlášky po pozvánku na pohovor]
 ) <obr:proces-p02>
 
-=== Proces náboru pracovníka
-Fáze osobního setkání a následného administrativního zajištění nástupu (preonboarding) je charakteristická vysokou mírou administrativní zátěže pro vedoucí pracovníky i HR oddělení. Proces je iniciován samotným pohovorem, kde probíhá kontrola odborných kompetencí a profesní historie uchazeče. Kritickým bodem procesu je nutnost fyzického doložení všech zákonem vyžadovaných dokladů (vzdělání, praxe, bezúhonnost), přičemž tato informace přišla e-mailem. V případě jejich absence dochází k okamžitému pozastavení procesu, což v praxi často vede k prodlevám v obsazování pozic.
+=== Proces náboru kandidáta
 
-Po akceptaci kandidáta následuje fáze sběru osobních údajů a podpis souhlasu s jejich zpracováním (GDPR), což je nezbytný předpoklad pro evidenci v personálním systému a generování identifikačního čísla pracovníka.
+Proces náboru pracovníka (P03) navazuje na ukončení procesu P02, který končí odesláním pozvánky kandidátovi k osobnímu pohovoru. Samotný pohovor tedy představuje iniciační bod tohoto procesu. Cílem procesu P03 je odborné posouzení kandidáta a splnění všech zákonných a interních podmínek nezbytných pro vznik pracovněprávního vztahu.
 
-Závěrečná fáze procesu vyžaduje lékařskou prohlídku kandidáta, po které musí vlastnoručně dodat personálnímu oddělení a také zahrnuje přípravu pracovní smlouvy, která vyžaduje schválení a vlastnoruční podpis příslušného náměstka.
+Pokud je po úspěšném absolvování pohovoru kandidát vyhodnocen jako vhodný pro obsazení pozice, tak se zahajuje administrativní část procesu vůči personálnímu a mzdovému oddělení. V současném stavu probíhá tento krok formou podání žádosti, ke které kandidát dokládá identifikační a osobní údaje a povinné dokumenty. Mezi tyto dokumenty patří zejména výpis z rejstříku trestů, doklady o dosaženém vzdělání a odborné kvalifikaci a další podklady vyžadované dle charakteru pracovní pozice. Úplnost a správnost těchto dokumentů je nezbytnou podmínkou pro pokračování procesu.
+
+Po předběžné kontrole dokumentace následuje zajištění vstupní lékařské prohlídky a absolvování vstupního školení v oblasti bezpečnosti a ochrany zdraví při práci. Tyto kroky jsou realizovány ještě před samotným vznikem pracovněprávního vztahu a představují nutné podmínky, jejichž splnění je předpokladem pro uzavření pracovní smlouvy.
+
+Teprve po úspěšném absolvování vstupní prohlídky a školení BOZP je připravena pracovní smlouva k podpisu. Podpisem pracovní smlouvy dochází ke vzniku pracovněprávního vztahu a proces náboru pracovníka je formálně ukončen.
 
 #figure(
-table(
-columns: 2,
-stroke: 0.5pt + black,
-fill: (col, row) => {
-if col == 0 { rgb("#cecece") }
+  table(
+    columns: 2,
+    stroke: 0.5pt + black,
+    fill: (col, row) => {
+      if col == 0 { rgb("#cecece") }  
+      else { white }
+    },
+    align: (left, left),
 
-else { white }
-},
-align: (left, left),
-[Identifikátor procesu:], [P03],
-[Název procesu:], [Pohovor a preonboarding],
-[Zákazník:], [Vedoucí dílčího oddělení nemocnice],
-[Vlastník procesu:], [Zaměstnanec HR, vedoucí dílčího oddělení],
-[Účel:], [Administrativní zajištění nástupu a podpis smluvní dokumentace],
-[Produkt:], [Smluvně zajištěný nový zaměstnanec],
-[Technické prostředky:], [E-mail, telefon, listinné dokumenty],
-[Metrika:], [Rychlost vyhotovení a finalizace smluvní dokumentace],
-[Nedostatky:], [manuální přenos dat mezi vedoucím a HR, riziko prodlev při schvalování dokumentace],
-),
-caption: [Proces P03 - Pohovor a preonboarding]
+    [Identifikátor procesu:], [P03],
+    [Název procesu:], [Pohovor a uzavření pracovního poměru],
+    [Zákazník:], [Vedoucí oddělení, PAM],
+    [Vlastník procesu:], [Vedoucí oddělení, personální a mzdové oddělení],
+    [Účel:], [Odborné posouzení kandidáta a splnění podmínek pro vznik pracovněprávního vztahu],
+    [Produkt:], [Podepsaná pracovní smlouva],
+    [Technické prostředky:], [Listinné dokumenty, e-mail, telefon],
+    [Metrika:], [Doba od pohovoru po podpis pracovní smlouvy],
+    [Nedostatky:], [Manuální sběr dokladů, vícestupňová administrativa, papírová komunikace],
+  ),
+  caption: [Proces P03 - Pohovor a uzavření pracovního poměru]
 ) <tab:proces-p03>
+
+
 
 // #figure(
 // image(
@@ -196,8 +208,66 @@ caption: [Proces P03 - Pohovor a preonboarding]
 
 
 === Proces zajištení vstupní agendy
+V okamžiku nástupu zaměstnance, tj. dokončení procesu P03, dochází k předání identifikační karty, která plní více rolí. Karta slouží jako identifikátor zaměstnance, současně je využívána pro fyzické vstupy do objektů a pro evidenci docházky. Zatímco samotná karta je vydávána při nástupu, konkrétní přístupová oprávnění (např. do vybraných prostor či systémů) jsou v části případů nastavována dodatečně podle potřeby pracoviště a rolí zaměstnance. Součástí vstupní agendy je dále zajištění prostředků pro elektronické podepisování. Organizace využívá autentizační token, přičemž u lékařů je jeho přidělení standardem, zatímco u ostatních kategorií zaměstnanců je poskytován na vyžádání. Z procesního hlediska jde o významný prvek, protože token přímo ovlivňuje schopnost zaměstnance podepisovat dokumentaci v digitálním prostředí.
+
+Následující část vstupní agendy probíhá na úrovni útvarové orientace. Vedoucí zaměstnanec seznamuje zaměstnance s pracovištěm, s organizačním uspořádáním oddělení, s pracovním a provozním řádem a s řízenou dokumentací vztahující se k vykonávané činnosti. V této části je typicky prováděno také nastavení pracovních návyků a očekávání vůči výkonu práce a zaměstnanec je formálně začleněn do pracovního týmu.
+
+#figure(
+  table(
+    columns: 2,
+    stroke: 0.5pt + black,
+    fill: (col, row) => {
+      if col == 0 { rgb("#cecece") }  
+      else { white }
+    },
+    align: (left, left),
+
+    [Identifikátor procesu:], [P04],
+    [Název procesu:], [Nástup zaměstnance a zajištění přístupových prostředků],
+    [Zákazník:], [Nový zaměstnanec],
+    [Vlastník procesu:], [PAM, IT, vedoucí oddělení],
+    [Účel:], [Zajištění připravenosti zaměstnance k výkonu práce],
+    [Produkt:], [Zaměstnanec vybaven ID kartou, přístupy a případně tokenem],
+    [Technické prostředky:], [ID karta, docházkový systém, autentizační token, interní IT systémy],
+    [Metrika:], [Doba od podpisu smlouvy po plnou funkčnost zaměstnance],
+    [Nedostatky:], [Oddělené nastavování oprávnění, ruční aktivace přístupů, absence jednotného postupu],
+  ),
+  caption: [Proces P04 - Nástup zaměstnance]
+) <tab:proces-p04>
+
 
 === Proces adaptace nových zaměstnanců
+Adaptační proces představuje systematické začlenění zaměstnance do pracovního a sociálního prostředí organizace a tvoří most mezi formálním nástupem a plnohodnotným výkonem práce. V prostředí #abbr("KZ", none) je adaptace klíčová zejména u zdravotnických pozic, kde je třeba v krátkém čase zajistit nejen organizační orientaci, ale také odborné zapracování v kontextu konkrétního pracoviště, jeho standardů a interních postupů.
+
+Obecná část adaptace probíhá v období zkušební doby a vztahuje se na všechny zaměstnance. Vedoucí zaměstnanec organizuje adaptaci, určuje školitele a zajišťuje vytvoření adaptačního plánu. Školitel následně provádí odborné vedení a mentorování zaměstnance, poskytuje průběžnou zpětnou vazbu a podílí se na hodnocení plnění adaptačního programu. Průběžná kontrola plnění adaptačního plánu a pravidelné hodnotící rozhovory umožňují včas identifikovat nedostatky, potřeby doškolení nebo nevhodné nastavení pracovního zařazení. Po ukončení adaptačního období je provedeno závěrečné vyhodnocení, jehož výstup je předán personálnímu oddělení k archivaci v osobním spisu zaměstnance.
+
+Odborně specifická část adaptace se týká zdravotnických pracovníků a reflektuje požadavky na výkon regulovaných povolání. U lékařů, zubních lékařů a farmaceutů má adaptační proces odborný charakter a může být navázán na systém vzdělávání (poskytuje společnost Vema). Školitel v této části plní roli konzultanta, který vede účastníka adaptace, průběžně hodnotí jeho dovednosti a podílí se na závěrečném pohovoru. U NLZP je adaptace zaměřena na ověření praktických dovedností, osvojení standardů pracoviště a postupné dosahování samostatnosti v rámci vykonávané profese. Délka odborné adaptace se liší podle typu pracoviště a předchozí praxe zaměstnance a může být individuálně upravena podle průběžných výsledků.
+
+V současném stavu je adaptační proces ve značné míře realizován prostřednictvím papírových plánů a záznamů. To omezuje možnost průběžného monitoringu, vytváření auditní stopy a centrálního reportingu o stavu adaptací napříč jednotlivými odštěpnými závody.
+
+#figure(
+  table(
+    columns: 2,
+    stroke: 0.5pt + black,
+    fill: (col, row) => {
+      if col == 0 { rgb("#cecece") }  
+      else { white }
+    },
+    align: (left, left),
+
+    [Identifikátor procesu:], [P05],
+    [Název procesu:], [Adaptační proces zaměstnance],
+    [Zákazník:], [Vedoucí oddělení, zaměstnanec],
+    [Vlastník procesu:], [Vedoucí zaměstnanec, školitel],
+    [Účel:], [Začlenění zaměstnance do pracovního a odborného prostředí],
+    [Produkt:], [Plně adaptovaný zaměstnanec],
+    [Technické prostředky:], [Adaptační formuláře, hodnotící pohovory],
+    [Metrika:], [Míra setrvání po zkušební době, fluktuace],
+    [Nedostatky:], [Papírová dokumentace, chybějící monitoring, slabý reporting],
+  ),
+  caption: [Proces P05 - Adaptace zaměstnance]
+) <tab:proces-p05>
+
 
 == Identifikace problémů a úzkých míst<kapitola-identifikcea-problemu>
 Na základě analýzy současného stavu procesů náboru a adaptace v KZ, konzultací s HR pracovníky jednotlivých nemocnic a pozorování reálného průběhu procesů byly identifikovány následující klíčové problémy. Problémy jsou kategorizovány podle oblastí dopadu a doplněny o kvalitativní hodnocení závažnosti.
@@ -224,6 +294,10 @@ Na základě analýzy současného stavu procesů náboru a adaptace v KZ, konzu
   caption: [Kvalitativní hodnocení závažnosti identifikovaných problémů]
 ) <tab:zavaznost-problemu>
 
+
+TODO: Tohle sem pak nějak zařadit Koza možná dodá i excel k tomu
+Další nároky na náborový a adaptační proces klade vysoká personální dynamika s průměrem 110 nástupů měsíčně (v sezónních špičkách až 180), zahrnující typicky 10 LZ, 50 NLZP a 50 THP/D pracovníků. Související masivní administrativa spojená se sběrem osobních dotazníků, kontrolou odborných kvalifikací a organizací povinných školení je aktuálně distribuována mezi odštěpné závody formou Excelových reportů a následně centrálně evidována v systému Vema.
+
 TODO strukturovat možná do dvou kapitol potom? (Problémy v oblasti evidence a problemy v oblasti procesů?)
 P1: Neefektivní papírová a tabulková agenda.
 P2: Chybějící centrální evidence uchazečů.
@@ -240,9 +314,6 @@ R1: Multi-tenantní architektura
 R2: Veřejný kariérní portál
 R3: Interní administrační rozhraní 
 R4:Adaptační portál 
-
-== Požadavky na digitalizaci procesů
-Na základě provedené analýzy procesů a identifikovaných problémů (@kapitola-identifikcea-problemu) lze formulovat klíčové požadavky na digitalizaci procesů náboru a adaptace. Každý požadavek je odůvodněn vazbou na identifikované problémy.
 
 #figure(
   table(
