@@ -12,7 +12,7 @@
 
   presentation: (
     append_thanks: true,
-    wide: false,
+    wide: true,
     first_heading_is_fullpage: true,
   ),
   author: [Bc. Pavel Vácha],
