@@ -197,15 +197,14 @@ Teprve po úspěšném absolvování vstupní prohlídky a školení BOZP je př
 ) <tab:proces-p03>
 
 
-
-// #figure(
-// image(
-// "../procesy/p03_pohovor_preonboarding.svg",
-// width: 100%,
-// ),
-// caption: [Diagram BPMN znázorňující proces od pohovoru po seznámení s právy a povinnostmi]
-// ) obr:proces-p03
-
+#figure(
+  image(
+    "../procesy/p03_prijmuti_a_pohovor.svg",
+     width: 100%, 
+     
+  ),
+  caption: [Diagram BPMN znázorňující proces od pohovoru po uzavření pracovního poměru]
+) <obr:proces-p03>
 
 === Proces zajištení vstupní agendy
 V okamžiku nástupu zaměstnance, tj. dokončení procesu P03, dochází k předání identifikační karty, která plní více rolí. Karta slouží jako identifikátor zaměstnance, současně je využívána pro fyzické vstupy do objektů a pro evidenci docházky. Zatímco samotná karta je vydávána při nástupu, konkrétní přístupová oprávnění (např. do vybraných prostor či systémů) jsou v části případů nastavována dodatečně podle potřeby pracoviště a rolí zaměstnance. Součástí vstupní agendy je dále zajištění prostředků pro elektronické podepisování. Organizace využívá autentizační token, přičemž u lékařů je jeho přidělení standardem, zatímco u ostatních kategorií zaměstnanců je poskytován na vyžádání. Z procesního hlediska jde o významný prvek, protože token přímo ovlivňuje schopnost zaměstnance podepisovat dokumentaci v digitálním prostředí.
@@ -234,6 +233,17 @@ Následující část vstupní agendy probíhá na úrovni útvarové orientace.
   ),
   caption: [Proces P04 - Nástup zaměstnance]
 ) <tab:proces-p04>
+
+
+#figure(
+  image(
+    "../procesy/p04_vstupni_agenda.svg",
+     width: 100%, 
+     
+  ),
+  caption: [Diagram BPMN znázorňující proces od nového pracovního poměru po přípravu zaměstnance k výkonu práce]
+) <obr:proces-p04>
+
 
 
 === Proces adaptace nových zaměstnanců
@@ -267,6 +277,15 @@ V současném stavu je adaptační proces ve značné míře realizován prostř
   ),
   caption: [Proces P05 - Adaptace zaměstnance]
 ) <tab:proces-p05>
+
+#figure(
+  image(
+    "../procesy/p05_adaptace.svg",
+     width: 100%, 
+     
+  ),
+  caption: [Diagram BPMN znázorňující proces od připraveného zaměstnance až po adaptovaného zaměstnance]
+) <obr:proces-p05>
 
 
 == Identifikace problémů a úzkých míst<kapitola-identifikcea-problemu>
