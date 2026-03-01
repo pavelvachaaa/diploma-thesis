@@ -1,24 +1,23 @@
 #import "../template/abbreviations.typ": abbr
 
-== Východiska a cíl dalšího rozvoje
-Návrh dalšího směřování vývoje navazuje na výsledky analýzy, architektonického návrhu, implementace, nasazení a uživatelského ověření systému. Cílem této kapitoly je definovat realistickou rozvojovou trajektorii, která zachová procesní přínos řešení pro #abbr("KZ", none), sníží provozní rizika a současně vytvoří předpoklady pro dlouhodobou škálovatelnost.
+Tato kapitola se zabývá návrhem dalšího směřování vývoje navazuje na výsledky analýzy, architektonického návrhu, implementace, nasazení a uživatelského ověření systému. Cílem této kapitoly je definovat realistickou rozvojovou trajektorii, která zachová procesní přínos řešení pro #abbr("KZ", none), sníží provozní rizika a současně vytvoří předpoklady pro dlouhodobou škálovatelnost.
 
-Navrhovaný rozvoj respektuje tři klíčové principy. Prvním je kontinuita business hodnoty, tedy preference kroků s přímým dopadem na náborovou a adaptační efektivitu. Druhým je architektonická konzistence, tj. rozvoj bez narušení návrhových kontraktů definovaných v kapitole 4. Třetím je provozní bezpečnost, která vyžaduje, aby nové funkcionality byly zaváděny inkrementálně a s průběžným měřením dopadů.
+Navrhovaný rozvoj respektuje tři klíčové principy. Prvním je kontinuita business hodnoty, tedy preference kroků s přímým dopadem na náborovou a adaptační efektivitu. Druhým je architektonická konzistence, tj. rozvoj bez narušení návrhovů definovaným v kapitole 4. Třetím je provozní bezpečnost, která vyžaduje, aby nové funkcionality byly zaváděny inkrementálně a s průběžným měřením dopadů.
 
 == Prioritizační rámec rozvoje
-Pro potřeby plánování byl další vývoj rozdělen do tří horizontů: krátkodobého (stabilizace a konsolidace), střednědobého (funkční rozšíření a vyšší automatizace) a dlouhodobého (strategická evoluce platformy). Toto členění umožňuje oddělit okamžitě realizovatelné kroky od změn, které vyžadují širší organizační nebo integrační připravenost.
+Pro potřeby plánování byl další vývoj rozdělen do tří horizontů. Do krátkodobého (stabilizace a konsolidace), střednědobého (funkční rozšíření a vyšší automatizace) a dlouhodobého (strategická evoluce platformy). Toto členění umožňuje oddělit okamžitě realizovatelné kroky od změn, které vyžadují širší organizační nebo integrační připravenost.
 
 Prioritizace rozvojových témat vychází z vazby na požadavky R1-R6 a NF01-NF12. Nejvyšší prioritu mají oblasti, které současně posilují provozní stabilitu (NF04, NF05), bezpečnost a auditovatelnost (NF01, NF11) a datově podložené řízení procesů (R6). Do stejné priority spadá i stabilizace distribuované AI vrstvy, protože její dostupnost přímo ovlivňuje část klíčových funkcí systému.
 
 == Krátkodobý horizont (0-6 měsíců)
-Krátkodobá etapa by měla být zaměřena primárně na stabilizaci produkčního provozu a odstranění nejednoznačností mezi návrhem a provozní realitou. První prioritou je sjednocení observability kontraktu napříč aplikační a AI vrstvou, zejména rozšíření metrického pokrytí backendu, `cv-processor` a `job-processor` tak, aby byly všechny kritické toky měřitelné jednotným způsobem. Tím vznikne předpoklad pro přesnější řízení dostupnosti a výkonu na základě trendových dat místo ad hoc diagnostiky.
+Krátkodobá etapa by měla být zaměřena primárně na stabilizaci produkčního provozu a odstranění nejednoznačností mezi návrhem a provozní realitou. První prioritou je sjednocení observability napříč aplikační a AI vrstvou, zejména rozšíření metrického pokrytí backendu, `cv-processor` a `job-processor` tak, aby byly všechny kritické toky měřitelné jednotným způsobem. Tím vznikne předpoklad pro přesnější řízení dostupnosti a výkonu na základě trendových dat místo ad hoc diagnostiky.
 
 Druhou prioritou je formalizace provozního modelu distribuované AI infrastruktury s GPU akcelerací (NVIDIA A10, 24 GB VRAM). V této etapě je vhodné standardizovat pravidla restartu služeb, timeout/retry politiku integračních volání, kapacitní limity front a explicitní fallback scénáře pro stav, kdy AI uzel není dostupný. Cílem není maximalizace funkční šíře, ale predikovatelné chování systému při běžných i degradačních stavech.
 
 Třetí oblastí krátkodobého rozvoje je bezpečnostní a provozní hygiena prostředí. Zahrnuje zejména zpřísnění správy tajných údajů, pravidelnou rotaci přístupových klíčů, omezení přístupu ke konfiguračním artefaktům a systematické ověřování obnovitelnosti záloh. Tyto kroky mají vysoký přínos vzhledem k nízké implementační náročnosti a přímo podporují požadavky NF01, NF07 a NF11.
 
 == Střednědobý horizont (6-18 měsíců)
-Ve střednědobé etapě je vhodné akcentovat funkční rozšíření systému v oblastech s nejvyšším dopadem na procesní efektivitu. První linií je rozvoj pokročilé analytiky a reportingu, tj. rozšíření dashboardů o prediktivní a srovnávací metriky na úrovni závodů, oddělení a typů pozic. Tím se posílí schopnost managementu vyhodnocovat průchodnost náborového funnelu a kvalitu adaptačních programů v čase.
+Ve střednědobé etapě je vhodné se zaměřit na funkční rozšíření systému v oblastech s nejvyšším dopadem na procesní efektivitu. První linií je rozvoj pokročilé analytiky a reportingu, tj. rozšíření dashboardů o prediktivní a srovnávací metriky na úrovni závodů, oddělení a typů pozic. Tím se posílí schopnost managementu vyhodnocovat průchodnost náborového funnelu a kvalitu adaptačních programů v čase.
 
 Druhou linií je dokončení integračního potenciálu systému, zejména ve vazbě na externí registry a navazující interní agendy. Zde je klíčové zachovat anti-corruption princip a preferovat kontraktově řízené integrace, aby rozvoj nevedl k přílišné vazbě doménového modelu na konkrétní externí API. Tento přístup udrží nízkou integrační křehkost i při změnách třetích stran.
 
@@ -27,7 +26,7 @@ Třetí linií je zvýšení míry automatizace vstupní agendy a adaptace. Prak
 == Dlouhodobý horizont (18+ měsíců)
 Dlouhodobý rozvoj by měl být veden jako řízená evoluce architektury podle reálných provozních dat. Pokud bude dlouhodobě potvrzena nerovnoměrná zátěž nebo odlišný release rytmus některých domén, lze zvážit postupnou extrakci vybraných částí modulárního monolitu do hybridního modelu. Tento krok však dává smysl pouze při splnění podmínky, že přínos vyšší autonomnosti převáží nárůst integrační a provozní složitosti.
 
-Současně je vhodné připravit vícevrstvý model provozní odolnosti AI části, tj. scénáře pro škálování inference kapacity, případnou redundanci AI uzlu a oddělení latenčně citlivých interaktivních úloh od dávkových výpočtů. V dlouhodobém výhledu může tato oblast výrazně ovlivnit kvalitu uživatelské zkušenosti i celkové provozní náklady.
+Současně je vhodné připravit vícevrstvý model provozní odolnosti AI části zmíněné výše. (TODO: Dát odkaz o kapitolu výše)
 
 Strategickým směrem je také rozvoj datového governance rámce. Se zvyšujícím se objemem historických dat roste význam standardizace datových definic, kvality metadat a pravidel přístupu k analytickým datům. Bez těchto pravidel by postupně klesala konzistence manažerských výstupů a snižovala se důvěryhodnost rozhodování založeného na datech.
 
