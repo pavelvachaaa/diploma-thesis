@@ -58,7 +58,7 @@ Při hodnocení existujících řešení byla zohledněna kritéria pokrytí po�
 = Implementace systému
 #include "chapters/implementation.typ"
 
-= Nasazení do NĚJAKÉHO prostředí
+= Nasazení systému do cílového prostředí
 #include "chapters/deployment.typ"
 
 = Uživatelské testování a zpětná vazba

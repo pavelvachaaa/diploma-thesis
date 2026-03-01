@@ -1,0 +1,22 @@
+@startuml
+skinparam shadowing false
+actor "Operátor" as Ops
+participant "deploy-compose.sh" as Script
+participant "Docker Compose" as Compose
+database "PostgreSQL" as DB
+participant "Migration service" as Mig
+participant "hr-backend" as Api
+participant "AI server\n(job-processor, cv-processor)" as AINode
+
+Ops -> Script: Spuštění nasazení
+Script -> Compose: build hr-backend, migration
+Script -> Compose: up -d db
+Compose -> DB: healthcheck ready
+Script -> Compose: up migration --exit-code-from migration
+Compose -> Mig: execute db:migrate
+Mig -> DB: schéma upgrade
+Script -> Compose: up -d hr-backend rabbitmq
+Compose -> Api: start application
+Api -> AINode: kontrola dostupnosti AI endpointů
+Script -> Compose: ps a základní verifikace
+@enduml

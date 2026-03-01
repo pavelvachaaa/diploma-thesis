@@ -1,0 +1,16 @@
+@startuml
+skinparam shadowing false
+participant "Aplikační služba" as APP
+participant "Sběrač metrik/logů" as SCR
+participant "Logový backend" as LOG
+participant "Metrický backend" as MET
+participant "Grafana" as GF
+actor "Operátor" as OPS
+
+APP -> SCR: 1) Logový a metrický signál
+SCR -> LOG: 2) Přenos log streamu
+SCR -> MET: 3) Přenos/scrape metrik
+LOG -> GF: 4) Dotazy nad logy
+MET -> GF: 5) Dotazy nad metrikami
+GF -> OPS: 6) Dashboardy a alerting
+@enduml

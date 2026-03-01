@@ -1,0 +1,26 @@
+@startuml
+left to right direction
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+rectangle "Transportní vrstva" as Routes
+rectangle "Politiky a middleware" as MW
+rectangle "Aplikační vstupní body" as Ctrl
+rectangle "Doménové služby" as Services
+rectangle "Perzistence / repository" as Repo
+rectangle "Integrační adaptéry" as Integr
+rectangle "Datová vrstva" as DB
+rectangle "Externí služby" as External
+rectangle "Kompoziční vrstva" as DI
+
+Routes --> MW
+MW --> Ctrl
+Ctrl --> Services
+Services --> Repo
+Services --> Integr
+Repo --> DB
+Integr --> External
+DI ..> Services
+DI ..> Repo
+@enduml

@@ -1,0 +1,54 @@
+@startuml
+left to right direction
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Uživatelé\n(HR, vedoucí, zaměstnanci, uchazeči)" as Users
+rectangle "Prezentační vrstva\n(frontend portály)" as FE
+
+cloud "Publikační vrstva\n(reverzní proxy / URL routing)" as Edge
+
+package "Aplikační stack\n(hiring_backend)" {
+  rectangle "hr-backend" as API
+  rectangle "migration" as MIG
+  database "PostgreSQL\n(pgvector)" as DB
+  rectangle "SeaweedFS\n(S3-compatible)" as S3
+  queue "RabbitMQ" as MQ
+}
+
+node "AI výpočetní server\n(samostatný host)" as AIHOST {
+  rectangle "cv-processor" as CVP
+  rectangle "job-processor" as JOBP
+  rectangle "Ollama\nGPU NVIDIA A10 24 GB" as OLLAMA
+}
+
+package "Monitoring stack\n(service-monitoring)" {
+  rectangle "Promtail" as PT
+  rectangle "Loki" as LOKI
+  rectangle "Prometheus" as PROM
+  rectangle "Grafana" as GRAF
+}
+
+Users --> FE
+FE --> Edge
+Edge --> API
+
+MIG --> DB
+API --> DB
+API --> S3
+API <--> MQ
+API <--> JOBP : HTTP/SSE (AI chat)
+CVP <--> MQ : async events
+CVP --> S3 : download CV
+CVP --> OLLAMA : extract/evaluate/embed
+JOBP --> OLLAMA : generation/refinement
+
+API ..> PT : logy (label logging=promtail)
+PT --> LOKI
+PROM --> API : scrape /metrics (cílově)
+PROM --> GRAF
+LOKI --> GRAF
+
+DB -[hidden]- S3
+@enduml

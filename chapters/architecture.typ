@@ -1,1 +1,0 @@
-návrh sw arch

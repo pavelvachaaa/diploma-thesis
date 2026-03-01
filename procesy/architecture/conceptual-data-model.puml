@@ -1,0 +1,29 @@
+@startuml
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+
+entity "ORGANIZATION" as org
+entity "JOB_POSTING" as posting
+entity "APPLICATION" as app
+entity "ATTACHMENT" as att
+entity "QUALIFICATION_CHECK" as qcheck
+entity "EMPLOYEE" as emp
+entity "ONBOARDING_CASE" as ocase
+entity "ONBOARDING_STEP" as ostep
+entity "USER" as usr
+entity "MEMBERSHIP" as mem
+entity "AUDIT_EVENT" as audit
+entity "METRIC_SNAPSHOT" as metric
+
+org ||--o{ posting
+org ||--o{ ocase
+posting ||--o{ app
+app ||--o{ att
+app ||--o{ qcheck
+emp ||--o{ ocase
+ocase ||--o{ ostep
+usr ||--o{ mem
+usr ||--o{ audit
+org ||--o{ metric
+@enduml

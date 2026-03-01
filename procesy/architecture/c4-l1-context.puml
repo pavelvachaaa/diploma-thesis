@@ -1,0 +1,44 @@
+@startuml
+left to right direction
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Uchazeč" as Candidate
+actor "Nový zaměstnanec" as Employee
+actor "HR pracovník" as HR
+actor "Vedoucí oddělení" as Manager
+actor "Centrální administrátor" as CentralAdmin
+
+rectangle "Veřejný kariérní portál" as Portal
+rectangle "Interní rozhraní" as AdminUI
+rectangle "Platforma náboru a adaptace" as Core
+
+rectangle "SSO / identitní služba" as Identity
+rectangle "NRZP (cílová integrace)" as Registry
+rectangle "Notifikační kanály" as Notify
+rectangle "Observability vrstva" as Obs
+
+node "AI výpočetní server" as AINode {
+  rectangle "cv-processor" as CVP
+  rectangle "job-processor" as JOBP
+  rectangle "Ollama (NVIDIA A10 24 GB)" as OLLAMA
+}
+
+Candidate --> Portal
+Employee --> Portal
+HR --> AdminUI
+Manager --> AdminUI
+CentralAdmin --> AdminUI
+
+Portal --> Core
+AdminUI --> Core
+Core --> Identity
+Core --> Registry
+Core --> JOBP : HTTP/SSE
+Core --> CVP : RabbitMQ events
+CVP --> OLLAMA
+JOBP --> OLLAMA
+Core --> Notify
+Core --> Obs
+@enduml

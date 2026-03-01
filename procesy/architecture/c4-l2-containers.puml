@@ -1,0 +1,53 @@
+@startuml
+left to right direction
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "Prezentační vrstva" {
+  rectangle "Kariérní portál" as FE1
+  rectangle "Interní HR/Admin\nrozhraní" as FE2
+}
+
+package "Aplikační vrstva" {
+  rectangle "Aplikační API" as API
+}
+
+package "Datová vrstva" {
+  database "Relační databáze" as DB
+  folder "Objektové úložiště\ndokumentů" as OBJ
+}
+
+package "Integrační vrstva" {
+  queue "Message broker" as MQ
+  rectangle "Externí integrační body" as EXT
+}
+
+node "AI server\n(separátní host)" as AINode {
+  rectangle "cv-processor" as CVP
+  rectangle "job-processor" as JOBP
+  rectangle "Ollama\nNVIDIA A10 24 GB" as OLLAMA
+}
+
+package "Observability vrstva" {
+  rectangle "Metrický backend" as PM
+  rectangle "Logový backend" as LOG
+  rectangle "Dashboarding\na alerting" as GF
+}
+
+FE1 --> API
+FE2 --> API
+API --> DB
+API --> OBJ
+API <--> MQ
+MQ <--> CVP
+API <--> EXT
+API <--> JOBP
+CVP --> OLLAMA
+JOBP --> OLLAMA
+
+API ..> PM : metriky
+API ..> LOG : logy
+PM --> GF
+LOG --> GF
+@enduml
