@@ -1,9 +1,9 @@
 #import "../template/abbreviations.typ": abbr
 
 == Metodika rešerše a hodnoticí rámec
-Rešerše dostupných softwarových řešení byla provedena jako strukturované komparativní posouzení produktů z kategorií #abbr("ATS", "Applicant Tracking System"), onboardingových platforem a integrovaných #abbr("HCM", "Human Capital Management") suite. Hodnocení vychází z veřejně dostupné produktové dokumentace výrobců a z oficiálních ceníků či produktových stránek. Stav zdrojů odpovídá datu *27. 2. 2026*.
+Rešerše dostupných softwarových řešení jsem provedl jako strukturované komparativní posouzení produktů z kategorií #abbr("ATS", "Applicant Tracking System"), onboardingových platforem a integrovaných #abbr("HCM", "Human Capital Management") suite. Hodnocení vychází z veřejně dostupné produktové dokumentace výrobců a z oficiálních ceníků či produktových stránek. Stav zdrojů odpovídá datu *21. 11. 2025*.
 
-Cílem kapitoly není určit obecně „nejlepší“ systém na trhu, ale identifikovat řešení nejvhodnější pro podmínky #abbr("KZ", none), tj. pro prostředí zdravotnického holdingu s požadavkem na on-premise provoz, auditovatelnost, multi-tenantní model a návaznost na specifické české procesy řízení odborné způsobilosti zdravotnických pracovníků.
+Cílem kapitoly není určit obecně nejlepší systém na trhu, ale identifikovat řešení nejvhodnější pro podmínky #abbr("KZ", none), tj. pro prostředí zdravotnického holdingu s požadavkem na on-premise provoz, auditovatelnost, multi-tenantní model a návaznost na specifické české procesy řízení odborné způsobilosti zdravotnických pracovníků.
 
 #figure(
   [
@@ -144,14 +144,14 @@ Specifickým požadavkem zdravotnického prostředí je napojení na ověřován
 == Identifikovaná omezení dostupných produktů a volba cílového přístupu
 Zjištění ukazuje, že hlavní limit dostupných produktů není v absenci jednotlivých funkcí, ale v nesouladu mezi jejich produktovou logikou a cílovou architekturou #abbr("KZ", none). První omezení představuje provozní model. Významná část funkčně robustních enterprise platforem je koncipována jako cloud-native služba, zatímco #abbr("KZ", none) požaduje provoz na vlastní infrastruktuře z důvodu interní governance, bezpečnostních politik a provozní autonomie.
 
-Druhé omezení se týká procesní kontinuity. U specializovaných ATS řešení je často vysoká kvalita náborové části, avšak adaptační proces bývá realizován v odděleném nástroji. Vzniká tak architektura „best of breed“, která je funkčně flexibilní, ale z pohledu provozu přináší rizika fragmentace dat, složitější správu identit a vyšší náklady na dlouhodobé integrační testování.
+Druhé omezení se týká procesní kontinuity. U specializovaných ATS řešení je často vysoká kvalita náborové části, avšak adaptační proces bývá realizován v odděleném nástroji. Vzniká tak architektura "best of breed", která je funkčně flexibilní, ale z pohledu provozu přináší rizika fragmentace dat, složitější správu identit a vyšší náklady na dlouhodobé integrační testování.
 
 Třetí omezení spočívá v doménové specificitě českého zdravotnictví. Hodnocené produkty jsou navrženy jako obecně použitelné HR platformy pro více odvětví a zemí. To je jejich komerční výhoda, ale současně limit v situaci, kdy organizace potřebuje cíleně implementovat lokální procesní logiku, například ověřování odborné způsobilosti, auditovatelný průchod zdravotnickou adaptací nebo detailní vazbu na interní předpisy jednotlivých závodů.
 
-Čtvrtým omezením je dlouhodobá provozní závislost na produktových roadmapách dodavatelů. U klíčových procesů, které jsou pro #abbr("KZ", none) strategické, představuje tato závislost významné riziko. Organizace by musela adaptovat interní postupy podle vývojového směru třetí strany, což je v rozporu s cílem řídit transformaci procesů primárně podle vlastních potřeb.
+Čtvrtým omezením je dlouhodobá provozní závislost na produktových plánech dodavatelů. U klíčových procesů, které jsou pro #abbr("KZ", none) strategické, představuje tato závislost významné riziko. Organizace by musela adaptovat interní postupy podle vývojového směru třetí strany, což je v rozporu s cílem řídit transformaci procesů primárně podle vlastních potřeb.
 
-Na základě uvedených zjištění je jako nejvhodnější zvolen cílový přístup založený na vývoji vlastního řešení. Tento přístup umožňuje navrhnout jednotný datový model pro nábor, vstupní agendu i adaptaci, implementovat multi-tenantní architekturu odpovídající holdingovému uspořádání a současně respektovat požadavek na on-premise provoz bez kompromisních výjimek.
+Na základě uvedených zjištění jsem zvolil jako nejvhodnější přístup založený na vývoji vlastního řešení. Tento přístup mi umožňuje navrhnout jednotný datový model pro nábor, vstupní agendu i adaptaci, implementovat multi-tenantní architekturu odpovídající holdingovému uspořádání a současně respektovat požadavek na on-premise provoz bez kompromisních výjimek.
 
-Vlastní řešení zároveň snižuje riziko, že kritické doménové požadavky budou odloženy kvůli externí produktové roadmapě. Integrace, které jsou pro #abbr("KZ", none) skutečně přínosné, lze realizovat selektivně a v řízeném rozsahu, například pro distribuci inzerce nebo výměnu dat s externími registry. Tím se kombinuje výhoda procesní suverenity s pragmatickým využitím existujícího softwarového ekosystému.
+Vlastní řešení zároveň snižuje riziko, že kritické doménové požadavky budou odloženy kvůli externí produktovému plánu. Integrace, které jsou pro #abbr("KZ", none) skutečně přínosné, lze realizovat selektivně a v řízeném rozsahu, například pro distribuci inzerce nebo výměnu dat s externími registry. Tím se kombinuje výhoda procesní suverenity s pragmatickým využitím existujícího softwarového ekosystému.
 
 Z metodického hlediska tedy tato kapitola nevede k absolutnímu závěru, že komerční produkty jsou obecně nevhodné, ale k závěru, že pro konkrétní kombinaci požadavků R1-R6 a NF01-NF12 je vlastní řešení v podmínkách #abbr("KZ", none) variantou s nejvyšší mírou strategické a provozní shody.
