@@ -1,5 +1,7 @@
 #import "../template/abbreviations.typ": abbr
 
+ TODO: ZMIGROVAL JSEM NA HYBRIDA TROCHU DŘÍVE NEŽ ZA 18 MESÍCU URPAVIT KAPITOLU A PŘIDAT ČÁST ZALOŽENOU NA FEEDBACKU
+
 Tato kapitola navazuje na výsledky analýzy, architektonického návrhu, implementace, nasazení a uživatelského ověření systému a zabývá se návrhem jeho dalšího směřování. Cílem je definovat realistickou rozvojovou trajektorii, která zachová procesní přínos řešení pro #abbr("KZ", none), sníží provozní rizika a současně vytvoří předpoklady pro dlouhodobou škálovatelnost.
 
 
