@@ -1,0 +1,42 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+
+actor "HR/Admin" as user
+participant "Backend API\n(hiring_backend)" as api
+database "PostgreSQL" as db
+participant "Outbox Worker" as worker
+queue "RabbitMQ" as mq
+participant "cv_processor" as cv
+participant "job_processor" as job
+participant "AI server\n(Ollama, A10 24 GB)" as ollama
+
+user -> api: create/update use case
+api -> db: BEGIN
+api -> db: write business data
+api -> db: insert side_effect_outbox
+api -> db: COMMIT
+
+loop polling
+  worker -> db: select pending outbox rows
+  db --> worker: rows
+  alt CV pipeline
+    worker -> mq: publish cv.publish.*
+    mq -> cv: consume event
+    cv -> ollama: analysis/embeddings
+    cv -> mq: publish cv.analyzed
+    mq -> api: consume result event
+    api -> db: persist cv_analyses
+  else Job pipeline
+    worker -> mq: publish job.embedding.requested
+    mq -> cv: consume embedding request
+    cv -> ollama: generate job embedding
+    cv -> mq: publish job.embedding.completed
+    mq -> api: consume result event
+    api -> db: persist job_embeddings
+  end
+  worker -> db: mark outbox as sent/dead
+end
+
+@enduml

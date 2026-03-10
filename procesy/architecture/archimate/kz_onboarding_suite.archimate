@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<archimate:model xmlns:archimate="http://www.archimatetool.com/archimate" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="KZ Onboarding Suite - Core" id="model-simplified" version="4.9.0">
+  
+  <folder name="Business" id="folder-biz" type="business">
+    <element xsi:type="archimate:BusinessActor" name="HR Specialist" id="elem-24"/>
+    <element xsi:type="archimate:BusinessActor" name="Job Seeker" id="elem-26"/>
+    <element xsi:type="archimate:BusinessFunction" name="Recruitment Management" id="elem-31"/>
+    <element xsi:type="archimate:BusinessProcess" name="Job Publication Process" id="elem-39"/>
+    <element xsi:type="archimate:BusinessProcess" name="Job Application Process" id="elem-40"/>
+  </folder>
+  
+  <folder name="Application" id="folder-app" type="application">
+    <element xsi:type="archimate:ApplicationComponent" name="hiring_backend" id="elem-55"/>
+    <element xsi:type="archimate:ApplicationComponent" name="onboarding.kzcr.eu" id="elem-56"/>
+    <element xsi:type="archimate:ApplicationComponent" name="cv_processor" id="elem-57"/>
+    <element xsi:type="archimate:ApplicationService" name="Admin Panel + Employee Portal" id="elem-68"/>
+  </folder>
+  
+  <folder name="Technology" id="folder-tech" type="technology">
+    <element xsi:type="archimate:Node" name="hr-backend container" id="elem-80"/>
+    <element xsi:type="archimate:Node" name="PostgreSQL 17 + pgvector" id="elem-84"/>
+    <element xsi:type="archimate:Node" name="Ollama (AI GPU)" id="elem-88"/>
+  </folder>
+  
+  <folder name="Relations" id="folder-rel" type="relations">
+    <element xsi:type="archimate:AssignmentRelationship" id="rel-100" source="elem-24" target="elem-39"/>
+    <element xsi:type="archimate:AssignmentRelationship" id="rel-106" source="elem-26" target="elem-40"/>
+    <element xsi:type="archimate:CompositionRelationship" id="rel-bc1" source="elem-31" target="elem-39"/>
+    <element xsi:type="archimate:CompositionRelationship" id="rel-bc2" source="elem-31" target="elem-40"/>
+    <element xsi:type="archimate:ServingRelationship" id="rel-130" source="elem-68" target="elem-31"/>
+    <element xsi:type="archimate:RealizationRelationship" id="rel-124" source="elem-56" target="elem-68"/>
+    <element xsi:type="archimate:FlowRelationship" id="rel-136" source="elem-56" target="elem-55"/>
+    <element xsi:type="archimate:FlowRelationship" id="rel-af1" source="elem-55" target="elem-57"/>
+    <element xsi:type="archimate:ServingRelationship" id="rel-155" source="elem-80" target="elem-55"/>
+    <element xsi:type="archimate:ServingRelationship" id="rel-159" source="elem-84" target="elem-55"/>
+    <element xsi:type="archimate:ServingRelationship" id="rel-165" source="elem-88" target="elem-57"/>
+  </folder>
+  
+  <folder name="Views" id="folder-views" type="diagrams">
+    <element xsi:type="archimate:ArchimateDiagramModel" name="Core Layered Architecture" id="view-simplified">
+      
+      <children xsi:type="archimate:DiagramModelGroup" id="grp-biz" name="Business Layer">
+        <bounds x="20" y="20" width="800" height="200"/>
+        
+        <children xsi:type="archimate:DiagramModelArchimateObject" id="obj-24" archimateElement="elem-24">
+          <bounds x="40" y="40" width="140" height="55"/>
+          <sourceConnections xsi:type="archimate:DiagramModelArchimateConnection" id="conn-100" source="obj-24" target="obj-39" archimateRelationship="rel-100"/>
+        </children>
+        <children xsi:type="archimate:DiagramModelArchimateObject" id="obj-26" archimateElement="elem-26">
+          <bounds x="40" y="120" width="140" height="55"/>
+          <sourceConnections xsi:type="archimate:DiagramModelArchimateConnection" id="conn-106" source="obj-26" target="obj-40" archimateRelationship="rel-106"/>
+        </children>
+        <children xsi:type="archimate:DiagramModelArchimateObject" id="obj-39" archimateElement="elem-39">
+          <bounds x="240" y="40" width="160" height="55"/>
+        </children>
+        <children xsi:type="archimate:DiagramModelArchimateObject" id="obj-40" archimateElement="elem-40">
+          <bounds x="240" y="120" width="160" height="55"/>
+        </children>
+        <children xsi:type="archimate:DiagramModelArchimateObject" id="obj-31" archimateElement="elem-31">
+          <bounds x="500" y="80" width="180" height="60"/>
+          <sourceConnections xsi:type="archimate:DiagramModelArchimateConnection" id="conn-bc1" source="obj-31" target="obj-39" archimateRelationship="rel-bc1"/>
+          <sourceConnections xsi:type="archimate:DiagramModelArchimateConnection" id="conn-bc2" source="obj-31" target="obj-40" archimateRelationship="rel-bc2"/>
+        </children>
+      </children>
+
+      <children xsi:type="archimate:DiagramModelGroup" id="grp-app" name="Application Layer">
+        <bounds x="20" y="250" width="800" height="250"/>
+        
+        <children xsi:type="archimate:DiagramModelArchimateObject" id="obj-56" archimateElement="elem-56">
+          <bounds x="240" y="40" width="160" height="55"/>
+          <sourceConnections xsi:type="archimate:DiagramModelArchimateConnection" id="conn-124" source="obj-56" target="obj-68" archimateRelationship="rel-124"/>
+          <sourceConnections xsi:type="archimate:DiagramModelArchimateConnection" id="conn-136" source="obj-56" target="obj-55" archimateRelationship="rel-136"/>
+        </children>
+        <children xsi:type="archimate:DiagramModelArchimateObject" id="obj-68" archimateElement="elem-68">
+          <bounds x="500" y="40" width="180" height="55"/>
+          <sourceConnections xsi:type="archimate:DiagramModelArchimateConnection" id="conn-130" source="obj-68" target="obj-31" archimateRelationship="rel-130"/>
+        </children>
+        <children xsi:type="archimate:DiagramModelArchimateObject" id="obj-55" archimateElement="elem-55">
+          <bounds x="240" y="140" width="160" height="55"/>
+          <sourceConnections xsi:type="archimate:DiagramModelArchimateConnection" id="conn-af1" source="obj-55" target="obj-57" archimateRelationship="rel-af1"/>
+        </children>
+        <children xsi:type="archimate:DiagramModelArchimateObject" id="obj-57" archimateElement="elem-57">
+          <bounds x="500" y="140" width="160" height="55"/>
+        </children>
+      </children>
+
+      <children xsi:type="archimate:DiagramModelGroup" id="grp-tech" name="Technology Layer">
+        <bounds x="20" y="530" width="800" height="200"/>
+        
+        <children xsi:type="archimate:DiagramModelArchimateObject" id="obj-84" archimateElement="elem-84">
+          <bounds x="40" y="50" width="160" height="55"/>
+          <sourceConnections xsi:type="archimate:DiagramModelArchimateConnection" id="conn-159" source="obj-84" target="obj-55" archimateRelationship="rel-159"/>
+        </children>
+        <children xsi:type="archimate:DiagramModelArchimateObject" id="obj-80" archimateElement="elem-80">
+          <bounds x="240" y="50" width="160" height="55"/>
+          <sourceConnections xsi:type="archimate:DiagramModelArchimateConnection" id="conn-155" source="obj-80" target="obj-55" archimateRelationship="rel-155"/>
+        </children>
+        <children xsi:type="archimate:DiagramModelArchimateObject" id="obj-88" archimateElement="elem-88">
+          <bounds x="500" y="50" width="160" height="55"/>
+          <sourceConnections xsi:type="archimate:DiagramModelArchimateConnection" id="conn-165" source="obj-88" target="obj-57" archimateRelationship="rel-165"/>
+        </children>
+      </children>
+      
+    </element>
+  </folder>
+</archimate:model>

@@ -1,0 +1,72 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BorderColor #333333
+  RoundCorner 12
+}
+skinparam package {
+  BorderColor #666666
+}
+
+package "Primarni adaptery (driving)" as driving {
+  component "Admin UI\n(onboarding.kzcr.eu)" as ui
+  component "Public API klient\n(kariera.kzcr.eu)" as public
+  component "Interni API volani" as internal
+}
+
+rectangle "Aplikacni vrstva (use-case orchestrace)" as app {
+  component "Controllers + Services" as services
+}
+
+rectangle "Domenove jadro (Hexagon)\nDDD + Ports" as domain {
+  component "Nabor" as hiring
+  component "Onboarding" as onboarding
+  component "Pohovory" as interviews
+  component "Notifikace" as notifications
+}
+
+package "Sekundarni adaptery (driven)" as driven {
+  component "PostgreSQL adapter" as db
+  component "SeaweedFS adapter" as s3
+  component "RabbitMQ adapter" as mq
+  component "Mailer adapter" as smtp
+  component "Audit adapter" as audit
+  component "AI integration adapter\n(job_processor, cv_processor)" as ai
+}
+
+ui --> services
+public --> services
+internal --> services
+
+services --> hiring
+services --> onboarding
+services --> interviews
+services --> notifications
+
+hiring --> db
+hiring --> mq
+hiring --> s3
+
+onboarding --> db
+onboarding --> s3
+
+interviews --> db
+interviews --> smtp
+interviews --> audit
+
+notifications --> db
+notifications --> mq
+
+mq --> ai
+
+legend left
+  Architektonicka interpretace:
+  - Domena neobsahuje technologicke detaily.
+  - Adaptery realizuji porty definovane domenou.
+  - Outbox + RabbitMQ tvori asynchronni integracni hranici.
+endlegend
+
+@enduml

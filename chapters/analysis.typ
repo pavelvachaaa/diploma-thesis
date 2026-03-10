@@ -13,9 +13,9 @@ Organizační struktura #abbr("KZ", none) využívá hybridní model. Jednotliv�
 Tato struktura holdingu, tvořená odštěpnými závody, přináší z hlediska digitalizace specifickou výzvu. Informační systém musí respektovat provozní potřeby jednotlivých nemocnic, které vystupují jako samostatné organizační jednotky, a zároveň umožnit centrální řízení a reporting na úrovni úseků náměstků holdingu (zejména pro ekonomiku, lidské zdroje a #abbr("IT", "Informační technologie")). V terminologii softwarové architektury se jedná o požadavek na _multi-tenantní_ řešení, kde každý odštěpný závod představuje samostatného _tenanta_ sdílejícího společnou infrastrukturu a metodiku definovanou centrálním vedením.
 
 === Specifika řízení lidských zdrojů ve zdravotnických organizací
-Řízení lidských zdrojů v prostředí #abbr("KZ", none) vykazuje řadu specifik, která jej odlišují od standardního korporátního modelu. Tato specifika přímo determinují požadavky na návrh a funkcionalitu personálního informačního systému, zejména v oblasti hlídání kvalifikací a zákonných termínů.
+Řízení lidských zdrojů v prostředí #abbr("KZ", none) vykazuje řadu specifik, která jej odlišují od standardního korporátního modelu. Tato specifika přímo determinují požadavky na návrh a funkcionalitu náborového informačního systému, zejména v oblasti hlídání kvalifikací a zákonných termínů.
 
-*Kategorizace pracovníků.* Zaměstnanci #abbr("KZ", none) spadají do čtyř základních klasifikačních kategorií, z nichž každá má odlišné požadavky na kvalifikaci, dokumentaci a průběh adaptačního procesu:
+Již samotná *kategorizace pracovníků* přináší svá specifika. Zaměstnanci #abbr("KZ", none) spadají do čtyř základních klasifikačních kategorií, z nichž každá má odlišné požadavky na kvalifikaci, dokumentaci a průběh adaptačního procesu.
 #figure(
   table(
     columns: (1.5fr, 2fr, 2fr),
@@ -45,7 +45,7 @@ Tato struktura holdingu, tvořená odštěpnými závody, přináší z hlediska
   caption: "Klasifikace pozic v KZ",
 )  <tab:zarazeni-zamestnancu>
 
-*Regulovaná odborná způsobilost.* Základním pilířem #abbr("HR", none) procesů v #abbr("KZ", none) je soulad s legislativním rámcem pro výkon zdravotnických povolání. Náborový proces a následná správa zaměstnanců se dělí podle dvou klíčových norem:
+Hlavním specifikem je, že se pohybujeme v rámci *regulované odborné způsobilosti.* Základním pilířem #abbr("HR", none) procesů v #abbr("KZ", none) je soulad s legislativním rámcem pro výkon zdravotnických povolání. Náborový proces a následná správa zaměstnanců se dělí podle dvou klíčových norem:
 
 - Zákon č. 95/2004 Sb. - upravuje získávání odborné a specializované způsobilosti u lékařů, zubních lékařů a farmaceutů. Systém musí sledovat průběh předatestační přípravy, platnost členství v ČLK/ČSK a zařazení do specializačních oborů.
 
@@ -53,18 +53,19 @@ Tato struktura holdingu, tvořená odštěpnými závody, přináší z hlediska
 
 Informační systém musí v rámci náborového a adaptačního modulu umožnit validaci dokladů o dosaženém vzdělání (diplomy, specializace) a následně sledovat platnost registrací v profesních komorách (ČLK, ČSK) či odbornou způsobilost pod dohledem.
 
-*Kontinuální nábor.* Na rozdíl od korporátního prostředí, kde je nábor často projektový (obsazení konkrétní pozice), zdravotnické organizace čelí kontinuální potřebě náboru způsobené přirozenou fluktuací personálu, demografickým vývojem (stárnutí lékařské populace) a celorepublikovým nedostatkem zdravotnických pracovníků, zejména v regionech mimo Prahu. @mzd2025TiskovkaNedostatek
+Dalším specifikem je *kontinuální nábor.* Na rozdíl od korporátního prostředí, kde je nábor často projektový (obsazení konkrétní pozice), zdravotnické organizace čelí kontinuální potřebě náboru způsobené přirozenou fluktuací personálu, demografickým vývojem (stárnutí lékařské populace) a celorepublikovým nedostatkem zdravotnických pracovníků, zejména v regionech mimo Prahu. @mzd2025TiskovkaNedostatek
 
 Informační systém by tedy měl být připraven tak, aby zajistil bezchybné, rychlé a legislativně bezpečné odbavení uchazečů.
 
-*Vícestupňový adaptační proces.* Adaptace nového zdravotnického pracovníka zahrnuje kromě standardních organizačních záležitostí (přidělení přístupů, školení #abbr("BOZP", "Bezpečnost a ochrana zdraví při práci")) také specifické odborné komponenty, seznámení s nemocničním informačním systémem, hygienickými standardy, postupy při mimořádných událostech a specifiky konkrétního pracoviště.
+Po odbavení uchazečů a přijmutí zaměstnance následuije ještě *vícestupňový adaptační proces.* Adaptace nového zdravotnického pracovníka zahrnuje kromě standardních organizačních záležitostí (přidělení přístupů, školení #abbr("BOZP", "Bezpečnost a ochrana zdraví při práci")) také specifické odborné komponenty, seznámení s nemocničním informačním systémem, hygienickými standardy, postupy při mimořádných událostech a specifiky konkrétního pracoviště.
 
 == Současný stav procesů náboru pracovníků<kapitola-soucasny-stav>
-Před zahájením digitalizace v KZ se správa uchazečů opírá o zažité postupy a běžné kancelářské nástroje, které však s postupným růstem organizace začínají narážet na své limity. V praxi to znamená, že většina agendy stojí a padá na "svaté dvojici" sdílených tabulek v Excelu a intenzivní e-mailové komunikaci. Tato technologická kombinace v praxi způsobuje, že nábor není plynulým procesem, ale spíše sérií izolovaných administrativních úkonů. TODO: Nazvat to něco jako administrativní ping pong mezi všemi
+Před zahájením digitalizace v KZ se správa uchazečů opírá o zažité postupy a běžné kancelářské nástroje, které však s postupným růstem organizace začínají narážet na své limity. V praxi to znamená, že většina agendy stojí a padá na "svaté dvojici" sdílených tabulek v Excelu a intenzivní e-mailové komunikaci. Tato technologická kombinace v praxi způsobuje, že nábor není plynulým procesem, ale spíše sérií izolovaných administrativních úkonů. 
 
-Pro účely analýzy a následné digitalizace těchto procesů bylo provedeno jejich detailní mapování metodou strukturovaných rozhovorů s vedoucím personálního oddělení a s nábořáři pro jednotlivé odštěpné závody. Tito zaměstnanci poskytli jak formální dokumentaci (interní směrnice), tak slovní popis reálného průběhu procesů včetně neformálních postupů a praktických zkušeností.
+Pro účely analýzy a následné digitalizace těchto procesů jsem provedl jejich detailní mapování metodou strukturovaných rozhovorů s vedoucím personálního oddělení a s nábořáři pro jednotlivé odštěpné závody. Tito zaměstnanci poskytli jak formální dokumentaci (interní směrnice), tak slovní popis reálného průběhu procesů včetně neformálních postupů a praktických zkušeností.
 
 Pro zajištění terminologické konzistence jsou v této kapitole používány následující pojmy:
+
 - *Uchazeč* o zaměstnání je fyzická osoba, která reaguje na konkrétní zveřejněnou pracovní pozici a doručí zaměstnavateli svou přihlášku (životopis, motivační dopis nebo jinou formu reakce).
 - *Kandidát* je uchazeč, který prošel prvotním screeningem a byl vybrán do další fáze výběrového řízení (např. k osobnímu pohovoru nebo odbornému posouzení).
 - *Zájemce* o zaměstnání je osoba, která projeví zájem o zaměstnání v KZ bez vazby na konkrétní vyhlášenou pracovní pozici (tzv. talent pool).
@@ -291,7 +292,7 @@ V současném stavu je adaptační proces ve značné míře realizován prostř
 
 
 == Identifikace problémů a úzkých míst<kapitola-identifikcea-problemu>
-Na základě analýzy současného stavu procesů náboru a adaptace v KZ, konzultací s HR pracovníky jednotlivých nemocnic a pozorování reálného průběhu procesů byly identifikovány následující klíčové problémy. Problémy jsou kategorizovány podle oblastí dopadu a doplněny o kvalitativní hodnocení závažnosti.
+Na základě analýzy současného stavu procesů náboru a adaptace v KZ, konzultací s HR pracovníky jednotlivých nemocnic a pozorování reálného průběhu procesů jsem identifikoval následující klíčové problémy. Problémy jsou kategorizovány podle oblastí dopadu a doplněny o kvalitativní hodnocení závažnosti.
 
 Identifikované problémy mají kumulativní charakter a v provozní praxi se vzájemně zesilují. Významným akceleračním faktorem je vysoká personální dynamika organizace, která dosahuje průměrně 110 nástupů měsíčně (v sezónních špičkách až 180). Typická měsíční struktura nástupů přitom zahrnuje přibližně 10 pracovníků kategorie #abbr("LZ", none), 50 #abbr("NLZP", none) a 50 #abbr("THP", "technickohospodářských pracovníků")/dělnických profesí. V takovém objemu se manuální administrativa stává kritickým omezením propustnosti celého procesu.
 
@@ -375,7 +376,7 @@ Požadavky R1-R6 představují minimální funkční rámec cílového systému.
 ) <tab:pozadavky-digitalizace>
 
 == Specifikace funkcionálních a nefunkcionálních požadavků
-Na základě formulovaných požadavků na digitalizaci (R1-R6) je v této sekci provedena jejich dekompozice na konkrétní funkcionální a nefunkcionální požadavky, které slouží jako vstup pro návrh softwarové architektury a implementaci systému.
+Na základě formulovaných požadavků na digitalizaci (R1-R6) jsem v této sekci provedl jejich dekompozici na konkrétní funkcionální a nefunkcionální požadavky, které slouží jako vstup pro návrh softwarové architektury a implementaci systému.
 
 === Funkcionální požadavky
 Funkcionální požadavky definují konkrétní chování systému, tedy co systém musí umožňovat svým uživatelům nebo jakých výstupů musí být schopen. Požadavky jsou kategorizovány podle oblastí systému a prioritizovány metodou MoSCoW (Must have, Should have, Could have, Won't have).

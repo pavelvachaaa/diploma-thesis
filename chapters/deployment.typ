@@ -1,52 +1,59 @@
 #import "../template/abbreviations.typ": abbr
 
-Kapitola popisuje nasazení navrženého systému do cílového provozního prostředí a navazuje na architektonická rozhodnutí kapitoly 4 a implementační důkazy kapitoly 5. Jejím cílem je prokázat, že navržená architektura je provozně realizovatelná v podmínkách #abbr("KZ", none), zejména ve vztahu k požadavku na on-premise provoz (NF07), dostupnost (NF04), auditovatelnost (NF11) a interoperabilitu (NF12).
-
-Text je orientován na provozní vrstvu systému: topologii nasazení, orchestrace kontejnerů, release postup, správu konfigurace, observability, zálohování a řízení provozních rizik.
+V této kapitole popisuji nasazení navrženého systému do cílového provozního prostředí. Navazuji na architektonická rozhodnutí kapitoly 4 a na implementační realizaci kapitoly 5. Cílem kapitoly je prokázat, že navržené řešení je provozně realizovatelné v podmínkách #abbr("KZ", none), zejména ve vztahu k požadavkům na on-premise provoz (NF07), dostupnost (NF04), auditovatelnost (NF11) a interoperabilitu (NF12).
 
 == Cílová topologie nasazení
-Nasazení je koncipováno jako distribuovaný model složený ze tří částí: aplikačního stacku, samostatného (TODO: to AI mi trhá oči, nějak to zlepšit) AI výpočetního uzlu a monitoring stacku. Aplikační stack zajišťuje transakční provoz náborových a adaptačních procesů, AI uzel zajišťuje výpočetně náročné jazykové úlohy a monitoring stack zajišťuje sběr logů, metrik a vizualizaci provozních indikátorů. Aplikační a monitoring část jsou propojeny přes dedikovanou Docker síť `monitoring_network`, AI uzel je provozován na separátním serveru a připojen integračními rozhraními.
+Nasazení koncipuji jako distribuovaný model složený ze tří částí. Aplikační vrstva, oddělená AI výpočetní vrstva a dohledová vrstva. Aplikační vrstva zajišťuje transakční provoz náborových a adaptačních procesů, AI vrstva realizuje výpočetně náročné jazykové úlohy a dohledová vrstva zajišťuje sběr logů, metrik a vizualizaci provozních indikátorů.
 
-TODO: Místo tohoto svg tam dát to z Archi
+TODO: Překreslit
 #figure(
   image(
     "../procesy/deployment/deployment-topology.svg",
     width: 100%,
   ),
-  caption: [Topologie nasazení aplikačního a monitoring stacku]
+  caption: [Topologie nasazení aplikační, AI a dohledové vrstvy],
 ) <obr:deployment-topology>
 
-Topologie na @obr:deployment-topology reflektuje princip oddělení odpovědností. Aplikační služby řeší business tok a perzistenci dat, AI uzel řeší inferenční a embedding úlohy a observability vrstva řeší provozní dohled. Tento model snižuje coupling mezi doménovou a výpočetní vrstvou a umožňuje škálovat AI část nezávisle na transakčním backendu.
+Topologie na @obr:deployment-topology vychází z principu oddělení odpovědností. Aplikační část drží business tok a datovou perzistenci, AI část drží inferenci a embeddingy a poslední část drží provozní dohled. Tím snižuji provázání mezi transakční a výpočetní vrstvou a umožňuji škálovat AI část nezávisle na API.
 
 == Kontejnerizační model a síťová segmentace
-Nasazení aplikační části je realizováno pomocí Docker Compose. Služby jsou rozděleny do interní sítě `app-network` a externě sdílené sítě `monitoring_network`. Interní síť slouží pro transakční komunikaci mezi API, databází, objektovým úložištěm a message brokerem. Monitoring síť je určena pro přenos provozních signálů směrem do stacku Grafana/Prometheus/Loki.
+Aplikační část nasazuji pomocí Docker Compose. TODO:
 
 #figure(
   [
     #set par(justify: false)
     #table(
-      columns: (1.2fr, 2fr, 1.7fr, 1.7fr),
+      columns: (1.2fr, 2fr, 1.7fr, 1.8fr),
       inset: 7pt,
       align: left,
       fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
       stroke: 0.5pt + gray,
       [Služba], [Role v nasazení], [Perzistence], [Síťový kontext],
-      [migration], [Jednorázové spuštění databázových migrací před startem API], [Bez perzistentního stavu], [app-network],
-      [hr-backend], [Aplikační API a integrační orchestrace], [Aplikační stav je v Postgresu a SeaWeedFS], [app-network + monitoring_network],
-      [PostgreSQL (pgvector)], [Transakční a analytická relační data], [Volume `pgdata`], [app-network],
+      [migration], [Jednorázové spuštění migrací schématu před startem API], [Bez perzistentního stavu], [app-network],
+      [hr-backend],
+      [Transakční API a integrační orchestrace],
+      [Aplikační stav je v PostgreSQL a SeaweedFS],
+      [app-network + monitoring_network],
+
+      [onboarding-frontend], [Webové rozhraní pro admin a zaměstnance], [Bez perzistentního stavu], [app-network],
+      [PostgreSQL (pgvector)], [Transakční i analytická relační data], [Volume `pgdata`], [app-network],
       [SeaweedFS], [S3-compatible úložiště dokumentů], [Volume `seaweedfs_data`], [app-network],
-      [RabbitMQ], [Asynchronní messaging pro integrační toky], [Volume `rabbitmq_data`], [app-network],
+      [RabbitMQ], [Asynchronní integrační messaging], [Volume `rabbitmq_data`], [app-network],
+      [Apache Tika], [TODO:], [Bez perzistentního stavu], [app-network],
+      [cv_processor], [TODO:ů], [Bez perzistentního stavu], [app-network],
+      [job_processor], [TODO:], [Bez perzistentního stavu], [app-network],
+      [audit_writer], [TODO:], [Bez perzistentního stavu], [app-network],
     )
   ],
-  caption: [Kontejnerové služby aplikačního stacku]
-) <tab:deployment-app-services>
+  caption: [Kontejnerové služby a jejich nasazovací role],
+) <tab:deployment-services>
 
-Podmíněné spouštění služeb je řízeno healthcheck závislostmi. Databáze a objektové úložiště musí být v dostupném stavu před startem API. Migration služba musí úspěšně dokončit běh před spuštěním aplikačního kontejneru. Tím je omezeno riziko startu aplikace proti nekompatibilnímu schématu databáze.
+Síťovou segmentaci řeším třemi vrstvami. Interní sítí `app-network` pro transakční komunikaci, externě sdílenou sítí `monitoring_network` pro dohled a sdílenou sítí `kz` pro oddělené compose soubory AI služeb. Tento model omezuje zbytečnou síťovou expozici a současně zachovává integrační prostupnost tam, kde ji potřebuji.
 
 == Distribuovaná AI výpočetní vrstva
-Vedle aplikačního stacku je provozována samostatná AI vrstva na odděleném serveru. Tuto vrstvu tvoří služby `job-processor` a `cv-processor`, které využívají lokálně dostupný runtime Ollama akcelerovaný GPU NVIDIA A10 s kapacitou 24 GB VRAM. Oddělení těchtí výpočtů na separátní host odpovídá cíli izolovat výpočetně náročné operace od transakční části systému a současně efektivně využít specializovaný hardware.
+Vrstva zpracování přirozeného jazyka je provozována na separátním serveru. Tuto vrstvu tvoří služby cv-processor a job-processor, které využívají lokální runtime Ollama akcelerovaný GPU NVIDIA A10 s kapacitou 24 GB VRAM. Oddělením výpočetně náročných modelových inference na samostatný host jsou tyto operace izolovány od transakční části aplikačního API.
 
-`cv-processor` je integrován asynchronně přes RabbitMQ: konzumuje události o nahraných dokumentech, zpracovává je pomocí Ollama a publikuje výsledky zpět do integrační fronty. Pro práci s dokumenty využívá objektové úložiště (SeaweedFS/S3-compatible), čímž je zachována datová kontinuita mezi aplikačním a AI uzlem. `job-processor` je integrován synchronně přes HTTP/SSE rozhraní a slouží pro interaktivní AI scénáře v administračním rozhraní.
+`cv-processor` je navázán na asynchronní tok přes RabbitMQ a zpracovává dokumentové události v pipeline objektové úložiště -> extrakce textu -> AI analýza -> publikace výsledku. `job-processor` je nasazen jako samostatná AI služba pro scénáře tvorby a úprav pracovních inzerátů. Obě služby používají stejný inferenční backend (Ollama), ale mají odlišný integrační účel.
 
 #figure(
   [
@@ -58,42 +65,45 @@ Vedle aplikačního stacku je provozována samostatná AI vrstva na odděleném 
       fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
       stroke: 0.5pt + gray,
       [Služba], [Role v AI vrstvě], [Integrační vazba], [Host],
-      [job-processor], [Interaktivní AI generování a úprava textu], [HTTP/SSE volání z backendu], [AI server (separátní)],
-      [cv-processor], [Asynchronní analýza CV a generování embeddingů], [RabbitMQ + SeaweedFS], [AI server (separátní)],
-      [Ollama], [LLM inference a embedding backend], [Lokální volání z processor služeb], [AI server (GPU A10 24 GB)],
+      [cv-processor],
+      [Asynchronní analýza CV a generování embeddingů],
+      [RabbitMQ + SeaweedFS + Tika],
+      [AI server (separátní)],
+
+      [job-processor], [AI podpora práce s obsahem inzerátů], [Aplikační integrační rozhraní], [AI server (separátní)],
+      [Ollama],
+      [LLM inference a embedding backend],
+      [Lokální volání z AI processor služeb],
+      [AI server (GPU A10 24 GB)],
     )
   ],
-  caption: [Služby distribuované AI výpočetní vrstvy]
+  caption: [Distribuovaná AI vrstva v nasazení],
 ) <tab:deployment-ai-services>
 
-== Release workflow a migrace schématu
-Release proces je v provozu standardizován skriptem `deploy-compose.sh`, který automatizuje build, kontrolu sítě, start databáze, provedení migrací a následné spuštění aplikačních služeb. Sekvence je navržena tak, aby minimalizovala provozní riziko během nasazení nové verze.
+== Startovací pořadí, release workflow a migrace schématu
+V provozu dodržuji explicitní startovací posloupnost, která omezuje riziko startu aplikace proti nekompatibilnímu stavu datové vrstvy.
+
+1. Nejprve startuji databázi a čekám na healthcheck.
+2. Následně spouštím migrační službu (`migration`) a vyžaduji její úspěšné dokončení.
+3. Teprve potom startuji `hr-backend`, `seaweedfs`, případně `rabbitmq` a AI profil.
 
 #figure(
   image(
     "../procesy/deployment/deployment-flow.svg",
     width: 100%,
   ),
-  caption: [Sekvenční tok release procesu]
+  caption: [Sekvenční tok release procesu],
 ) <obr:deployment-flow>
 
-Provozní logika release procesu na @obr:deployment-flow zajišťuje, že migrační krok je vyhodnocen jako (jak se tohle asi řekne česky) explicitní quality gate. Při neúspěchu migrace se nasazení ukončí a nová verze API není spuštěna. Tento mechanismus snižuje riziko nekonzistence mezi verzí aplikace a verzí datového schématu.
+V release toku na @obr:deployment-flow chápu migrační krok jako explicitní quality gate. Při neúspěchu migrace nasazení ukončuji a novou verzi API nespouštím. Tím snižuji riziko nekonzistence mezi binární verzí aplikace a verzí databázového schématu.
 
-Vzhledem k tomu, že databáze běží v samostatném kontejneru s perzistentním volume, je její stav zachován mezi jednotlivými release cykly. Nasazení tedy neprovádí destruktivní operace nad datovou vrstvou a podporuje kontinuální evoluci systému bez resetu produkčních dat. AI server je nasazován samostatným release cyklem. Z pohledu backendu je proto kritické průběžně ověřovat dostupnost externích endpointů `job-processor` a integračních toků `cv-processor`.
+== Správa konfigurace a bezpečnost provozu
+Konfiguraci služeb držím v environment souborech, čímž odděluji provozní parametry od aplikačního kódu. Tento přístup podporuje udržitelnost (NF08) a umožňuje konzistentně spravovat rozdíly mezi lokálním, testovacím a produkčním režimem.
 
-== Správa konfigurace a bezpečnostní aspekty provozu
-Konfigurace služeb je v environment souborech, které oddělují provozní parametry od aplikačního kódu. Tento přístup odpovídá požadavku na udržitelnost (NF08) a zároveň umožňuje diferencovat prostředí podle charakteru provozu (lokální vývoj, testovací provoz, produkční režim).
+Z bezpečnostního hlediska neukládám citlivé hodnoty do zdrojových kódů. Přístupové údaje pro databázi, message broker, SMTP a identity provider předávám přes prostředí. Pro produkční režim předpokládám pravidelnou rotaci tajných údajů, omezení přístupů ke konfiguračním artefaktům a audit administrátorských zásahů.
 
-Z bezpečnostního hlediska je klíčové, že citlivé údaje (hesla, tokeny, SMTP přístupové údaje) nejsou hardcoded v implementaci, ale předávány prostřednictvím proměnných prostředí. Pro produkční provoz je dále nutné zajistit pravidelnou rotaci tajných údajů, omezení přístupu k `.env` souborům a audit operací nad infrastrukturou.
-
-Síťová segmentace doplňuje aplikační bezpečnostní model o provozní vrstvu ochrany. Databáze, messaging i úložiště nejsou publikovány jako veřejné HTTP služby aplikace a jsou určeny primárně pro interní komunikaci kontejnerů. Externí přístup je řízen pouze přes publikované aplikační body. Pro integrační komunikaci s AI serverem jsou využita explicitní endpointová rozhraní (např. `JOB_CHAT_URL`) a kanály přes RabbitMQ.
-
-== Observability v provozu (Grafana, Loki, Promtail, Prometheus)
-Observability stack je provozován samostatně v repozitáři `service-monitoring` a je tvořen komponentami Grafana, Loki, Promtail a Prometheus. Sběr logů je realizován přes Promtail s Docker service discovery, přičemž jsou vybírány kontejnery označené labelem `logging=promtail`. Tento model umožňuje cílené připojení pouze těch služeb, které mají být součástí centralizovaného logového dohledu.
-
-Záznamy jsou v ingest pipeline transformovány do strukturované podoby a doplněny o provozní štítky (např. úroveň logu, služba, operace). Výsledkem je konzistentní dotazovatelnost v Loki a kvalitnější diagnostika incidentů v Grafaně. Na úrovni metrik je Prometheus konfigurován na periodický scrape. Aktuální konfigurace je využita pro monitorování vybraných služeb a je připravena na rozšíření o plné pokrytí backendu i AI uzlu.
-
-Grafana je v nasazení používána nejen pro dashboarding, ale i pro alerting. Konfigurační provisioning datových zdrojů a kontaktů je součástí monitoring stacku, což zajišťuje opakovatelnost nasazení observability vrstvy a omezuje manuální kroky při obnově prostředí.
+== Dohledová vrstva
+Dohledovou vrstvu jsem nasadil odděleně od aplikační části. Vrstva je tvořena komponentami Grafana, Loki, Promtail a Prometheus. Promtail sbírá logy z vybraných kontejnerů, Loki je ukládá a zpřístupňuje k dotazům, Prometheus sbírá metriky a Grafana poskytuje intutivní a přehlednou nástěnku s daty a v případě nutnosti varuje správce systému o dergadaci
 
 #figure(
   [
@@ -105,30 +115,28 @@ Grafana je v nasazení používána nejen pro dashboarding, ale i pro alerting. 
       fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
       stroke: 0.5pt + gray,
       [Komponenta], [Primární funkce], [Provozní přínos],
-      [Promtail], [Sběr a předzpracování logů z Docker kontejnerů], [Centralizovaná logová observability bez zásahu do business logiky],
-      [Loki], [Uložení a dotazování log streamů], [Rychlá diagnostika incidentů na základě časových a štítkových dotazů],
-      [Prometheus], [Sběr a vyhodnocení metrik], [Podpora trendové analýzy dostupnosti a výkonu],
-      [Grafana], [Vizualizace a alerting], [Jednotné operátorské rozhraní pro logy i metriky],
+      [Promtail], [Sběr a předzpracování logů z kontejnerů], [Centralizovaná diagnostika bez zásahu do business logiky],
+      [Loki], [Uložení a dotazování log streamů], [Rychlá analýza incidentů podle času a štítků],
+      [Prometheus], [Sběr metrik a trendové vyhodnocení], [Podpora řízení dostupnosti a výkonu],
+      [Grafana], [Vizualizace a upozornění], [Jednotné operátorské rozhraní pro logy i metriky],
     )
   ],
-  caption: [Role komponent observability stacku]
+  caption: [Role komponent dohledové vrstvy],
 ) <tab:deployment-observability>
 
-== Zálohování, obnova a datová kontinuita
-Datová kontinuita je v nasazení zajištěna využitím perzistentních Docker volumes pro klíčové stavové služby. Pro aplikační stack se jedná zejména o volumes `pgdata`, `seaweedfs_data` a `rabbitmq_data`. Pro monitoring stack jsou použity volumes pro data Grafany, Loki a Promethea.
+== Perzistence dat a stavové služby
+Provoz systému zahrnuje několik stavových komponent, jejichž data musí být zachována i při restartu kontejnerů nebo aktualizaci aplikační vrstvy. Z tohoto důvodu jsou pro tyto služby použita perzistentní Docker úložiště (Docker volumes).
 
-Tento přístup snižuje riziko ztráty stavu při restartu kontejnerů nebo při release nové verze aplikace. Z provozního hlediska je zásadní, že release cyklus neprovádí automatické mazání volume vrstev. Obnova systému po incidentu tak může být provedena kombinací restartu služeb, obnovy databáze ze záloh a opětovného připojení persistentních dat.
-
-Součástí provozní disciplíny musí být i periodické ověřování obnovitelnosti záloh. Samotná existence záloh bez pravidelných restore testů nezajišťuje reálnou odolnost systému vůči kritickým incidentům. TODO: Tohle se musí ještě doimplementovat, takže pak změnit podle finálního výsledku..
+Perzistentní úložiště jsou využita zejména pro Postgres, SeaweedFS a RabbitMQ.
 
 == Provozní omezení a mitigace
-Aktuální model nasazení je zvolen jako pragmatický kompromis mezi rychlostí implementace a provozní robustností. Přináší však i omezení, která je nutné evidovat. Prvním omezením je orchestrace na úrovni Docker Compose, která je vhodná pro pilotní a menší produkční provoz, ale neposkytuje pokročilé orchestrace schopnosti typu automatický self-healing nebo horizontální autoscaling na úrovni clusteru.
 
-Druhým omezením je postupná fáze pokrytí metrikami, kdy logová observability dosahuje vyššího pokrytí. V praxi to znamená, že část provozních rozhodnutí je stále více log-driven než SLO-driven. Mitigací je doplnění metrik pro všechny kritické komponenty aplikačního toku.
+Navržený model nasazení představuje pragmatický kompromis mezi rychlostí implementace, provozní jednoduchostí a úrovní infrastruktury. Architektura byla navržena s ohledem na pilotní provoz, což s sebou přináší několik provozních omezení.
 
-Třetím omezením je závislost na správném provozním nastavení tajných údajů v prostředí. Mitigací je zavedení centralizované správy secretů, pravidelná rotace hesel a audit přístupů k infrastrukturním konfiguračním artefaktům.
+Prvním omezením je způsob orchestrace kontejnerů. Nasazení je realizováno pomocí nástroje Docker Compose, který poskytuje jednoduchou správu více kontejnerových služeb na jednom hostu. Tento přístup je vhodný pro vývojová a menší produkční prostředí, nicméně neposkytuje pokročilé vlastnosti typické pro kontejnerové orchestrátory vyšší úrovně, jako je automatická obnova služeb po selhání, horizontální škálování nebo distribuce zátěže mezi více výpočetními uzly.
 
-== Shrnutí kapitoly
-Kapitola ukazuje, že navržený systém je nasaditelný v on-premise režimu pomocí kontejnerizačního modelu s oddělenou observability vrstvou. Topologie, release workflow a model perzistence dat podporují stabilní provoz, kontrolovanou evoluci systému a průběžný dohled nad kvalitou služby.
+Další omezení souvisí s dohledovou vrstvou. Systém již obsahuje základní infrastrukturu pro sběr logů a metrik, nicméně pokrytí jednotlivých komponent metrikami je stále postupně rozšiřováno. V současné fázi provozu je proto část provozních rozhodnutí založena především na analýze aplikačních logů a manuálním vyhodnocování provozních situací, zatímco plně formalizovaný model řízení dostupnosti založený na definovaných SLO (Service Level Objectives) zatím není implementován.
 
-Zároveň byly explicitně identifikovány limity současného nasazení a odpovídající mitigační opatření. Tím je vytvořen realistický základ pro další provozní zrání řešení v navazujících etapách projektu.
+Určitou citlivost systému představuje také správa konfiguračních parametrů a tajných údajů. Přístupové údaje k databázi, message brokeru, SMTP serveru a dalším integračním službám jsou předávány prostřednictvím prostředí běhového systému. Tento model sice odděluje konfiguraci od aplikačního kódu, ale zároveň klade zvýšené nároky na provozní disciplínu při správě konfiguračních souborů a přístupových práv.
+
+Zmírnění těchto omezení je řešeno kombinací několika opatření. Postupně je rozšiřováno pokrytí systému provozními metrikami, což umožňuje přesnější sledování chování systému v čase. Současně je uplatňována přísnější správa tajných údajů, zahrnující omezení přístupových práv ke konfiguračním souborům a pravidelnou rotaci přístupových klíčů a evidenci. Tato opatření přispívají ke zvýšení provozní bezpečnosti a postupnému posilování robustnosti nasazeného systému.

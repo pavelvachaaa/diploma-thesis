@@ -10,20 +10,21 @@ actor "HR pracovník" as HR
 actor "Vedoucí oddělení" as Manager
 actor "Centrální administrátor" as CentralAdmin
 
-rectangle "Veřejný kariérní portál" as Portal
-rectangle "Interní rozhraní" as AdminUI
-rectangle "Platforma náboru a adaptace" as Core
+rectangle "Platforma náboru a adaptace" {
+
+  rectangle "Kariérní portál\n(React / Next.js)" as Portal
+  rectangle "Interní administrační UI\n(React)" as AdminUI
+  rectangle "Backend služby\n(Node / API)" as Core
+
+  rectangle "CV processor\n(Python service)" as CVP
+  rectangle "Job processor\n(Python service)" as JOBP
+  rectangle "LLM inference service\n(Ollama)" as OLLAMA
+}
 
 rectangle "SSO / identitní služba" as Identity
 rectangle "NRZP (cílová integrace)" as Registry
-rectangle "Notifikační kanály" as Notify
-rectangle "Observability vrstva" as Obs
-
-node "AI výpočetní server" as AINode {
-  rectangle "cv-processor" as CVP
-  rectangle "job-processor" as JOBP
-  rectangle "Ollama (NVIDIA A10 24 GB)" as OLLAMA
-}
+rectangle "Notifikační kanály\n(email / push)" as Notify
+rectangle "Observability stack\n(Prometheus / Grafana / Loki)" as Obs
 
 Candidate --> Portal
 Employee --> Portal
@@ -33,12 +34,15 @@ CentralAdmin --> AdminUI
 
 Portal --> Core
 AdminUI --> Core
+
 Core --> Identity
 Core --> Registry
-Core --> JOBP : HTTP/SSE
-Core --> CVP : RabbitMQ events
+Core --> CVP
+Core --> JOBP
+
 CVP --> OLLAMA
 JOBP --> OLLAMA
+
 Core --> Notify
 Core --> Obs
 @enduml
