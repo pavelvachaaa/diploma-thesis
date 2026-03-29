@@ -1,22 +1,29 @@
 @startuml
 skinparam shadowing false
-actor "Operátor" as Ops
-participant "deploy-compose.sh" as Script
+actor "Vývojář" as Dev
+participant "Gitea repozitář" as Repo
+participant "Gitea Actions runner" as Runner
+database "Container registry\n(docker.kzcr.eu)" as Registry
+participant "Deploy bundle\n(compose.yaml, env, skripty)" as Bundle
+participant "Cílový host" as Host
 participant "Docker Compose" as Compose
-database "PostgreSQL" as DB
-participant "Migration service" as Mig
-participant "hr-backend" as Api
-participant "AI server\n(job-processor, cv-processor)" as AINode
+participant "Migrační služba\n(jen backend)" as Migration
+participant "Kontejner služby" as App
 
-Ops -> Script: Spuštění nasazení
-Script -> Compose: build hr-backend, migration
-Script -> Compose: up -d db
-Compose -> DB: healthcheck ready
-Script -> Compose: up migration --exit-code-from migration
-Compose -> Mig: execute db:migrate
-Mig -> DB: schéma upgrade
-Script -> Compose: up -d hr-backend rabbitmq
-Compose -> Api: start application
-Api -> AINode: kontrola dostupnosti AI endpointů
-Script -> Compose: ps a základní verifikace
+Dev -> Repo: push změn a release tagu vX.Y.Z
+Repo -> Runner: trigger workflow na refs/tags/vX.Y.Z
+Runner -> Runner: validace tagu, testy a build image
+Runner -> Registry: push ${REGISTRY_IMAGE}:${TAG}
+Runner -> Bundle: vytvoření deploy bundle
+Runner -> Host: SSH/SCP upload bundle
+Runner -> Host: vzdálené spuštění deploy příkazů
+Host -> Registry: docker login
+Host -> Host: ensure app-network exists
+Host -> Compose: compose pull
+alt stavová backendová služba
+  Compose -> Migration: start migrační quality gate
+  Migration --> Compose: úspěch migrace
+end
+Host -> Compose: compose up -d --remove-orphans
+Compose -> App: start nebo recreate kontejneru
 @enduml

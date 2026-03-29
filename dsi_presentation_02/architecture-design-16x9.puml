@@ -1,0 +1,138 @@
+@startuml
+top to bottom direction
+hide stereotype
+
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam defaultFontName Arial
+skinparam defaultTextAlignment center
+skinparam dpi 160
+skinparam ranksep 28
+skinparam nodesep 35
+skinparam ArrowColor #475569
+skinparam ArrowThickness 1.1
+skinparam RoundCorner 16
+
+skinparam rectangle {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  FontColor #0F172A
+}
+
+skinparam rectangle<<frontend>> {
+  BackgroundColor #EAF2FF
+  BorderColor #2B5AA6
+}
+
+skinparam rectangle<<core>> {
+  BackgroundColor #E8FFF8
+  BorderColor #0F766E
+}
+
+skinparam rectangle<<integration>> {
+  BackgroundColor #FFF4E5
+  BorderColor #C97A10
+}
+
+skinparam rectangle<<data>> {
+  BackgroundColor #FFF9DB
+  BorderColor #B7791F
+}
+
+skinparam rectangle<<ai>> {
+  BackgroundColor #ECFDF5
+  BorderColor #0F766E
+}
+
+skinparam rectangle<<external>> {
+  BackgroundColor #F1F5F9
+  BorderColor #64748B
+}
+
+skinparam actor {
+  BorderColor #64748B
+  FontColor #0F172A
+}
+
+actor "Uchazeč" as Candidate
+actor "HR / vedoucí" as Hr
+actor "Nový zaměstnanec" as Employee
+
+rectangle "Cílová architektura platformy náboru a adaptace KZ" {
+  package "Prezentační vrstva" {
+    together {
+      rectangle "Kariérní portál" <<frontend>> as Career
+      rectangle "Administrační portál" <<frontend>> as Admin
+      rectangle "Onboardingový portál" <<frontend>> as Onboard
+    }
+  }
+
+  package "Aplikační vrstva" {
+    rectangle "Transakční jádro\nDDD modulární monolit\npozice • uchazeči • pohovory • onboarding • notifikace" <<core>> as Core
+  }
+
+  package "Integrační vrstva" {
+    together {
+      rectangle "Externí integrační adaptéry" <<integration>> as Integrations
+      rectangle "Asynchronní orchestrace\noutbox • události • notifikace" <<integration>> as Async
+    }
+  }
+
+  package "Datová vrstva" {
+    together {
+      rectangle "Transakční data" <<data>> as DataTx
+      rectangle "Dokumenty a přílohy" <<data>> as DataDocs
+      rectangle "Auditní a analytická data" <<data>> as DataAudit
+    }
+  }
+
+  package "Vrstva inteligentního pracování" {
+    together {
+      rectangle "Analýza CV" <<ai>> as AiCv
+      rectangle "AI asistence pro inzerci" <<ai>> as AiJob
+    }
+  }
+}
+
+rectangle "SSO / OIDC" <<external>> as SSO
+rectangle "NRZP a další registry" <<external>> as NRZP
+rectangle "SMTP / notifikační infrastruktura" <<external>> as SMTP
+rectangle "Personální a podnikové IS" <<external>> as ERP
+
+Candidate --> Career
+Hr --> Admin
+Employee --> Onboard
+
+Career --> Core
+Admin --> Core
+Onboard --> Core
+
+Core --> Integrations
+Core --> Async
+Core --> DataTx
+Core --> DataDocs
+Core --> DataAudit
+
+Async --> AiCv
+Async --> AiJob
+Async --> SMTP
+
+Integrations --> SSO
+Integrations --> NRZP
+Integrations --> ERP
+
+AiCv --> DataTx
+AiCv --> DataDocs
+AiJob --> DataTx
+
+Career -[hidden]right-> Admin
+Admin -[hidden]right-> Onboard
+DataTx -[hidden]right-> DataDocs
+DataDocs -[hidden]right-> DataAudit
+AiCv -[hidden]right-> AiJob
+SSO -[hidden]right-> NRZP
+NRZP -[hidden]right-> SMTP
+SMTP -[hidden]right-> ERP
+@enduml

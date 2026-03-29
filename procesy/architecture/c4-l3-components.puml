@@ -1,26 +1,60 @@
 @startuml
-left to right direction
+top to bottom direction
 skinparam linetype ortho
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-rectangle "Transportní vrstva" as Routes
-rectangle "Politiky a middleware" as MW
-rectangle "Aplikační vstupní body" as Ctrl
-rectangle "Doménové služby" as Services
-rectangle "Perzistence / repository" as Repo
-rectangle "Integrační adaptéry" as Integr
-rectangle "Datová vrstva" as DB
-rectangle "Externí služby" as External
-rectangle "Kompoziční vrstva" as DI
+package "HTTP vrstva" {
+  rectangle "Express Router\n[route definice + mount]" as Routes
+  rectangle "Middleware pipeline\n(autentizace · org scope\nrequest context · validace)" as MW
+}
+
+package "Doménové jádro" {
+  package "Bounded Contexts (domain modules)" {
+    rectangle "applicants\n[controller · service · repository · events]" as M_APP
+    rectangle "jobs\n[controller · service · repository · events]" as M_JOBS
+    rectangle "interviews\n[controller · service · repository]" as M_INT
+    rectangle "employees · jobSeekers\n[controller · service · repository]" as M_EMP
+    rectangle "notifications · chat · cv · operations\n[controller · service · repository]" as M_OTHER
+  }
+  rectangle "Port kontrakty\n[src/shared/contracts/ports]\n(NotificationsPort · CvPort\nJobEmbeddingPort · ...)" as PORTS
+}
+
+package "Platformní adaptéry (src/platform)" {
+  rectangle "DB adapter\n(pg connection pool)" as ADB
+  rectangle "Storage adapter\n(SeaweedFS / S3 API)" as AOBJ
+  rectangle "RabbitMQ adapter\n(AMQP publish)" as AMQ
+  rectangle "Email adapter\n(Nodemailer / SMTP)" as AEMAIL
+  rectangle "Audit adapter\n(RabbitMQ → audit_events)" as AAUDIT
+  rectangle "Outbox service + Worker\n(transactional side-effects)" as AOUTBOX
+}
+
+rectangle "DI Kontejner\n(Awilix)\n[Composition Root]" as DI
 
 Routes --> MW
-MW --> Ctrl
-Ctrl --> Services
-Services --> Repo
-Services --> Integr
-Repo --> DB
-Integr --> External
-DI ..> Services
-DI ..> Repo
+MW --> M_APP
+MW --> M_JOBS
+MW --> M_INT
+MW --> M_EMP
+MW --> M_OTHER
+
+M_APP --> PORTS : cross-domain\nkomunikace přes port
+M_JOBS --> PORTS
+M_INT --> PORTS
+M_EMP --> PORTS
+M_OTHER --> PORTS
+
+PORTS --> ADB
+PORTS --> AOBJ
+PORTS --> AMQ
+PORTS --> AEMAIL
+PORTS --> AAUDIT
+PORTS --> AOUTBOX
+
+DI ..> M_APP : injektuje port\nimplementace
+DI ..> M_JOBS
+DI ..> M_INT
+DI ..> M_EMP
+DI ..> M_OTHER
+
 @enduml

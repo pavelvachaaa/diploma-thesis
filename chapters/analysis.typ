@@ -444,23 +444,18 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
       [R3],
 
       [F08],
-      [Systém umožní konfigurovat náborovou pipeline (stavy a přechody) podle typu pozice a závodu],
-      [Must],
-      [R3],
-
-      [F09],
       [Systém umožní plánování pohovorů, přiřazení odpovědných osob a evidenci výsledků jednotlivých kol],
       [Must],
       [R3],
 
-      [F10],
+      [F09],
       [Systém poskytne standardizované komunikační šablony (pozvánka, zamítnutí, žádost o doplnění podkladů) a jejich evidenci],
       [Should],
       [R3],
 
-      [F11], [Systém umožní strukturované hodnocení kandidátů dle předem definovaných kritérií], [Should], [R3, R6],
+      [F10], [Systém umožní strukturované hodnocení kandidátů dle předem definovaných kritérií], [Should], [R3, R6],
 
-      [F12],
+      [F11],
       [Vedoucí oddělení bude mít online přehled o stavu svých náborových požadavků bez nutnosti ad-hoc e-mailových dotazů],
       [Must],
       [R3, R6],
@@ -503,12 +498,7 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
       [Must],
       [R4, R6],
 
-      [F18],
-      [Systém podpoří závěrečné vyhodnocení adaptace včetně archivace výstupu do osobního spisu zaměstnance],
-      [Must],
-      [R4],
-
-      [F19], [Systém poskytne přehled stavu adaptací podle závodu, oddělení a typu pracovní pozice], [Should], [R4, R6],
+      [F18], [Systém poskytne přehled stavu adaptací podle závodu, oddělení a typu pracovní pozice], [Should], [R4, R6],
     )
   ],
   caption: [Funkcionální požadavky — Vstupní agenda a adaptace],
@@ -528,7 +518,7 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
       [ID], [Požadavek], [Priorita], [Vazba],
 
       [F20],
-      [Systém umožní automatizované ověření odborné způsobilosti zdravotnických pracovníků prostřednictvím API napojení na NRZP],
+      [Systém umožní automatizované ověření odborné způsobilosti pracovníků prostřednictvím API napojení na národní registr zdravotnických pracovníků],
       [Should],
       [R5],
 
@@ -628,7 +618,7 @@ Nefunkcionální požadavky definují kvalitativní vlastnosti systému, které 
 
       [NF09],
       [Lokalizace],
-      [Veškerá uživatelská rozhraní musí být v českém jazyce; systém musí správně pracovat s českou diakritikou ve všech vrstvách (databáze, API, UI)],
+      [Veškerá uživatelská rozhraní musí být v českém jazyce, systém musí správně pracovat s českou diakritikou ve všech vrstvách (databáze, API, UI)],
 
       [NF10],
       [Kompatibilita],
@@ -638,9 +628,6 @@ Nefunkcionální požadavky definují kvalitativní vlastnosti systému, které 
       [Auditovatelnost],
       [Systém musí uchovávat auditní záznamy o změnách klíčových entit (pozice, kandidát, adaptace) minimálně po dobu 5 let],
 
-      [NF12],
-      [Interoperabilita],
-      [Systém musí poskytovat dokumentované API pro integraci s interními systémy (zejména mzdová a personální agenda, reportingové nástroje)],
     )
   ],
   caption: [Nefunkcionální požadavky na systém],

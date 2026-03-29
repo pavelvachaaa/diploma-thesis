@@ -1,0 +1,130 @@
+@startuml
+left to right direction
+hide stereotype
+
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam defaultFontName Arial
+skinparam defaultTextAlignment center
+skinparam dpi 180
+skinparam wrapWidth 180
+skinparam nodesep 55
+skinparam ranksep 50
+skinparam ArrowColor #475569
+skinparam ArrowThickness 1.2
+skinparam RoundCorner 18
+
+skinparam rectangle {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  FontColor #0F172A
+}
+
+skinparam rectangle<<frontend>> {
+  BackgroundColor #EAF2FF
+  BorderColor #2B5AA6
+}
+
+skinparam rectangle<<core>> {
+  BackgroundColor #E8FFF8
+  BorderColor #0F766E
+}
+
+skinparam rectangle<<ai>> {
+  BackgroundColor #ECFDF5
+  BorderColor #0F766E
+}
+
+skinparam rectangle<<external>> {
+  BackgroundColor #F1F5F9
+  BorderColor #64748B
+}
+
+skinparam database {
+  BackgroundColor #FFF3E0
+  BorderColor #C97A10
+  FontColor #7C2D12
+}
+
+skinparam folder {
+  BackgroundColor #FFF3E0
+  BorderColor #C97A10
+  FontColor #7C2D12
+}
+
+skinparam queue {
+  BackgroundColor #FFF3E0
+  BorderColor #C97A10
+  FontColor #7C2D12
+}
+
+skinparam node {
+  BackgroundColor #ECFDF5
+  BorderColor #0F766E
+  FontColor #134E4A
+}
+
+skinparam actor {
+  BorderColor #64748B
+  FontColor #0F172A
+}
+
+actor "Uchazeč" as Candidate
+actor "HR / vedoucí" as Hr
+actor "Nový zaměstnanec" as Employee
+
+rectangle "Platforma náboru a adaptace KZ" {
+  together {
+    rectangle "Kariérní portál\nNext.js" <<frontend>> as Career
+    rectangle "HR a onboarding portál\nNext.js" <<frontend>> as Portal
+  }
+
+  rectangle "hiring_backend\nNode.js / Express\nDDD • multi-tenant • audit • outbox" <<core>> as Backend
+
+  together {
+    database "PostgreSQL\n+ pgvector" as DB
+    folder "SeaweedFS\nS3 dokumenty" as S3
+    queue "RabbitMQ\nasync události" as MQ
+  }
+
+  node "Oddělený AI host" as AiHost {
+    rectangle "cv_processor\nGo • Apache Tika • Ollama" <<ai>> as CV
+    rectangle "job_processor\nGo • Ollama" <<ai>> as JOB
+  }
+}
+
+rectangle "SSO / OIDC" <<external>> as SSO
+rectangle "NRZP" <<external>> as NRZP
+rectangle "SMTP" <<external>> as SMTP
+
+Candidate --> Career : přihlášky
+Hr --> Portal : nábor
+Employee --> Portal : onboarding
+
+Career --> Backend : HTTPS / REST
+Portal --> Backend : HTTPS / REST
+
+Backend --> DB : SQL
+Backend --> S3 : S3 API
+Backend <--> MQ : integrační události
+MQ --> CV : screening CV
+MQ --> JOB : AI asistence
+CV --> MQ : výsledky
+JOB --> MQ : návrhy
+
+Backend --> SSO : autentizace
+Backend --> NRZP : ověření kvalifikace
+Backend --> SMTP : notifikace
+
+Candidate -[hidden]down-> Hr
+Hr -[hidden]down-> Employee
+Career -[hidden]right-> Portal
+DB -[hidden]right-> S3
+S3 -[hidden]right-> MQ
+CV -[hidden]right-> JOB
+DB -[hidden]down-> CV
+SSO -[hidden]down-> NRZP
+NRZP -[hidden]down-> SMTP
+@enduml

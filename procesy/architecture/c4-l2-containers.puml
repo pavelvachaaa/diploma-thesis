@@ -4,50 +4,72 @@ skinparam linetype ortho
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-package "Prezentační vrstva" {
-  rectangle "Kariérní portál" as FE1
-  rectangle "Interní HR/Admin\nrozhraní" as FE2
+actor "Uchazeč" as Candidate
+actor "HR / Admin /\nZaměstnanec" as Internal
+
+rectangle "Systémová hranice: Platforma náboru a adaptace KZ" {
+
+  package "Prezentační vrstva" {
+    rectangle "Kariérní portál\n(Next.js)\n[kariera.kzcr.eu]" as FE_Career
+    rectangle "Administrační a zaměstnanecký\nportál (Next.js)\n[onboarding.kzcr.eu]" as FE_Admin
+  }
+
+  package "Aplikační vrstva" {
+    rectangle "Backend API\n(Node.js / Express)\n[hiring_backend]" as API
+    rectangle "Audit Writer\n(Go)\n[audit_writer]" as AUDIT
+  }
+
+  package "Datová vrstva" {
+    database "PostgreSQL 17\n+ pgvector" as DB
+    folder "SeaweedFS\n[S3 objektové úložiště]" as OBJ
+  }
+
+  queue "RabbitMQ\n[Message Broker]" as MQ
+
+  node "Host vrstvy inteligentního zpracování dat\n(NVIDIA A10, 24 GB VRAM)" as AINode {
+    rectangle "Apache Tika\n[extrakce textu]" as TIKA
+    rectangle "cv_processor\n(Go)" as CVP
+    rectangle "job_processor\n(Go)" as JOBP
+    rectangle "Ollama\n[LLM inference]" as OLLAMA
+  }
+
+  package "Observability" {
+    rectangle "Promtail / Loki\nPrometheus / Grafana" as OBS
+  }
 }
 
-package "Aplikační vrstva" {
-  rectangle "Aplikační API" as API
-}
+rectangle "SSO / UCP\n[External]" as SSO
+rectangle "NRZP\n[External]" as NRZP
+rectangle "SMTP server\n[External]" as SMTP
+rectangle "Vema\n[External — R5, plánováno]" as VEMA
 
-package "Datová vrstva" {
-  database "Relační databáze" as DB
-  folder "Objektové úložiště\ndokumentů" as OBJ
-}
+Candidate --> FE_Career
+Internal --> FE_Admin
 
-package "Integrační vrstva" {
-  queue "Message broker" as MQ
-  rectangle "Externí integrační body" as EXT
-}
+FE_Career --> API : HTTPS / REST
+FE_Admin --> API : HTTPS / REST
 
-node "AI server\n(separátní host)" as AINode {
-  rectangle "cv-processor" as CVP
-  rectangle "job-processor" as JOBP
-  rectangle "Ollama\nNVIDIA A10 24 GB" as OLLAMA
-}
+API --> DB : SQL
+API --> OBJ : S3 API
+API --> MQ : AMQP (publish)
 
-package "Observability vrstva" {
-  rectangle "Metrický backend" as PM
-  rectangle "Logový backend" as LOG
-  rectangle "Dashboarding\na alerting" as GF
-}
+MQ --> CVP : AMQP (consume)
+MQ --> JOBP : AMQP (consume)
+MQ --> AUDIT : AMQP (consume)
 
-FE1 --> API
-FE2 --> API
-API --> DB
-API --> OBJ
-API <--> MQ
-MQ <--> CVP
-API <--> EXT
-API <--> JOBP
-CVP --> OLLAMA
-JOBP --> OLLAMA
+CVP --> TIKA : HTTP (extrakce)
+CVP --> OLLAMA : HTTP (inference)
+JOBP --> OLLAMA : HTTP (streaming)
 
-API ..> PM : metriky
-API ..> LOG : logy
-PM --> GF
-LOG --> GF
+CVP --> MQ : AMQP (publish výsledky)
+JOBP --> MQ : AMQP (publish výsledky)
+AUDIT --> DB : SQL (audit záznamy)
+
+API --> SSO : OIDC
+API --> NRZP : SOAP / REST
+API --> SMTP : SMTP
+API --> VEMA : REST
+
+API ..> OBS : metriky / logy
+
 @enduml

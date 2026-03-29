@@ -1,48 +1,32 @@
 @startuml
-left to right direction
-skinparam linetype ortho
-skinparam packageStyle rectangle
-skinparam shadowing false
+!include <c4/C4_Context>
 
-actor "Uchazeč" as Candidate
-actor "Nový zaměstnanec" as Employee
-actor "HR pracovník" as HR
-actor "Vedoucí oddělení" as Manager
-actor "Centrální administrátor" as CentralAdmin
+HIDE_STEREOTYPE()
 
-rectangle "Platforma náboru a adaptace" {
+title Platforma náboru a adaptace KZ — Kontextový pohled (C4 L1)
 
-  rectangle "Kariérní portál\n(React / Next.js)" as Portal
-  rectangle "Interní administrační UI\n(React)" as AdminUI
-  rectangle "Backend služby\n(Node / API)" as Core
+Person(candidate, "Uchazeč o zaměstnání", "Prochází inzeráty, podává přihlášky, sleduje stav")
+Person(hr, "HR pracovník / Personalista", "Zpracovává přihlášky, plánuje pohovory, řídí onboarding")
+Person(manager, "Vedoucí oddělení", "Schvaluje nástup zaměstnanců, monitoruje adaptaci")
+Person(employee, "Nastupující zaměstnanec", "Plní onboardingové kroky a dokumenty")
+Person(admin, "Správce systému", "Administruje organizace, uživatele a oprávnění")
 
-  rectangle "CV processor\n(Python service)" as CVP
-  rectangle "Job processor\n(Python service)" as JOBP
-  rectangle "LLM inference service\n(Ollama)" as OLLAMA
-}
+System(system, "Platforma náboru a adaptace KZ", "Systém pro digitalizaci náboru a adaptace zdravotnických pracovníků v KZ")
 
-rectangle "SSO / identitní služba" as Identity
-rectangle "NRZP (cílová integrace)" as Registry
-rectangle "Notifikační kanály\n(email / push)" as Notify
-rectangle "Observability stack\n(Prometheus / Grafana / Loki)" as Obs
+System_Ext(sso, "SSO / Identitní služba (Duo / UCP)", "Ověřuje identitu interních uživatelů")
+System_Ext(nrzp, "NRZP", "Národní registr zdravotnických pracovníků")
+System_Ext(smtp, "SMTP server", "Odesílání transakčních e-mailů")
+System_Ext(vema, "Personální systém Vema", "Správa personálních dat [R5 — plánováno]")
 
-Candidate --> Portal
-Employee --> Portal
-HR --> AdminUI
-Manager --> AdminUI
-CentralAdmin --> AdminUI
+Rel_D(candidate, system, "Prochází inzeráty, podává přihlášky")
+Rel_D(hr, system, "Zpracovává přihlášky, plánuje pohovory")
+Rel_D(manager, system, "Schvaluje nástup, monitoruje adaptaci")
+Rel_D(employee, system, "Plní onboardingové kroky")
+Rel_D(admin, system, "Administruje organizace a oprávnění")
 
-Portal --> Core
-AdminUI --> Core
+Rel(system, sso, "Ověřuje identitu uživatelů", "OIDC")
+Rel(system, nrzp, "Ověřuje odbornou způsobilost", "SOAP / REST")
+Rel(system, smtp, "Odesílá transakční e-maily", "SMTP")
+Rel(system, vema, "Předává personální data", "REST [plánováno]")
 
-Core --> Identity
-Core --> Registry
-Core --> CVP
-Core --> JOBP
-
-CVP --> OLLAMA
-JOBP --> OLLAMA
-
-Core --> Notify
-Core --> Obs
 @enduml

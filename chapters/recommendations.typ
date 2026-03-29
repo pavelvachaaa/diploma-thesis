@@ -10,12 +10,12 @@ Navrhovaný rozvoj vychází ze tří klíčových principů. Prvním je prefere
 == Prioritizační rámec rozvoje
 Pro potřeby plánování jsem další vývoj rozdělil do tří fází. Do krátkodobé (stabilizace a konsolidace), střednědobé (funkční rozšíření a vyšší automatizace) a dlouhodobé (strategická evoluce platformy). Toto členění umožňuje oddělit okamžitě realizovatelné kroky od změn, které vyžadují širší organizační nebo integrační připravenost.
 
-Prioritizace rozvojových témat vychází z vazby na požadavky R1-R6 a NF01-NF12. Nejvyšší prioritu mají oblasti, které současně posilují provozní stabilitu (NF04, NF05), bezpečnost a auditovatelnost (NF01, NF11) a datově podložené řízení procesů (R6). Do této úrovně spadá rovněž stabilizace AI vrstvy, jelikož její dostupnost přímo ovlivňuje klíčové funkce systému.
+Prioritizace rozvojových témat vychází z vazby na požadavky R1-R6 a NF01-NF12. Nejvyšší prioritu mají oblasti, které současně posilují provozní stabilitu (NF04, NF05), bezpečnost a auditovatelnost (NF01, NF11) a datově podložené řízení procesů (R6). Do této úrovně spadá rovněž stabilizace vrstvy inteligentního zpracování dat, jelikož její dostupnost přímo ovlivňuje klíčové funkce systému.
 
 == Krátkodobá fáze (0 - 6 měsíců)
-Tato fáze by měla být zaměřena primárně na stabilizaci produkčního provozu a odstranění nejednoznačností mezi návrhem a provozní realitou. První prioritou je sjednocení monitorování a vyhodnocování provozu napříč aplikační a AI vrstvou, zejména rozšíření sledování výkonových a provozních ukazatelů služeb, `cv-processor` a `job-processor`, tak aby všechny kritické procesní toky byly měřitelné jednotným způsobem. Tím vznikne předpoklad pro řízení dostupnosti a výkonu na základě dlouhodobě sbíraných dat namísto nahodilé diagnostiky.
+Tato fáze by měla být zaměřena primárně na stabilizaci produkčního provozu a odstranění nejednoznačností mezi návrhem a provozní realitou. První prioritou je sjednocení monitorování a vyhodnocování provozu napříč aplikační vrstvou a vrstvou inteligentního zpracování dat, zejména rozšíření sledování výkonových a provozních ukazatelů služeb `cv-processor` a `job-processor`, tak aby všechny kritické procesní toky byly měřitelné jednotným způsobem. Tím vznikne předpoklad pro řízení dostupnosti a výkonu na základě dlouhodobě sbíraných dat namísto nahodilé diagnostiky.
 
-Druhou prioritou je formalizace provozního modelu AI uzlu. V této fázi je vhodné standardizovat pravidla restartu služeb, nastavit jasná pravidla opakování neúspěšných požadavků, definovat kapacitní limity zpracovatelských front a stanovit scénáře chování systému při nedostupnosti AI uzlu. Cílem není rozšiřování funkcionality, ale dosažení předvídatelného chování systému v běžných i zhoršených provozních podmínkách.
+Druhou prioritou je formalizace provozního modelu hostu vrstvy inteligentního zpracování dat. V této fázi je vhodné standardizovat pravidla restartu služeb, nastavit jasná pravidla opakování neúspěšných požadavků, definovat kapacitní limity zpracovatelských front a stanovit scénáře chování systému při nedostupnosti tohoto hostu. Cílem není rozšiřování funkcionality, ale dosažení předvídatelného chování systému v běžných i zhoršených provozních podmínkách.
 
 Třetí oblastí krátkodobého rozvoje je bezpečnostní a provozní hygiena prostředí. Zahrnuje zejména zpřísnění správy tajných údajů, pravidelnou rotaci přístupových klíčů, omezení přístupu ke konfiguračním artefaktům a systematické ověřování obnovitelnosti záloh. Tyto kroky mají vysoký přínos vzhledem k nízké implementační náročnosti a přímo podporují požadavky NF01, NF07 a NF11.
 
@@ -47,12 +47,12 @@ Pro zvýšení realizovatelnosti je účelné převést uvedené směry do etapi
       fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
       stroke: 0.5pt + gray,
       [Horizont], [Milník], [Primární přínos], [Vazba na požadavky],
-      [0 - 6 měsíců], [Sjednocené monitorování a stabilizace AI uzlu], [Vyšší provozní predikovatelnost], [R6, NF04, NF05, NF08],
+      [0 - 6 měsíců], [Sjednocené monitorování a stabilizace hostu vrstvy inteligentního zpracování dat], [Vyšší provozní predikovatelnost], [R6, NF04, NF05, NF08],
       [0 - 6 měsíců], [Bezpečnostní posílení konfigurace a záloh], [Snížení provozního a bezpečnostního rizika], [NF01, NF07, NF11],
       [6 - 18 měsíců], [Rozšířené reporty a procesní analytika], [Datově podložené řízení], [R6, NF12],
       [6 - 18 měsíců], [Prohloubení integračních vazeb], [Vyšší míra automatizace], [R5, NF12],
       [18+ měsíců], [Evoluce k hybridní architektuře dle provozních dat], [Lepší škálovatelnost kritických domén], [R3, R4, NF05, NF08],
-      [18+ měsíců], [Odolnost a kapacitní škálování AI vrstvy], [Stabilní výkon AI funkcí], [R5, R6, NF04, NF05],
+      [18+ měsíců], [Odolnost a kapacitní škálování vrstvy inteligentního zpracování dat], [Stabilní výkon funkcí inteligentního zpracování dat], [R5, R6, NF04, NF05],
     )
   ],
   caption: [Doporučený plán směřování vývoje]
