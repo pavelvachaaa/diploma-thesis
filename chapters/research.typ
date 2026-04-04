@@ -1,9 +1,9 @@
 #import "../template/abbreviations.typ": abbr
 
 == Metodika rešerše a hodnoticí rámec
-Rešerše dostupných softwarových řešení jsem provedl jako strukturované komparativní posouzení produktů z kategorií #abbr("ATS", "Applicant Tracking System"), onboardingových platforem a integrovaných #abbr("HCM", "Human Capital Management") suite. Hodnocení vychází z veřejně dostupné produktové dokumentace výrobců a z oficiálních ceníků či produktových stránek. Stav zdrojů odpovídá datu *21. 11. 2025*.
+Rešerši dostupných softwarových řešení jsem provedl jako strukturované komparativní posouzení produktů ze tří skupin. Jedná se o  #abbr("ATS", "Applicant Tracking System"), onboardingových platforem a integrovaných #abbr("HCM", "Human Capital Management") suite. Hodnocení vychází z veřejně dostupné produktové dokumentace výrobců, z oficiálních ceníků a z produktových stránek. Stav zdrojů odpovídá datu *21. 11. 2025*.
 
-Cílem kapitoly není určit obecně nejlepší systém na trhu, ale identifikovat řešení nejvhodnější pro podmínky #abbr("KZ", none), tj. pro prostředí zdravotnického holdingu s požadavkem na on-premise provoz, auditovatelnost, multi-tenantní model a návaznost na specifické české procesy řízení odborné způsobilosti zdravotnických pracovníků.
+V této kapitole nehledám obecně nejlepší systém na trhu. Hledám řešení, které by bylo nejbližší podmínkám #abbr("KZ", none), tedy zdravotnickému holdingu s požadavkem na on-premise provoz, auditovatelnost, multi-tenantní členění a návaznost na české procesy ověřování odborné způsobilosti zdravotnických pracovníků.
 
 #figure(
   [
@@ -32,7 +32,7 @@ Cílem kapitoly není určit obecně nejlepší systém na trhu, ale identifikov
 Pro účely rozhodnutí byla kritéria typu *Must* chápána jako diskvalifikační. Pokud řešení nesplní kterékoli kritérium K1-K5, není vhodné jako cílová platforma pro digitalizaci procesů #abbr("KZ", none), i když může být přínosné jako dílčí integrační komponenta.
 
 == Specializované ATS platformy
-Specializované ATS nástroje jsou navrženy primárně pro optimalizaci akviziční části náboru, tj. pro správu pozic, řízení kandidátského workflow, evidenci komunikace a publikaci pracovních nabídek. Jejich architektura zpravidla reflektuje potřeby obchodně orientovaného náboru a rychlé administrace výběrového řízení. V kontextu této práce je proto klíčové posoudit, nakolik takové systémy dokážou přirozeně pokračovat do vstupní agendy a adaptační fáze, které jsou v prostředí zdravotnické organizace procesně i regulatorně náročnější.
+Specializované ATS nástroje jsou navrženy především pro akviziční část náboru. Silné bývají tam, kde je potřeba spravovat pozice, kandidátské workflow, komunikaci s uchazeči a publikaci pracovních nabídek. Otázkou pro tuto práci však není jen to, jak dobře umí nábor zahájit, ale zda dokážou přirozeně pokračovat do vstupní agendy a adaptační fáze, které jsou v prostředí zdravotnické organizace podstatně náročnější než v běžném komerčním náboru.
 
 === Teamio (Alma Career)
 Teamio lze považovat za referenční ATS řešení českého trhu, zejména díky jeho úzkému propojení s dominantními inzertními kanály Jobs.cz a Práce.cz. Tato vazba je v podmínkách #abbr("KZ", none) významná, protože umožňuje snížit transakční náklady spojené s publikací inzerce a konsolidací reakcí uchazečů. Oficiální dokumentace současně uvádí možnost automatického importu pozic z interních systémů i z portálů provozovaných Alma Career. @teamioAutoImport2026
@@ -63,7 +63,7 @@ Onbee představuje specializovanou onboarding/offboarding platformu zaměřenou 
 Z hlediska hodnoticího rámce tak Onbee velmi dobře pokrývá část požadavků spojených s adaptací (R4) a částečně i provozní požadavky NF07. Jeho limit spočívá v tom, že nejde o plnohodnotné ATS řešení, takže by organizace musela paralelně provozovat a integračně udržovat další náborový systém. Vznikla by tak vícevrstvá architektura s vyšší závislostí na kvalitě integračních vazeb.
 
 == Integrované HCM suite (enterprise)
-Integrované #abbr("HCM", none) platformy mají oproti specializovaným ATS nebo onboarding nástrojům jiný strategický cíl: pokrýt co největší část zaměstnaneckého cyklu v jednotném datovém a procesním modelu. Tento koncept je z hlediska metodiky enterprise architektury konzistentní, protože snižuje fragmentaci dat. V praxi však bývá spojen s vyšší implementační náročností, výraznějšími náklady na změnové řízení a s provozním modelem orientovaným na cloud.
+Integrované #abbr("HCM", none) platformy sledují jiný strategický cíl než specializované ATS nebo onboardingové nástroje. Snaží se pokrýt co největší část zaměstnaneckého cyklu v jednom datovém a procesním modelu. Z pohledu enterprise architektury jde o logický přístup, protože snižuje fragmentaci dat. V praxi však bývá vykoupen vyšší implementační náročností, větším rozsahem změnového řízení a velmi často i cloudovým provozním modelem.
 
 === SAP SuccessFactors
 SAP SuccessFactors je výrobcem prezentován jako cloud-based HCM suite s moduly pro recruiting i onboarding. @sapSuccessfactorsWhatIs2026 @sapSuccessfactorsOnboarding2026 Z hlediska funkční šíře jde o robustní platformu schopnou pokrýt velkou část HR procesů, včetně centralizovaného reportingu a governance.
@@ -142,7 +142,7 @@ Z porovnání doplňkových kritérií vyplývá, že rozdíly mezi produkty se 
 Specifickým požadavkem zdravotnického prostředí je napojení na ověřování odborné způsobilosti zdravotnických pracovníků (NRZP), které je v českém eGovernment ekosystému dostupné jako samostatná služba. @govNrzpOvereni2026 Ve veřejné dokumentaci hodnocených komerčních produktů nebyla k datu rešerše doložena explicitní, hotová podpora tohoto procesu bez doplňkového vývoje nebo integrační nadstavby.
 
 == Identifikovaná omezení dostupných produktů a volba cílového přístupu
-Zjištění ukazuje, že hlavní limit dostupných produktů není v absenci jednotlivých funkcí, ale v nesouladu mezi jejich produktovou logikou a cílovou architekturou #abbr("KZ", none). První omezení představuje provozní model. Významná část funkčně robustních enterprise platforem je koncipována jako cloud-native služba, zatímco #abbr("KZ", none) požaduje provoz na vlastní infrastruktuře z důvodu interní governance, bezpečnostních politik a provozní autonomie.
+Zjištění ukazují, že hlavní limit dostupných produktů neleží v absenci jednotlivých funkcí. Leží v nesouladu mezi jejich produktovou logikou a cílovou architekturou #abbr("KZ", none). První omezení představuje provozní model. Významná část funkčně robustních enterprise platforem je koncipována jako cloud-native služba, zatímco #abbr("KZ", none) vyžaduje provoz na vlastní infrastruktuře z důvodu interní governance, bezpečnostních politik a provozní autonomie.
 
 Druhé omezení se týká procesní kontinuity. U specializovaných ATS řešení je často vysoká kvalita náborové části, avšak adaptační proces bývá realizován v odděleném nástroji. Vzniká tak architektura "best of breed", která je funkčně flexibilní, ale z pohledu provozu přináší rizika fragmentace dat, složitější správu identit a vyšší náklady na dlouhodobé integrační testování.
 
@@ -154,4 +154,4 @@ Na základě uvedených zjištění jsem zvolil jako nejvhodnější přístup z
 
 Vlastní řešení zároveň snižuje riziko, že kritické doménové požadavky budou odloženy kvůli externí produktovému plánu. Integrace, které jsou pro #abbr("KZ", none) skutečně přínosné, lze realizovat selektivně a v řízeném rozsahu, například pro distribuci inzerce nebo výměnu dat s externími registry. Tím se kombinuje výhoda procesní suverenity s pragmatickým využitím existujícího softwarového ekosystému.
 
-Z metodického hlediska tedy tato kapitola nevede k absolutnímu závěru, že komerční produkty jsou obecně nevhodné, ale k závěru, že pro konkrétní kombinaci požadavků R1-R6 a NF01-NF12 je vlastní řešení v podmínkách #abbr("KZ", none) variantou s nejvyšší mírou strategické a provozní shody.
+Z metodického hlediska tedy tato kapitola nevede k závěru, že komerční produkty jsou obecně nevhodné. Vede k závěru, že pro konkrétní kombinaci požadavků R1-R6 a NF01-NF12 je v podmínkách #abbr("KZ", none) vlastní řešení variantou s nejvyšší mírou strategické a provozní shody.

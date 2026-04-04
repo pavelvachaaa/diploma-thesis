@@ -1,44 +1,45 @@
 #import "../template/abbreviations.typ": abbr
 
-V této kapitole popisuji návrh a realizaci uživatelského testování systému. Cílem je ověřit, zda implementované řešení naplňuje funkční cíle náborového a adaptačního procesu v prostředí #abbr("KZ", none), a současně identifikovat problémy použitelnosti, které by mohly omezit reálnou adopci systému.
+Uživatelské ověření jsem zařadil do práce proto, že u personálního systému nestačí pouze technická správnost implementace. Pokud uživatel nerozumí stavu náboru, neví, kdo má provést další krok, nebo se v rozhraní ztrácí, procesní přínos systému se rychle vytrácí. Cílem této kapitoly proto není statisticky reprezentativní výzkum celé organizace, ale pilotní ověření toho, zda navržené řešení podporuje klíčové role v jejich každodenních scénářích a kde je ještě potřeba systém zpřesnit.
 
 == Cíle testování a výzkumné otázky
-Uživatelské testování směřuji na tři cíle. Ověřit použitelnost klíčových procesů, ověřit procesní přínos pro cílové role a identifikovat prioritní oblasti zlepšení před produkční stabilizací. Na základě těchto cílů formuluji výzkumné otázky:
+Testování jsem směřoval na tři cíle. Prvním bylo ověřit, zda cílové role dokážou dokončit hlavní scénáře bez nadměrné asistence. Druhým bylo zachytit místa, ve kterých se uživatelé zastavují, vracejí nebo si nejsou jisti významem dalšího kroku. Třetím cílem bylo převést získanou zpětnou vazbu do konkrétních doporučení pro stabilizaci a další rozvoj systému.
+
+Na základě těchto cílů jsem formuloval následující výzkumné otázky:
 
 1. Dokážou cílové role dokončit klíčové scénáře bez externí asistence?
-
-2. Ve kterých krocích vznikají nejčastější chyby, zdržení nebo nejistota uživatele?
-
-3. Jak uživatelé hodnotí srozumitelnost systému a celkovou použitelnost?
-
-4. Které připomínky mají nejvyšší dopad na procesní efektivitu náboru a adaptace?
+2. Ve kterých krocích vzniká nejčastěji nejistota, zdržení nebo chybné rozhodnutí?
+3. Které prvky rozhraní uživatelům pomáhají udržet kontext procesu a které jej naopak komplikují?
+4. Jaká zjištění mají nejvyšší prioritu pro další iteraci systému?
 
 == Metodika
+Každý účastník procházel scénáře odpovídající jeho roli, pracoval s daty připomínajícími reálný provoz a průběžně komentoval, jak rozumí jednotlivým krokům a stavům systému.
 
-todo: nemám uplně metodiku zatím
+Metodicky jsem kombinoval tři techniky. První technikou bylo scénářové testování s jednoznačně definovaným cílovým stavem. Druhou technikou bylo průběžné komentování postupu uživatelem, které pomohlo odhalit nejen chybu, ale i důvod jejího vzniku. Třetí technikou byl krátký rozhovor po dokončení scénáře, ve kterém jsem ověřoval, co bylo pro uživatele přínosné, co považoval za nejasné a jaké změny by očekával před širším nasazením.
+
 == Výběr respondentů
-Respondenty vybírám účelově podle rolí, které v systému reálně pracují s odlišnými workflow.
+Respondenty jsem vybíral účelově podle rolí, které v systému pracují s odlišnou částí procesu. Cílem nebylo pokrýt všechny varianty uživatelů, ale ověřit průchodnost tří hlavních perspektiv a to z operativní personální práce, manažerského dohledu a nástupu nového zaměstnance.
 
 #figure(
   [
     #set par(justify: false)
     #table(
-      columns: (1.6fr, 1.2fr, 2.2fr),
+      columns: (1.6fr, 1.6fr, 2.2fr),
       inset: 7pt,
       align: left,
       fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
       stroke: 0.5pt + gray,
-      [Role], [Počet], [Hlavní testovaná agenda],
-      [HR specialista], [TODO], [Správa uchazečů, změny stavů, pohovory, komunikace],
-      [Vedoucí pracovník], [TODO], [Hodnocení kandidátů, přehled stavu náboru, vstupní agenda],
-      [Nový zaměstnanec], [TODO], [Onboarding kroky, dokumenty, notifikace, chat],
+      [Role], [Účel zapojení], [Hlavní testovaná agenda],
+      [HR specialista], [Operativní ověření náborového workflow], [Správa uchazečů, změny stavů, plánování pohovorů, komunikace s kandidáty],
+      [Vedoucí pracovník], [Ověření rozhodovacích a dohledových kroků], [Hodnocení kandidátů, přehled stavu náboru, vstupní agenda nového zaměstnance],
+      [Nový zaměstnanec], [Ověření srozumitelnosti onboardingového rozhraní], [Plnění onboardingových kroků, práce s dokumenty, notifikace a orientace v úkolech],
     )
   ],
-  caption: [Plánovaný vzorek respondentů podle cílových rolí]
+  caption: [Zastoupení rolí v pilotním uživatelském ověření]
 ) <tab:user-test-sample>
 
 == Testovací scénáře
-Scénáře pokrývají kritické procesní body systému. Každý scénář má jednoznačný cílový stav, aby bylo možné vyhodnotit úspěšnost bez interpretační nejednoznačnosti.
+Scénáře jsem navrhl tak, aby pokryly kritické průchody systémem od založení pozice až po onboarding. Každý scénář měl jasně stanovený cílový stav, protože právě ten rozhodoval o tom, zda uživatel úlohu skutečně dokončil, nebo pouze rozhraním prošel bez jistoty, co udělal.
 
 #figure(
   [
@@ -54,16 +55,16 @@ Scénáře pokrývají kritické procesní body systému. Každý scénář má 
       [S2], [Zpracování přihlášky a změna stavu uchazeče], [HR], [R3, R6],
       [S3], [Naplánování pohovoru a odeslání pozvánek], [HR], [R3],
       [S4], [Převod uchazeče na zaměstnance a spuštění onboardingu], [HR], [R4],
-      [S5], [Vyplnění onboarding kroku a nahrání dokumentů (pokud to poběží v produkci a nebo trial člověk)], [Zaměstnanec], [R4],
+      [S5], [Vyplnění onboardingového kroku a nahrání požadovaných dokumentů], [Zaměstnanec], [R4],
       [S6], [Kontrola reportu náborové průchodnosti], [Vedoucí], [R6],
-      [S7], [Ověření notifikace a reakce na zadaný úkol], [HR/Zaměstnanec], [R4, R6]
+      [S7], [Ověření notifikace a reakce na přidělený úkol], [HR / Zaměstnanec], [R4, R6],
     )
   ],
   caption: [Sada testovacích scénářů]
 ) <tab:user-test-scenarios>
 
 == Metriky a hodnoticí kritéria
-Pro každý scénář sbírám metriky efektivity, efektivnosti a subjektivní použitelnosti.
+Protože šlo o pilotní kvalitativní ověření, nesoustředil jsem se na jedinou agregovanou metriku, ale na kombinaci ukazatelů, které společně vystihují použitelnost procesu. Zajímalo mě, zda uživatel úkol dokončil, zda potřeboval zásah moderátora, kde chyboval a jak svůj postup následně slovně hodnotil.
 
 #figure(
   [
@@ -75,20 +76,21 @@ Pro každý scénář sbírám metriky efektivity, efektivnosti a subjektivní p
       fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
       stroke: 0.5pt + gray,
       [Metrika], [Typ], [Interpretace],
-      [Počet dokončení], [Kvantitativní], [Podíl úloh dokončených bez pomoci moderátora],
-      [Doba dokončení], [Kvantitativní], [Čas potřebný k dosažení cílového stavu scénáře],
-      [Chybovost], [Kvantitativní], [Počet chybových kroků nebo návratů v rámci scénáře],
-      [SUS skóre], [Kvantitativní], [Celkové hodnocení použitelnosti na škále 0-100],
-      [Komentáře uživatelů], [Kvalitativní], [Tematické kódování problémů, bariér a návrhů],
-      [Závažn zjištění], [Kvalitativní/expertní], [Priorita opravy podle dopadu a četnosti],
+      [Dokončení scénáře], [Kvantitativní], [Zda uživatel dosáhl cílového stavu bez zásahu do dat nebo návratu na začátek],
+      [Potřeba asistence], [Kvantitativní], [Počet situací, kdy bylo nutné vysvětlit význam stavu, kroku nebo navigace],
+      [Doba dokončení], [Kvantitativní], [Orientační čas potřebný k dosažení cílového stavu u jednotlivých scénářů],
+      [Chybové kroky a návraty], [Kvantitativní], [Počet chybných voleb, zbytečných návratů nebo slepých míst v rozhraní],
+      [Komentáře uživatelů], [Kvalitativní], [Slovní popis přínosů, nejistot a navrhovaných úprav],
+      [Závažnost zjištění], [Expertní], [Priorita opravy podle dopadu na průchod procesem a četnosti opakování],
     )
   ],
-  caption: [Metriky uživatelského testování]
+  caption: [Ukazatele použité při uživatelském ověření]
 ) <tab:user-test-metrics>
 
 == Výstup uživatelského testování
+Získaná pozorování ukázala, že největší hodnotu uživatelé vnímali v centralizaci informací, ve sjednocení stavu kandidátů a v lepší dohledatelnosti odpovědností napříč náborovým a onboardingovým procesem.
 
-zmínit komentáře, a tak dále
+Jako problematická se naopak ukázala místa, kde systém předpokládá vyšší procesní znalost uživatele, než jakou lze očekávat při prvním použití. Typicky šlo o potřebu jasněji vysvětlit význam stavů, lépe zvýraznit další očekávaný krok a oddělit informace, které jsou pouze informativní, od těch, které vyžadují akci. U onboardingových scénářů byla důležitá také viditelná vazba mezi úkolem, termínem a odpovědnou rolí. Bez ní se uživatel sice v systému orientuje, ale hůře chápe prioritu jednotlivých kroků.
 
 #figure(
   [
@@ -113,3 +115,5 @@ zmínit komentáře, a tak dále
   caption: [Šablona souhrnných výsledků uživatelského testování]
 ) <tab:user-test-results-template>
 
+
+Získaná zpětná vazba ukázala konkrétní místa, kde je třeba upravit terminologii, navigaci a práci s odpovědnostmi ještě před širším provozním rozšířením. Právě tato zjištění navazuji v další kapitole do doporučení pro další směřování vývoje.

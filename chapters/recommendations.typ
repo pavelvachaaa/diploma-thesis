@@ -1,41 +1,37 @@
 #import "../template/abbreviations.typ": abbr
 
- TODO: ZMIGROVAL JSEM NA HYBRIDA TROCHU DŘÍVE NEŽ ZA 18 MESÍCU URPAVIT KAPITOLU A PŘIDAT ČÁST ZALOŽENOU NA FEEDBACKU
+Tato kapitola navazuje na výsledky analýzy, architektonického návrhu, implementace, nasazení i pilotního uživatelského ověření systému. Jejím cílem není navrhnout co největší množství nových funkcí, ale určit takové pořadí kroků, které udrží procesní přínos řešení pro #abbr("KZ", none), sníží provozní rizika a současně ponechá prostor pro další rozvoj bez zbytečného architektonického dluhu.
 
-Tato kapitola navazuje na výsledky analýzy, architektonického návrhu, implementace, nasazení a uživatelského ověření systému a zabývá se návrhem jeho dalšího směřování. Cílem je definovat realistickou rozvojovou trajektorii, která zachová procesní přínos řešení pro #abbr("KZ", none), sníží provozní rizika a současně vytvoří předpoklady pro dlouhodobou škálovatelnost.
-
-
-Navrhovaný rozvoj vychází ze tří klíčových principů. Prvním je preference kroků s přímým dopadem na náborovou a adaptační efektivitu. Druhým je zachování architektonické konzistence. Třetím je provozní bezpečnost, která předpokládá inkrementální zavádění nových funkcionalit a jejich průběžné vyhodnocování na základě měřitelných dopadů.
+Navrhovaný rozvoj stavím na třech principech. Prvním je preference změn s přímým dopadem na každodenní práci HR pracovníků, vedoucích a nových zaměstnanců. Druhým je zachování architektonické kázně, aby rychlé provozní úpravy neoslabily modularitu systému. Třetím principem je měřitelnost. Každá další iterace má být vyhodnocena nejen podle toho, že byla nasazena, ale i podle toho, zda zlepšila průchodnost procesu, srozumitelnost rozhraní a provozní stabilitu.
 
 == Prioritizační rámec rozvoje
-Pro potřeby plánování jsem další vývoj rozdělil do tří fází. Do krátkodobé (stabilizace a konsolidace), střednědobé (funkční rozšíření a vyšší automatizace) a dlouhodobé (strategická evoluce platformy). Toto členění umožňuje oddělit okamžitě realizovatelné kroky od změn, které vyžadují širší organizační nebo integrační připravenost.
+Pro potřeby plánování jsem další vývoj rozdělil do tří horizontů. Do krátkodobého, střednědobého a dlouhodobého. Toto členění mi umožňuje oddělit kroky, které je vhodné provést ihned po stabilizaci pilotního provozu, od změn, jež vyžadují širší integrační nebo organizační připravenost.
 
-Prioritizace rozvojových témat vychází z vazby na požadavky R1-R6 a NF01-NF12. Nejvyšší prioritu mají oblasti, které současně posilují provozní stabilitu (NF04, NF05), bezpečnost a auditovatelnost (NF01, NF11) a datově podložené řízení procesů (R6). Do této úrovně spadá rovněž stabilizace vrstvy inteligentního zpracování dat, jelikož její dostupnost přímo ovlivňuje klíčové funkce systému.
+Prioritizace vychází z vazby na požadavky R1-R6 a NF01-NF12. Nejvyšší prioritu mají oblasti, které současně zvyšují provozní spolehlivost, bezpečnost a srozumitelnost práce se systémem. Pilotní uživatelské ověření navíc ukázalo, že další vývoj nemá směřovat pouze k novým funkcím, ale i k lepšímu vysvětlení stavů, odpovědností a návazností mezi kroky procesu.
 
 == Krátkodobá fáze (0 - 6 měsíců)
-Tato fáze by měla být zaměřena primárně na stabilizaci produkčního provozu a odstranění nejednoznačností mezi návrhem a provozní realitou. První prioritou je sjednocení monitorování a vyhodnocování provozu napříč aplikační vrstvou a vrstvou inteligentního zpracování dat, zejména rozšíření sledování výkonových a provozních ukazatelů služeb `cv-processor` a `job-processor`, tak aby všechny kritické procesní toky byly měřitelné jednotným způsobem. Tím vznikne předpoklad pro řízení dostupnosti a výkonu na základě dlouhodobě sbíraných dat namísto nahodilé diagnostiky.
+Krátkodobý horizont by měl být zaměřen především na stabilizaci provozu a na odstranění nejednoznačností, které se ukázaly při pilotním ověření. První prioritou je proto sjednocení monitorování a provozního vyhodnocování napříč aplikační vrstvou a vrstvou inteligentního zpracování dat. Cílem není sbírat více technických dat samoúčelně, ale získat spolehlivý obraz o tom, kde vznikají latence, selhání nebo nedoručené asynchronní operace.
 
-Druhou prioritou je formalizace provozního modelu hostu vrstvy inteligentního zpracování dat. V této fázi je vhodné standardizovat pravidla restartu služeb, nastavit jasná pravidla opakování neúspěšných požadavků, definovat kapacitní limity zpracovatelských front a stanovit scénáře chování systému při nedostupnosti tohoto hostu. Cílem není rozšiřování funkcionality, ale dosažení předvídatelného chování systému v běžných i zhoršených provozních podmínkách.
+Druhou prioritou je zpřesnění uživatelského rozhraní v bodech, kde testování ukázalo zvýšenou míru nejistoty. Prakticky to znamená lépe vysvětlit význam stavů kandidáta, viditelněji zobrazit odpovědnost za další krok vstupní agendy a seskupit onboardingové úkoly podle procesu, nikoli pouze podle technického typu záznamu. Tyto úpravy nejsou architektonicky rozsáhlé, ale mají okamžitý dopad na reálné používání systému.
 
-Třetí oblastí krátkodobého rozvoje je bezpečnostní a provozní hygiena prostředí. Zahrnuje zejména zpřísnění správy tajných údajů, pravidelnou rotaci přístupových klíčů, omezení přístupu ke konfiguračním artefaktům a systematické ověřování obnovitelnosti záloh. Tyto kroky mají vysoký přínos vzhledem k nízké implementační náročnosti a přímo podporují požadavky NF01, NF07 a NF11.
+Třetí oblastí krátkodobého rozvoje je bezpečnostní a provozní hygiena prostředí. Patří sem pravidelná rotace přístupových údajů, zpřesnění práce s tajnými hodnotami, kontrola obnovitelnosti záloh a formalizace postupů při nedostupnosti vrstvy inteligentního zpracování dat. Jde o změny, které nejsou z pohledu uživatele nejviditelnější, ale mají zásadní význam pro důvěryhodnost a dlouhodobou provozuschopnost systému.
 
 == Střednědobá fáze (6 - 18 měsíců)
+Ve střednědobém horizontu má smysl soustředit se na rozšíření funkcí, které zvyšují řídicí hodnotu systému. První oblastí je rozvoj reportingu a procesní analytiky. Vedení organizace potřebuje sledovat nejen počet otevřených pozic, ale i průchodnost náboru, dobu reakce mezi kroky, úspěšnost adaptačních plánů a rozdíly mezi odštěpnými závody.
 
-V této fázi je vhodné zaměřit se na funkční rozšíření systému v oblastech s nejvyšším dopadem na procesní efektivitu.
+Druhou oblast představuje další rozvoj integračních vazeb systému, zejména ve vztahu k externím registrům a navazujícím interním agendám (Vema, Plánování služeb, atd.). Rozvoj by měl zůstat řízený přes explicitní integrační kontrakty, aby nedocházelo k tomu, že externí systémy začnou určovat podobu doménového modelu.
 
-První oblastí je rozvoj pokročilé analytiky a reportingu, tedy rozšíření přehledových nástrojů o prediktivní a srovnávací ukazatele na úrovni závodů, oddělení a typů pozic. Tím se posílí schopnost vedení systematicky vyhodnocovat průchodnost náborového procesu a kvalitu adaptačních programů v čase.
-
-Druhou oblast představuje další rozvoj integračních vazeb systému, zejména ve vztahu k externím registrům a navazujícím interním agendám (Vema, Plánování služeb, atd.). Klíčové je zachovat oddělení doménového modelu od konkrétních externích rozhraní a preferovat jasně definované integrační rozhrarní. Tento přístup omezuje závislost na třetích stranách a snižuje riziko narušení systému při změnách externích služeb.
-
-Třetí oblastí je zvýšení míry automatizace vstupní agendy a adaptační fáze. Prakticky jde o rozšíření pravidlových upozornění, automatickou eskalaci při prodlení a sjednocení způsobu vyhodnocování adaptačních milníků. Přínosem je omezení administrativních prodlev a vyšší transparentnost odpovědností jednotlivých rolí v procesu.
+Třetím směrem střednědobého rozvoje je vyšší automatizace vstupní agendy a adaptace. Přínos zde nepřinese jen více notifikací, ale hlavně lepší práce s pravidly, eskalacemi a přehledem nesplněných kroků. Cílem je omezit situace, kdy je úkol sice v systému založen, ale z pohledu uživatele není zřejmé, kdo jej má převzít a co blokuje další postup.
 
 == Dlouhodobá fáze (18+ měsíců)
-Dlouhodobý rozvoj by měl být veden jako řízená evoluce architektury podle reálných provozních dat. Pokud bude dlouhodobě potvrzena nerovnoměrná zátěž nebo odlišný  rytmus vydávání některých domén, lze zvážit postupnou extrakci vybraných částí modulárního monolitu do hybridního modelu. Tento krok však dává smysl pouze při splnění podmínky, že přínos vyšší autonomnosti převáží nárůst integrační a provozní složitosti.
+Dlouhodobý rozvoj by měl být veden jako řízená evoluce již zavedené hybridní architektury. Nejde tedy o přechod k hybridnímu modelu, protože ten je součástí řešení už nyní, ale o rozhodování, zda mají být některé další části systému postupně oddělovány podle skutečných provozních dat. Takový krok dává smysl pouze tehdy, pokud konkrétní komponenta dlouhodobě vykazuje odlišný rytmus změn, zátěžový profil nebo provozní požadavky než zbytek jádra.
 
-Dalším směrem je také rozvoj datového governance rámce. Jak přibývá historických dat, je potřeba mít jednotné definice, kvalitní popisy dat a jasně daná pravidla, kdo k nim může přistupovat. Bez těchto pravidel by se postupně zhoršovala přehlednost a spolehlivost výstupů pro management a rozhodování by bylo méně důvěryhodné.
+Vedle architektonické evoluce bude v delším horizontu důležitější i datové governance. S růstem objemu historických dat poroste potřeba jednotně definovat metriky, popsat význam reportovaných ukazatelů a určit odpovědnost za jejich interpretaci. Bez této vrstvy by se i technicky kvalitní systém postupně měnil v další zdroj nejednoznačných dat.
+
+Samostatnou dlouhodobou oblastí je také kapacitní a kvalitativní rozvoj vrstvy inteligentního zpracování dat. Pokud se její výstupy stanou běžnou součástí náboru a adaptace, bude nutné systematicky vyhodnocovat přesnost, latenci, provozní náklady i dopady případných chyb. Rozvoj této vrstvy proto nesmí být veden jen technologickou atraktivitou, ale jasně měřeným přínosem pro proces.
 
 == Návrh fází realizace a klíčových milníků
-Pro zvýšení realizovatelnosti je účelné převést uvedené směry do etapizovaných milníků s jasnou odpovědností a vyhodnocením dopadu.
+Pro zvýšení realizovatelnosti převádím uvedené směry do etapizovaných milníků s jasným přínosem a vazbou na požadavky.
 
 #figure(
   [
@@ -47,23 +43,24 @@ Pro zvýšení realizovatelnosti je účelné převést uvedené směry do etapi
       fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
       stroke: 0.5pt + gray,
       [Horizont], [Milník], [Primární přínos], [Vazba na požadavky],
-      [0 - 6 měsíců], [Sjednocené monitorování a stabilizace hostu vrstvy inteligentního zpracování dat], [Vyšší provozní predikovatelnost], [R6, NF04, NF05, NF08],
+      [0 - 6 měsíců], [Sjednocené monitorování a stabilizace provozu vrstvy inteligentního zpracování dat], [Vyšší provozní předvídatelnost], [R6, NF04, NF05, NF08],
+      [0 - 6 měsíců], [Úpravy rozhraní podle pilotního uživatelského ověření], [Vyšší srozumitelnost workflow a menší potřeba asistence], [R3, R4, R6],
       [0 - 6 měsíců], [Bezpečnostní posílení konfigurace a záloh], [Snížení provozního a bezpečnostního rizika], [NF01, NF07, NF11],
       [6 - 18 měsíců], [Rozšířené reporty a procesní analytika], [Datově podložené řízení], [R6, NF12],
-      [6 - 18 měsíců], [Prohloubení integračních vazeb], [Vyšší míra automatizace], [R5, NF12],
-      [18+ měsíců], [Evoluce k hybridní architektuře dle provozních dat], [Lepší škálovatelnost kritických domén], [R3, R4, NF05, NF08],
-      [18+ měsíců], [Odolnost a kapacitní škálování vrstvy inteligentního zpracování dat], [Stabilní výkon funkcí inteligentního zpracování dat], [R5, R6, NF04, NF05],
+      [6 - 18 měsíců], [Prohloubení integračních vazeb a automatizace vstupní agendy], [Vyšší míra automatizace a menší ruční administrativa], [R4, R5, NF12],
+      [18+ měsíců], [Selektivní oddělení dalších zatížených komponent podle provozních dat], [Lepší škálovatelnost bez předčasné distribuované složitosti], [R5, NF05, NF08],
+      [18+ měsíců], [Zavedení datové governance a evaluace výstupů inteligentního zpracování dat], [Vyšší důvěryhodnost reportů a kontrolovaný rozvoj AI vrstvy], [R6, NF01, NF11, NF12],
     )
   ],
   caption: [Doporučený plán směřování vývoje]
 ) <tab:roadmap-dalsi-rozvoj>
 
 == Řízení změny a organizační předpoklady
-Úspěch dalšího rozvoje nebude záviset pouze na technických rozhodnutích, ale i na organizační schopnosti změnu stabilně řídit. Klíčové je zavést pravidelný cyklus vyhodnocení plánu, ve kterém budou zahrnuty role vývoje, provozu a business vlastníků procesů. Bez tohoto mechanismu hrozí, že priorita technických aktivit se odchýlí od reálných potřeb personálního provozu.
+Úspěch dalšího rozvoje nebude záviset jen na technických rozhodnutích, ale i na tom, zda organizace udrží pravidelný cyklus vyhodnocování změn. Do tohoto cyklu musí vstupovat vývoj, provoz i vlastníci HR procesů. Bez společného vyhodnocení hrozí, že technické priority začnou sledovat interní pohodlí týmu místo reálných problémů uživatelů.
 
-Dalším předpokladem je průběžná práce s uživatelskou zpětnou vazbou v režimu řízené iterace. Prakticky to znamená, že návrhy změn budou validovány na reprezentativních uživatelských scénářích ještě před plošným nasazením. Tento postup snižuje riziko regresí použitelnosti a podporuje vyšší adopci systému napříč odštěpnými závody.
+Stejně důležitá je průběžná práce se zpětnou vazbou. Pilotní testování ukázalo, že i drobná nejasnost v názvu stavu nebo ve zobrazení odpovědnosti může zpomalit celý proces více než absence nové funkce. Změny proto doporučuji nasazovat inkrementálně, ověřovat je na konkrétních scénářích a teprve poté rozšiřovat do širšího provozu.
 
 == Závěrečné doporučení kapitoly
-Z pohledu dalšího směřování vývoje je vhodné postupovat evolučně, nikoli revolučně. Prioritou má být stabilizace a měřitelnost provozu, následně cílené funkční rozšiřování a teprve poté strukturální architektonické změny. Takto zvolený postup maximalizuje pravděpodobnost, že systém bude dlouhodobě plnit cíle digitalizace náboru a adaptace bez nadměrného provozního rizika.
+Pro další směřování vývoje považuji za nejvhodnější evoluční postup. Nejprve je potřeba stabilizovat provoz a odstranit bariéry zjištěné při uživatelském ověření, poté rozšiřovat analytiku, integrace a automatizaci a teprve nakonec otevírat otázku hlubších strukturálních změn. Takto zvolený postup dává nejvyšší šanci, že systém bude dlouhodobě podporovat cíle digitalizace náboru a adaptace bez zbytečného provozního rizika.
 
-Navržený plán umožňuje reagovat na budoucí změny organizačních potřeb #abbr("KZ", none), aniž by docházelo k narušení základních architektonických principů stanovených v této práci.
+Navržený plán současně zachovává prostor pro budoucí organizační i technické změny v #abbr("KZ", none), aniž by narušil základní architektonické principy stanovené v této práci.

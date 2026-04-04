@@ -1,14 +1,11 @@
+Tato diplomová práce vycházela z praktického problému, který se v prostředí Krajské zdravotní, a.s. dlouhodobě projevoval jako roztříštěná správa náboru a adaptace pracovníků. Analytická část ukázala, že hlavním omezením není jediný nefunkční krok, ale souběh několika faktorů, mezi které patří rozptýlená data, ruční komunikace mezi rolemi, nízká transparentnost stavu náboru, chybějící auditní stopa a papírově vedená adaptace nových zaměstnanců. V organizaci s více odštěpnými závody a vysokou frekvencí nástupů se tyto slabiny navzájem zesilují a postupně snižují propustnost celého procesu.
 
-Tak to je insane.
+Na základě zjištěného stavu jsem formuloval požadavky na cílové řešení a porovnal je s dostupnými komerčními produkty. Rešerše ukázala, že na trhu existují kvalitní dílčí nástroje pro správu náboru nebo onboarding, ale žádné z hodnocených řešení současně nenaplňuje požadavek na procesní kontinuitu, provoz na vlastní infrastruktuře, multi-tenantní členění organizace a vazbu na specifika českého zdravotnického prostředí. Tato zjištění vedla k rozhodnutí navrhnout a dále rozvíjet vlastní řešení, které dokáže uvedené požadavky spojit v jednom datovém a procesním modelu.
 
-Zde jsou příklady citací pro testování:
+V návrhové části byla představena hybridní architektura kombinující modulární monolit pro transakční jádro a oddělenou vrstvu pro inteligentní zpracování dat. Tento přístup umožňuje zachovat provozní jednoduchost systému a zároveň podporuje jeho rozšiřitelnost, auditovatelnost a integrační schopnosti. Součástí práce je také implementace backendu, kariérního portálu, onboardingového rozhraní, integračních adaptérů a nasazení v on-premise prostředí.
 
-- Příklad citace v textu: @armstrongRizeniLidskychZdroju2007 popisuje klíčové postupy řízení lidských zdrojů.
-- Závorková (parentetická) citace: [@aCloudBasedHRPlatforms2025] ukazuje moderní přístup k HR systémům založeným na cloudu.
-- Více zdrojů najednou: [@pavlinaAssessingBestPractices2020; @stajnerDigitalizaceProcesuPrijimani2023].
+Uživatelské ověření potvrdilo, že hlavním přínosem řešení je sjednocení informací, zvýšení transparentnosti procesu a omezení ruční komunikace mezi zúčastněnými rolemi. Zároveň se ukázalo, že pro úspěch systému je klíčová nejen jeho technická kvalita, ale i srozumitelnost procesů, jasné rozdělení odpovědností a průběžná práce se zpětnou vazbou uživatelů.
 
-Poznámka: tento projekt používá Typst; bibliografický soubor je `citations.bib` a je předán přes `thesis.typ`.
+Hlavním přínosem práce je propojení analytického, architektonického a implementačního pohledu na konkrétní problém organizace. Výsledkem není pouze návrh, ale prakticky využitelný základ platformy respektující specifika zdravotnického prostředí. Limitem práce zůstává nutnost dalšího rozvoje systému v návaznosti na provozní zkušenosti a dostupné kapacity.
 
-
-#include "sections/code_examples.typ"
-
+Práce nicméně prokazuje, že vlastní softwarové řešení představuje v daném kontextu efektivnější alternativu k rigidním komerčním systémům. Zároveň poskytuje metodický rámec pro realizaci obdobných digitálních transformací ve zdravotnických organizacích.

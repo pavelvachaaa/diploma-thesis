@@ -1,1 +1,5 @@
-introduction 
+Digitalizace personálních procesů ve zdravotnictví není jen otázkou převodu formulářů do elektronické podoby. V prostředí velké zdravotnické organizace se v jednom procesu potkávají vysoký objem náboru, legislativní požadavky na odbornou způsobilost, rozdílné potřeby jednotlivých pracovišť i tlak na rychlé obsazování pozic. Pokud se tyto okolnosti řeší pouze e-mailem, tabulkami a lokálními zvyklostmi, nevzniká jen administrativní zátěž. Vzniká také nepřehlednost, která zpomaluje nábor, komplikuje nástup nových zaměstnanců a oslabuje možnost proces řídit na úrovni celé organizace.
+
+Téma této práce vychází z praktické potřeby Krajské zdravotní, a.s. sjednotit a zpřehlednit nábor a adaptaci pracovníků napříč odštěpnými závody. 
+
+Cílem práce je analyzovat současný stav těchto procesů, identifikovat jejich hlavní nedostatky a navrhnout řešení jejich digitalizace formou vhodné softwarové architektury. Součástí práce je také porovnání existujících řešení a zdůvodňuje, proč v podmínkách KZ dává smysl vlastní vývoj. Na ni navazuje návrh softwarové architektury, implementace navrženého systému, jeho nasazení a vyhodnocení zpětné vazby uživatelů. Práce se zaměřuje na proces od vzniku personální potřeby po adaptaci nového zaměstnance.

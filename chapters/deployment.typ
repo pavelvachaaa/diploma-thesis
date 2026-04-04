@@ -1,13 +1,10 @@
 #import "../template/abbreviations.typ": abbr
 
-V této kapitole popisuji nasazení navrženého systému do cílového provozního prostředí. Navazuji na architektonická rozhodnutí kapitoly 4 a na implementační realizaci kapitoly 5. Cílem kapitoly je prokázat, že navržené řešení je provozně realizovatelné v podmínkách #abbr("KZ", none), zejména ve vztahu k požadavkům na on-premise provoz (NF07), dostupnost (NF04), auditovatelnost (NF11) a interoperabilitu (NF12). Nasazení se přitom netýká jediné aplikace, ale soustavy spolupracujících frontendových, backendových, integračních a výpočetních služeb, které společně tvoří jeden provozní celek.
-
+Navržený systém má hodnotu jen tehdy, pokud jej lze provozně udržet v podmínkách #abbr("KZ", none). V této kapitole proto nepopisuji nasazení jako technický dovětek k implementaci, ale jako samostatnou vrstvu návrhu, která musí respektovat požadavky na on-premise provoz (NF07), dostupnost (NF04), auditovatelnost (NF11) a interoperabilitu (NF12). Nasazení se netýká jediné aplikace, ale soustavy spolupracujících frontendových, backendových, integračních a výpočetních služeb, které dohromady tvoří jeden provozní celek.
 
 == Kontejnerizační model a síťová segmentace
-Jednotlivé části systému distribuuji jako samostatné kontejnerové image a provozuji je pomocí `Docker Compose`. Bezstavové služby jsou aktualizovány výměnou image, zatímco stavové komponenty používají perzistentní volumes nebo sdílenou databázovou vrstvu. Přehled hlavních služeb uvádím v @tab:deployment-services.
+Jednotlivé části systému distribuuji jako samostatné kontejnerové image a provozuji je pomocí `Docker Compose`. Tento přístup jsem zvolil proto, že odpovídá cílovému on-premise prostředí a současně nevyžaduje zavedení rozsáhlejšího orchestracečního rámce již v pilotní fázi. Bezstavové služby jsou aktualizovány výměnou image, zatímco stavové komponenty používají perzistentní volumes nebo sdílenou databázovou vrstvu. Přehled hlavních služeb uvádím v @tab:deployment-services.
 
-
-TodO: formátování a promyslet jestli vubec v tehle kapitole chci zminovat všechny ty běžící kontejnery (jako asi jo ale promyslet jestli je dávat takhle do tabulky nebo jen trochu zminit v odstavci..)
 #figure(
   [
     #set par(justify: false)
@@ -46,22 +43,22 @@ TodO: formátování a promyslet jestli vubec v tehle kapitole chci zminovat vš
   caption: [Hlavní služby v nasazení],
 ) <tab:deployment-services>
 
-Síťový model používá čtyři logické segmenty. `app-network` nese hlavní aplikační komunikaci mezi frontendy, backendem a stavovými službami. `adapter-internal` odděluje interní adaptéry `qualification-adapter` a `user-search-adapter`, které jsou přístupné pouze službě `hr-backend`. `monitoring_network` je vyhrazena pro sběr logů a metrik. Síť `kz` propojuje host vrstvy inteligentního zpracování dat s procesory `cv_processor`, `job_processor`, `Apache Tika` a `Ollama`. Interní adaptéry záměrně nemají publikovaný host port, protože jejich rozhraní slouží pouze pro komunikaci mezi službami a nepatří do veřejného síťového perimetru.
+Síťový model používá čtyři logické segmenty. `app-network` nese hlavní aplikační komunikaci mezi frontendy, backendem a stavovými službami. `adapter-internal` odděluje interní adaptéry `qualification-adapter` a `user-search-adapter`, které jsou přístupné pouze službě `hr-backend`. `monitoring_network` je vyhrazena pro sběr logů a metrik. Síť `kz` propojuje host vrstvy inteligentního zpracování dat s procesory `cv_processor`, `job_processor`, `Apache Tika` a `Ollama`. Interní adaptéry záměrně nemají publikovaný host port, protože jejich rozhraní slouží jen pro komunikaci mezi službami a nepatří do veřejného síťového perimetru.
 
 TODO: Rozhodnout se ještě jestli zminovat DMZ, zabix fiewall atsd-... 
 
 == Nasazení aplikačního stacku `hiring_backend`
-Aplikační stack tvoří `hr-backend`, migrační služba `migration`, interní adaptéry `qualification-adapter` a `user-search-adapter`, stavové služby `PostgreSQL`, `SeaweedFS`, `RabbitMQ` a doprovodná analytická služba `Umami`. Celek je navržen tak, aby oddělil transakční API od integračních detailů i od pomocných provozních funkcí.
+Aplikační stack tvoří `hr-backend`, migrační služba `migration`, interní adaptéry `qualification-adapter` a `user-search-adapter`, stavové služby `PostgreSQL`, `SeaweedFS`, `RabbitMQ` a doprovodná analytická služba `Umami`. Toto rozdělení jsem zvolil proto, aby transakční API zůstalo oddělené od integračních detailů i od pomocných provozních funkcí.
 
 Startovací posloupnost má explicitní pořadí:
 
 1. Nejprve se startuje `PostgreSQL` a čeká se na úspěšný `healthcheck`.
 2. Následně se spustí jednorázová služba `migration`, která aplikuje SQL migrace a představuje quality gate mezi novou verzí aplikace a databázovým schématem.
 3. Po úspěšné migraci se uvede do běhu interní adaptéry `qualification-adapter` a `user-search-adapter` a vyžaduji jejich `healthcheck`.
-4. Teprve potom se startuje `hr-backend`, navázané infrastrukturní služby a analytickou službu `Umami`.
+4. Teprve poté se startuje `hr-backend`, navázané infrastrukturní služby a analytická služba `Umami`.
 5. Při prvním nebo změněném nasazení `Umami` se doplňují jednorázové inicializační kroky `umami-db-init` a `umami-bootstrap`, které připraví databázi a základní konfiguraci analytického prostředí.
 
-Význam migrační služby spočívá v tom, že brání startu API proti nekompatibilní verzi schématu. `qualification-adapter` a `user-search-adapter` běží jako interní Node.js služby s vlastním `healthcheck`em. `Umami` v tomto modelu nepředstavuje byznysové jádro systému, ale provozní doplněk pro měření používání portálů. Samotný `hr-backend` je současně připojen do `monitoring_network`, aby bylo možné centrálně sbírat jeho logy a metriky.
+Význam migrační služby spočívá v tom, že brání startu API proti nekompatibilní verzi schématu. `qualification-adapter` a `user-search-adapter` běží jako interní Node.js služby s vlastním `healthcheck`em. `Umami` v tomto modelu nepředstavuje byznysové jádro systému, ale provozní doplněk pro měření používání portálů. Samotný `hr-backend` je zároveň připojen do `monitoring_network`, aby bylo možné centrálně sbírat jeho logy a metriky.
 
 Z hlediska hexagonální architektury je důležité, že nasazovací hranice nejsou totožné s hranicemi portů a adaptérů. Většina vstupních adaptérů (`routes`, kontrolery, middleware) i většina výstupních adaptérů (`audit`, `outbox`, `storage`, `ReBAC`) běží uvnitř procesu `hr-backend` a nejsou samostatnými nasazovacími jednotkami. Samostatně nasazuji pouze ty adaptéry, které mají odlišný runtime, síťové oddělení nebo vlastní provozní životní cyklus, konkrétně `qualification-adapter`, `user-search-adapter`, `audit_writer_processor`, `cv_processor` a `job_processor`.
 
