@@ -30,31 +30,6 @@ Vedle architektonické evoluce bude v delším horizontu důležitější i dato
 
 Samostatnou dlouhodobou oblastí je také kapacitní a kvalitativní rozvoj vrstvy inteligentního zpracování dat. Pokud se její výstupy stanou běžnou součástí náboru a adaptace, bude nutné systematicky vyhodnocovat přesnost, latenci, provozní náklady i dopady případných chyb. Rozvoj této vrstvy proto nesmí být veden jen technologickou atraktivitou, ale jasně měřeným přínosem pro proces.
 
-== Návrh fází realizace a klíčových milníků
-Pro zvýšení realizovatelnosti převádím uvedené směry do etapizovaných milníků s jasným přínosem a vazbou na požadavky.
-
-#figure(
-  [
-    #set par(justify: false)
-    #table(
-      columns: (1.1fr, 1.8fr, 1.7fr, 1.7fr),
-      inset: 7pt,
-      align: left,
-      fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
-      stroke: 0.5pt + gray,
-      [Horizont], [Milník], [Primární přínos], [Vazba na požadavky],
-      [0 - 6 měsíců], [Sjednocené monitorování a stabilizace provozu vrstvy inteligentního zpracování dat], [Vyšší provozní předvídatelnost], [R6, NF04, NF05, NF08],
-      [0 - 6 měsíců], [Úpravy rozhraní podle pilotního uživatelského ověření], [Vyšší srozumitelnost workflow a menší potřeba asistence], [R3, R4, R6],
-      [0 - 6 měsíců], [Bezpečnostní posílení konfigurace a záloh], [Snížení provozního a bezpečnostního rizika], [NF01, NF07, NF11],
-      [6 - 18 měsíců], [Rozšířené reporty a procesní analytika], [Datově podložené řízení], [R6, NF12],
-      [6 - 18 měsíců], [Prohloubení integračních vazeb a automatizace vstupní agendy], [Vyšší míra automatizace a menší ruční administrativa], [R4, R5, NF12],
-      [18+ měsíců], [Selektivní oddělení dalších zatížených komponent podle provozních dat], [Lepší škálovatelnost bez předčasné distribuované složitosti], [R5, NF05, NF08],
-      [18+ měsíců], [Zavedení datové governance a evaluace výstupů inteligentního zpracování dat], [Vyšší důvěryhodnost reportů a kontrolovaný rozvoj AI vrstvy], [R6, NF01, NF11, NF12],
-    )
-  ],
-  caption: [Doporučený plán směřování vývoje]
-) <tab:roadmap-dalsi-rozvoj>
-
 == Řízení změny a organizační předpoklady
 Úspěch dalšího rozvoje nebude záviset jen na technických rozhodnutích, ale i na tom, zda organizace udrží pravidelný cyklus vyhodnocování změn. Do tohoto cyklu musí vstupovat vývoj, provoz i vlastníci HR procesů. Bez společného vyhodnocení hrozí, že technické priority začnou sledovat interní pohodlí týmu místo reálných problémů uživatelů.
 
