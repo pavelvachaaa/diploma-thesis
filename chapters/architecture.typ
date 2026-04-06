@@ -129,7 +129,7 @@ Na datový model přímo navazuje způsob, jakým systém komunikuje s okolními
 
 @obr:arch-runtime-flow ukazuje, jak se architektonická rozhodnutí promítají do běhu systému. Klíčovým vzorem je transactional outbox. Doménová operace nejprve uloží business data i odpovídající integrační událost do jedné transakce a teprve následně je událost publikována do integrační vrstvy. Tím se vyhýbám problému, kdy by změna v databázi proběhla, ale vedlejší efekt se kvůli chybě v messaging vrstvě nikdy nevykonal.
 
-Pro průběžné informování klienta o stavu vybraných operací doplňuji architekturu o Server-Sent Events (SSE). Tento mechanismus je vhodný tam, kde potřebuji klientovi zobrazovat postup nebo změny stavu bez zbytečně komplikovaného plně duplexního kanálu.
+Pro komunikaci směrem ke klientovi architektura počítá s mechanismem (SSE) průběžného informování o stavu operací. Ten umožňuje zobrazovat změny nebo postup zpracování bez nutnosti opakovaného dotazování klienta a zároveň nezatěžuje systém plně obousměrnou komunikací.  
 
 == Bezpečnost a provozní dohled
 Jakmile systém propojuje více rolí, více závodů a citlivé personální údaje, stává se bezpečnostní architektura jedním z rozhodujících kritérií návrhu. Proto ji navrhuji ve třech vrstvách: autentizace, autorizace a datový rozsah. Autentizace je řešena prostřednictvím `OIDC/SSO`, aby interní uživatelé nemuseli spravovat oddělené identity pouze pro tento systém. Tento krok zároveň snižuje provozní režii spojenou se správou účtů.

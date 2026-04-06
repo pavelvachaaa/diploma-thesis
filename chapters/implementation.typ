@@ -104,11 +104,17 @@ Worker používá dávkové zpracování, zamykání položek, řízené opakov�
 Verzování událostí pomocí suffixu `v1`, případně dalších verzí, slouží k bezpečné evoluci integračního rozhraní. Pokud se změní struktura zprávy nebo její sémantika, lze zavést novou verzi bez nutnosti rozbít stávající konzumenty v jednom kroku.
 
 == Implementace vrstvy inteligentního zpracování dat
-Vrstva inteligentního zpracování dat je implementována jako samostatné služby v jazyce Go. Toto oddělení řeší problém, že inference a zpracování dokumentů mají jiný provozní profil než transakční API. Kdybych tyto úlohy provozoval přímo uvnitř backendu, zvyšoval bych riziko latencí i provozních výpadků hlavní aplikace.
+Vrstva inteligentního zpracování dat vznikla jako řešení na provozní tlak popsaný v analytické části práce. V prostředí #abbr("KZ", none) probíhá nábor kontinuálně, takže systém souběžně pracuje s větším množstvím životopisů i průběžně upravovaných pracovních nabídek. Manuální screening životopisů je přitom časově náročný a snadno vede k přehlédnutí důležitých údajů. Transakční jádro proto nemá nést dokumentové a AI úlohy přímo.
 
-Služba `cv_processor` zpracovává životopisy asynchronně. Po přijetí události z `RabbitMQ` načte dokument z objektového úložiště, extrahuje text a provede jeho strukturovanou analýzu i generování embeddingů. Výsledek pak publikuje zpět do systému jako integrační událost. Služba `job_processor` je zaměřena na práci s textem pracovních pozic a obsluhuje scénáře, ve kterých backend potřebuje inteligentní generování nebo úpravu obsahu.
+Na tuto situaci odpovídám oddělenou vrstvou implementovanou jako samostatné služby v jazyce Go. Komunikace probíhá asynchronně přes `RabbitMQ` a inference zajišťuje `Ollama` s konfigurovatelným generativním modelem podle konkrétní služby a nasazení. Smyslem této vrstvy není řídit samotný náborový proces, ale doplnit jej o podpůrné schopnosti tam, kde by přímé zpracování dokumentů a textů zbytečně zatěžovalo backend.
 
-Praktickým přínosem tohoto rozdělení je, že dočasná nedostupnost AI vrstvy neblokuje základní náborové a onboardingové funkce. Systém tak degraduje řízeně. Uživatelé mohou přijít o část rozšířené funkcionality, nikoli o samotné transakční jádro.
+Služba `cv_processor` zpracovává příchozí životopisy. Po přijetí události z `RabbitMQ` stáhne dokument z objektového úložiště, extrahuje text přes `Apache Tika`, pomocí `Ollama` provede strukturované vytěžení a shrnutí a nad připraveným textem vytvoří embedding pomocí modelu `nomic-embed-text`. Výsledek pak vrací zpět do backendu přes `RabbitMQ`. Embeddingy zde neslouží jen jako doplňkové metadata, ale jako podklad pro sémantické porovnávání uchazečů a pozic. Backend je ukládá do `pgvector` jako `vector(768)`.
+
+Služba `job_processor` řeší jiný typ úlohy. Také zde se používá `Ollama`, ale role služby je odlišná. Jejím cílem je generování a úprava textů pracovních nabídek, které v prostředí kontinuálního náboru vznikají, mění se a znovu publikují. 
+
+Vedle toho běží samostatný asynchronní tok pro embeddingy pracovních pozic. Backend publikuje požadavek `job.embedding.requested.v1`, zpracování připraví text pozice do podoby vhodné pro vektorové porovnávání a výsledný embedding se vrací do tabulky `job_embeddings`. I zde se používá `nomic-embed-text`, takže sémantické porovnávání pracuje nad stejným typem reprezentace jako u životopisů.
+
+Technické oddělení této vrstvy má přímý provozní důvod. Inference, práce s dokumenty a vektorové výpočty mají jiný latencní i chybový profil než transakční API. Jejich dočasná nedostupnost proto nesmí zablokovat základní náborové a onboardingové funkce. Systém tak degraduje řízeně. Uživatelé mohou přijít o část rozšířené funkcionality, nikoli o samotné transakční jádro.
 
 #figure(
   image(
