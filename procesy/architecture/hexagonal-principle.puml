@@ -1,0 +1,81 @@
+@startuml
+left to right direction
+hide stereotype
+
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam defaultFontName Arial
+skinparam defaultTextAlignment center
+skinparam dpi 160
+skinparam ranksep 28
+skinparam nodesep 26
+skinparam ArrowColor #475569
+skinparam ArrowThickness 1.0
+skinparam RoundCorner 14
+
+skinparam rectangle {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  FontColor #0F172A
+}
+
+skinparam rectangle<<primary>> {
+  BackgroundColor #EAF2FF
+  BorderColor #2B5AA6
+}
+
+skinparam rectangle<<core>> {
+  BackgroundColor #E8FFF8
+  BorderColor #0F766E
+}
+
+skinparam rectangle<<secondary>> {
+  BackgroundColor #FFF3E0
+  BorderColor #C97A10
+  FontColor #7C2D12
+}
+
+skinparam actor {
+  BorderColor #334155
+  FontColor #0F172A
+}
+
+skinparam database {
+  BackgroundColor #FFF3E0
+  BorderColor #C97A10
+  FontColor #7C2D12
+}
+
+skinparam queue {
+  BackgroundColor #FFF3E0
+  BorderColor #C97A10
+  FontColor #7C2D12
+}
+
+title Hexagonalni princip backendu
+
+actor "Uzivatel / jiny system / test" as ACTOR
+rectangle "Primarni adaptery\nHTTP, CLI, event consumer,\ntest harness" <<primary>> as PRIMARY
+
+package "Uvnitr aplikace" {
+  rectangle "Vstupni porty\n(use-cases)" as INPORTS
+  rectangle "Aplikacni jadro\n(domena + aplikacni sluzby)" <<core>> as CORE
+  rectangle "Vystupni porty\n(repozitare, audit,\nintegrace, messaging)" as OUTPORTS
+}
+
+rectangle "Sekundarni adaptery\nDB, broker, externi API,\nstorage, audit transport" <<secondary>> as SECONDARY
+database "Databaze" as DB
+queue "Message broker" as MQ
+rectangle "Externi sluzby" <<secondary>> as EXT
+
+ACTOR --> PRIMARY
+PRIMARY --> INPORTS
+INPORTS --> CORE
+CORE --> OUTPORTS
+OUTPORTS --> SECONDARY
+SECONDARY --> DB
+SECONDARY --> MQ
+SECONDARY --> EXT
+@enduml

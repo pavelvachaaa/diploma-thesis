@@ -59,42 +59,42 @@ skinparam queue {
   FontColor #7C2D12
 }
 
-title hiring_backend - struktura a architektonicke hranice
+title Navrh hranic backendu v hexagonalnim usporadani
 
 package "Vstupni adaptery" {
-  rectangle "HTTP routes a controllery\n(src/routes, src/domain/*/controller)" <<frontend>> as ROUTES
-  rectangle "Middleware pipeline\n(authn, authz, org scope,\nrequest context, validace)" <<frontend>> as MW
-  rectangle "Konzumenti integracnich udalosti\n a SSE vstupy" <<frontend>> as CONSUMERS
+  rectangle "HTTP vstupy a controllery" <<frontend>> as ROUTES
+  rectangle "Vstupni middleware\nkontext, validace, autentizace" <<frontend>> as MW
+  rectangle "Konzumenti udalosti\n a SSE vstupy" <<frontend>> as CONSUMERS
 }
 
-package "Domenove moduly a use-cases" {
-  package "Bounded contexts" {
-    rectangle "applicants" <<service>> as M_APP
-    rectangle "jobs" <<service>> as M_JOBS
-    rectangle "interviews" <<service>> as M_INT
-    rectangle "employees / onboarding" <<service>> as M_EMP
-    rectangle "notifications / operations" <<service>> as M_OTHER
+package "Domenove jadro a use-cases" {
+  package "Ohranicene kontexty" {
+    rectangle "Uchazeci" <<service>> as M_APP
+    rectangle "Pracovni pozice" <<service>> as M_JOBS
+    rectangle "Pohovory" <<service>> as M_INT
+    rectangle "Zamestnanci a adaptace" <<service>> as M_EMP
+    rectangle "Notifikace a provozni logika" <<service>> as M_OTHER
   }
 
-  rectangle "Port kontrakty\n(src/shared/contracts/ports)" as PORTS
+  rectangle "Port kontrakty" as PORTS
 }
 
-package "Platformni adaptery (src/platform)" {
-  rectangle "DB a repository adaptery" as ADB
-  rectangle "Outbox a messaging adaptery" as AOUTBOX
-  rectangle "Storage a e-mail adaptery" as ASTORAGE
-  rectangle "OIDC / ReBAC adaptery" as ASEC
-  rectangle "Qualification / user-search adaptery" as AINT
-  rectangle "Audit adapter" as AAUDIT
+package "Sekundarni adaptery" {
+  rectangle "Datove adaptery" as ADB
+  rectangle "Messaging a outbox" as AOUTBOX
+  rectangle "Dokumenty a e-mail" as ASTORAGE
+  rectangle "Autentizace a autorizace" as ASEC
+  rectangle "Integrace s okolnimi sluzbami" as AINT
+  rectangle "Auditni adapter" as AAUDIT
 }
 
-rectangle "DI kontejner\n(Awilix, composition root)" <<obs>> as DI
+rectangle "Composition root\n a DI kontejner" <<obs>> as DI
 
 database "PostgreSQL" as DB
 folder "SeaweedFS" as S3
 queue "RabbitMQ" as MQ
 rectangle "SSO / OIDC" <<external>> as SSO
-rectangle "NRZP a interni sluzby" <<external>> as EXT
+rectangle "Registry a interni sluzby" <<external>> as EXT
 rectangle "SMTP" <<external>> as SMTP
 
 ROUTES --> MW

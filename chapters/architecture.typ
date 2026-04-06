@@ -73,24 +73,34 @@ Stejně podstatná je integrační vrstva. Její role nespočívá jen v napojen
 
 Vedle ní stojí messaging vrstva, která neřeší, na jaký externí systém se systém napojuje, ale jak jsou úlohy a události předávány mimo hlavní transakční tok. 
 
-== Vrstvy řešení a struktura backendu
-Nejcitlivější částí celého řešení je backend, protože právě v něm se setkávají business pravidla, datové hranice, bezpečnost i integrace. Jádro backendu proto stavím na hexagonální architektuře, kterou Cockburn popsal jako vzor Ports and Adapters @cockburnHexagonalArchitecture2005, a současně ji opírám o principy doménově orientovaného návrhu @evansDomaindrivenDesignTackling2003. V praktickém smyslu to znamená, že doménová logika nesmí být závislá na konkrétní databázi, messaging knihovně ani HTTP frameworku a že klíčové procesní pojmy mají vlastní ohraničené kontexty se samostatnou odpovědností.
+== Struktura backendu
+Nejcitlivější částí celého řešení je backend, protože právě v něm se setkávají business pravidla, datové hranice, bezpečnost i integrace. Jádro backendu proto stavím na hexagonální architektuře, kterou Cockburn popsal jako vzor `Ports and Adapters` @cockburnHexagonalArchitecture2005. Motivací tohoto vzoru je oddělit aplikační logiku od uživatelského rozhraní, databáze a dalších zařízení tak, aby systém bylo možné testovat, provozovat i rozvíjet bez přímé závislosti na konkrétní technologii. V praktickém smyslu to znamená, že business pravidla nesmějí být uzamčena v controlleru, HTTP frameworku ani databázovém driveru.
 
-Tento přístup je důležitý ze tří důvodů. Zaprvé udržuje multi-tenantní a organizační kontext pod kontrolou od vstupu do systému až po datovou vrstvu. Zadruhé chrání doménu před přímou závislostí na integračních detailech, které se mohou v čase měnit. Zatřetí vytváří čitelnou strukturu, kterou lze dlouhodobě rozvíjet i bez velkého specializovaného architektonického týmu.
+Klíčová asymetrie této architektury neleží mezi „horní“ prezentační a „spodní“ datovou vrstvou, ale mezi vnitřkem a vnějškem aplikace @cockburnHexagonalArchitecture2005. Port v tomto pojetí nepředstavuje síťový port, nýbrž účelově definovaný kontrakt komunikace mezi jádrem a jeho okolím. K jednomu portu přitom může existovat více adaptérů, například produkční HTTP vstup, konzolový přístup nebo náhradní implementace persistence pro integrační testy @cockburnHexagonalArchitecture2005. Tento přístup je důležitý ze tří důvodů. Zaprvé udržuje multi-tenantní a organizační kontext pod kontrolou od vstupu do systému až po datovou vrstvu. Zadruhé chrání doménu před přímou závislostí na integračních detailech, které se mohou v čase měnit. Zatřetí vytváří čitelnou strukturu, kterou lze dlouhodobě rozvíjet i bez velkého specializovaného architektonického týmu.
 
-V návrhu proto rozlišuji vstupní a výstupní hranice. Vstupní adaptéry převádějí vnější požadavky na use-cases domény. V praxi jde o HTTP routy, middleware a konzumenty integračních událostí. Výstupní adaptéry naopak převádějí doménové požadavky do konkrétní infrastruktury, například do práce s `PostgreSQL`, `RabbitMQ`, objektovým úložištěm, `OIDC`, registrem `NRZP` nebo interním vyhledáváním uživatelů. Port zde neoznačuje síťový port, ale pojmenovaný kontrakt mezi jádrem a jeho okolím.
+V terminologii této práce proto označuji adaptéry, které aplikaci řídí zvenku dovnitř, jako primární adaptéry, zatímco adaptéry vykonávající požadavky jádra směrem do infrastruktury označuji jako sekundární adaptéry. Primární adaptér převádí vnější signál na volání use-casu, kdežto sekundární adaptér implementuje port definovaný jádrem a překládá jeho požadavek do konkrétního protokolu, API nebo perzistenční technologie. Současně je důležité odlišit architektonickou hranici od hranice nasazovací. Hexagonální architektura sama o sobě neznamená, že každý adaptér musí být samostatná služba. Naopak většina adaptérů běží uvnitř jednoho backendového procesu a samostatně odděluji jen ty části, jejichž runtime, provozní profil nebo integrační režim se od jádra skutečně liší.
 
-Současně je důležité odlišit architektonickou hranici od hranice nasazovací. Hexagonální architektura sama o sobě neznamená, že každý adaptér musí být samostatná služba. Naopak většina adaptérů běží uvnitř jednoho backendového procesu a samostatně odděluji jen ty části, jejichž runtime, provozní profil nebo integrační režim se od jádra skutečně liší.
+Hexagonální uspořádání v mém návrhu současně doplňuje principy `Domain-Driven Design`. Doménové moduly jsou vedeny jako ohraničené kontexty s vlastním modelem a slovníkem, protože význam pojmů je v doménovém návrhu vždy platný jen uvnitř explicitně vymezené hranice @evansDomaindrivenDesignTackling2003 @evansDDDReference2015. Na styku s externími službami proto integrační vrstva plní roli překladové mezivrstvy. Doména pracuje se svým modelem, zatímco adaptér přebírá odpovědnost za převod z cizího rozhraní a zpět @evansDDDReference2015.
+
+#figure(
+  image(
+    "../procesy/architecture/hexagonal-principle.svg",
+    width: 84%,
+  ),
+  caption: [Obecný princip hexagonální architektury]
+) <obr:arch-hexagon-principle>
+
+Obecný princip zachycený na @obr:arch-hexagon-principle se v `hiring_backend` promítá do konkrétní struktury backendu. Primární adaptéry na vstupu aplikace převádějí HTTP požadavky a integrační události na use-cases domény. Uvnitř aplikace zůstává doménová vrstva členěná do ohraničených kontextů a komunikuje s okolím pouze prostřednictvím explicitních port kontraktů. Sekundární adaptéry pak zajišťují napojení na databázi, messaging, audit, autorizaci a externí registry.
 
 #figure(
   image(
     "../procesy/architecture/backend-structure.svg",
     width: 100%,
   ),
-  caption: [Struktura backendu a jeho hranice]
+  caption: [Návrh hranic backendu v hexagonálním uspořádání]
 ) <obr:arch-backend>
 
-Backend je na @obr:arch-backend členěn do čtyř vrstev odpovídajících hexagonálnímu uspořádání. Vstupní adaptéry přijímají požadavky, připravují kontext a předávají řízení do doménových modulů. Doménová vrstva soustřeďuje ohraničené kontexty, jako jsou uchazeči, pracovní pozice, pohovory, zaměstnanci, onboarding nebo notifikace. Port kontrakty určují, jaké schopnosti může doména požadovat od okolí, a platformní adaptéry zajišťují konkrétní napojení na databázi, messaging, audit, autorizaci nebo externí registry. Tím se omezuje šíření skrytých vazeb a současně vzniká jasná hranice mezi stabilnější business logikou a proměnlivější integrační infrastrukturou.
+@obr:arch-backend už neslouží jako inventář implementačních složek, ale jako návrh hlavních hranic backendu. Ukazuje, že vstupní adaptéry řídí vstup do systému, doménové jádro nese use-cases a ohraničené kontexty, porty vymezují povolené závislosti a sekundární adaptéry připojují databázi, messaging, audit, bezpečnost a okolní služby. Smyslem tohoto rozdělení je udržet stabilnější business logiku uvnitř a proměnlivější integrační infrastrukturu na hraně systému.
 
 == Datový model a integrační toky
 Architektonická rozhodnutí by zůstala neúplná, pokud by se nepropsala i do datového modelu. Ten tvoří přibližně šedesát tabulek organizovaných do sedmi doménových skupin. Cílem této části proto není vypsat celé schéma, ale vysvětlit, jaké logické celky model obsahuje a proč je navržen právě tímto způsobem. Technické detaily migrací a fyzické perzistence rozvádím v následující implementační kapitole.
