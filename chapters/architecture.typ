@@ -117,17 +117,7 @@ Třetím rozhodnutím je explicitní vazba mezi uchazečem a vzniklým zaměstna
 
 Čtvrtým rozhodnutím je důsledné nesení atributu `organization_id` u klíčových entit. Multi-tenantní charakter systému nesmí být jen pravidlem v dokumentaci, ale musí být fyzicky přítomen v datech a následně respektován v aplikační logice.
 
-Na datový model přímo navazuje způsob, jakým systém komunikuje s okolními službami a jak zpracovává vedlejší efekty. Integrační vrstvu proto navrhuji kombinací synchronní a asynchronní komunikace. Synchronní volání používám tam, kde uživatel očekává okamžitou odezvu, například při práci s administračním rozhraním nebo při generování konkrétního výstupu. Asynchronní komunikaci naopak využívám pro vedlejší efekty a časově náročnější operace, u nichž by blokování requestu zhoršovalo použitelnost systému.
-
-#figure(
-  image(
-    "../procesy/architecture/seq-outbox-rabbitmq-ai.svg",
-    width: 100%,
-  ),
-  caption: [Hlavní runtime tok integrační a asynchronní vrstvy]
-) <obr:arch-runtime-flow>
-
-@obr:arch-runtime-flow ukazuje, jak se architektonická rozhodnutí promítají do běhu systému. Klíčovým vzorem je transactional outbox. Doménová operace nejprve uloží business data i odpovídající integrační událost do jedné transakce a teprve následně je událost publikována do integrační vrstvy. Tím se vyhýbám problému, kdy by změna v databázi proběhla, ale vedlejší efekt se kvůli chybě v messaging vrstvě nikdy nevykonal.
+Na datový model přímo navazuje způsob, jakým systém komunikuje s okolními službami a jak zpracovává vedlejší efekty. Integrační vrstvu proto navrhuji kombinací synchronní a asynchronní komunikace. Synchronní volání používám tam, kde uživatel očekává okamžitou odezvu, například při práci s administračním rozhraním nebo při generování konkrétního výstupu. Asynchronní komunikaci naopak využívám pro vedlejší efekty a časově náročnější operace, u nichž by blokování requestu zhoršovalo použitelnost systému. Konkrétní realizační tok této kombinace, včetně využití vzoru transactional outbox a návaznosti na vrstvu inteligentního zpracování dat, uvádím až v implementační kapitole.
 
 Pro komunikaci směrem ke klientovi architektura počítá s mechanismem (SSE) průběžného informování o stavu operací. Ten umožňuje zobrazovat změny nebo postup zpracování bez nutnosti opakovaného dotazování klienta a zároveň nezatěžuje systém plně obousměrnou komunikací.  
 
