@@ -60,38 +60,7 @@ Startovací posloupnost má explicitní pořadí, protože právě na ní závis
 
 Význam migrační služby spočívá v tom, že brání startu API proti nekompatibilní verzi schématu. `qualification-adapter` a `user-search-adapter` běží jako interní Node.js služby s vlastním `healthcheck`em. `Umami` v tomto modelu nepředstavuje byznysové jádro systému, ale provozní doplněk pro měření používání portálů. Samotný `hr-backend` je zároveň připojen do `monitoring_network`, aby bylo možné centrálně sbírat jeho logy a metriky.
 
-Z hlediska hexagonální architektury je důležité, že nasazovací hranice nejsou totožné s hranicemi portů a adaptérů. Většina vstupních adaptérů (`routes`, kontrolery, middleware) i většina výstupních adaptérů (`audit`, `outbox`, `storage`, `ReBAC`) běží uvnitř procesu `hr-backend` a nejsou samostatnými nasazovacími jednotkami. Samostatně nasazuji pouze ty adaptéry, které mají odlišný runtime, síťové oddělení nebo vlastní provozní životní cyklus, konkrétně `qualification-adapter`, `user-search-adapter`, `audit_writer_processor`, `cv_processor` a `job_processor`.
-
-== Nasazení auditní služby
-Asynchronní persistenci auditu zajišťuje samostatný worker `audit_writer_processor`. Tato služba konzumuje auditní události z `RabbitMQ`, validuje jejich obsah a ukládá je do tabulky `audit_events` v `PostgreSQL`. Oddělení auditního zápisu od request cesty `hr-backend` zkracuje odezvu aplikačního API a současně zvyšuje odolnost proti dočasnému selhání databázové nebo messaging vrstvy.
-
-`audit_writer_processor` nemá veřejné HTTP rozhraní a je provozován pouze jako interní asynchronní worker. Jeho provozními závislostmi jsou `RabbitMQ`, `PostgreSQL` a aplikační síť, v níž jsou obě služby dostupné. V textu je důležité odlišovat tento worker od samotné tabulky `audit_events`; tabulka je datová struktura, zatímco worker představuje vykonávací provozní komponentu.
-
-== Nasazení vrstvy inteligentního zpracování dat
-Vrstva inteligentního zpracování dat je provozována na samostatném hostu, aby byla výpočetně náročná inference oddělena od transakční části systému. Tento host obsluhuje `cv_processor`, `job_processor`, pomocnou službu `Apache Tika` a lokální inferenční backend `Ollama`. Oddělení této vrstvy omezuje riziko, že dlouhé nebo GPU náročné úlohy zhorší dostupnost `hr-backend`, a současně umožňuje nastavovat odlišný runtime profil než u hlavního aplikačního hostu.
-
-`cv_processor` je navázán na asynchronní tok přes `RabbitMQ`. Po přijetí události stáhne dokument ze `SeaweedFS`, předá jej do `Apache Tika` pro extrakci textu, zavolá `Ollama` pro analýzu a generování embeddingů a výsledek publikuje zpět do messaging vrstvy. Naproti tomu `job_processor` vystupuje jako samostatná HTTP/SSE služba, kterou `hr-backend` volá synchronně při generování nebo úpravě obsahu pracovních inzerátů. Oba procesory sdílejí stejný inferenční backend, ale plní odlišné integrační role. Přehled vrstvy inteligentního zpracování dat uvádím v @tab:deployment-ai-services.
-
-#figure(
-  [
-    #set par(justify: false)
-    #table(
-      columns: (1.25fr, 2fr, 1.85fr, 1.55fr),
-      inset: 7pt,
-      align: left,
-      fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
-      stroke: 0.5pt + gray,
-      [Služba], [Role ve vrstvě inteligentního zpracování dat], [Integrační vazba], [Host],
-      [`cv_processor`], [Asynchronní analýza CV a generování embeddingů], [`RabbitMQ`, `SeaweedFS`, `Apache Tika`, `Ollama`], [Host vrstvy inteligentního zpracování dat v síti `kz`],
-      [`job_processor`], [HTTP/SSE služba pro tvorbu a úpravy textu inzerátů], [Synchronní volání z `hr-backend` + `Ollama`], [Host vrstvy inteligentního zpracování dat v síti `kz`],
-      [`Apache Tika`], [Extrakce textového obsahu z dokumentů CV], [Interní HTTP volání z `cv_processor`], [Host vrstvy inteligentního zpracování dat v síti `kz`],
-      [`Ollama`], [Lokální inference a embedding backend], [Volání z `cv_processor` a `job_processor`], [Host vrstvy inteligentního zpracování dat s GPU NVIDIA A10 24 GB],
-    )
-  ],
-  caption: [Distribuovaná vrstva inteligentního zpracování dat v nasazení],
-) <tab:deployment-ai-services>
-
-Výpočetní host využívá lokální `Ollama` akcelerovanou GPU kartou NVIDIA A10 s kapacitou 24 GB VRAM. Tento údaj v kontextu nasazení neuvádím jako marketingový parametr, ale jako provozní zdůvodnění, proč je vrstva inteligentního zpracování dat oddělena na samostatný uzel a proč má vlastní runtime konfiguraci.
+Z hlediska hexagonální architektury je důležité, že nasazovací hranice nejsou totožné s hranicemi portů a adaptérů. Většina vstupních adaptérů (`routes`, kontrolery, middleware) i většina výstupních adaptérů (`audit`, `outbox`, `storage`, `ReBAC`) běží uvnitř procesu `hr-backend` a nejsou samostatnými nasazovacími jednotkami. Samostatně nasazuji pouze ty adaptéry a workery, které mají odlišný runtime, síťové oddělení nebo vlastní provozní životní cyklus, konkrétně `qualification-adapter`, `user-search-adapter`, `audit_writer_processor`, `cv_processor` a `job_processor`. `audit_writer_processor` je v tomto modelu provozován jako interní worker bez veřejného HTTP rozhraní, zatímco vrstva inteligentního zpracování dat běží na samostatném výpočetním hostu.
 
 == Release workflow, distribuce image a aktualizace služeb
 Nasazení celého ekosystému stavím na jednotném image-based `CI/CD` modelu. Vývojář po dokončení změny publikuje release tag `vX.Y.Z`, který aktivuje workflow na Gitea runneru. Ten ověří formát tagu, podle povahy služby provede build a testy, sestaví produkční image a publikuje jej do interního registru kontejnerových image `docker.kzcr.eu`.
@@ -106,7 +75,7 @@ Po úspěšném buildu workflow vytváří minimální deploy bundle. U frontend
   caption: [Obecný image-based release tok služby s distribucí do registry a nasazením na cílový host],
 ) <obr:deployment-flow>
 
-U backendové části na tento obecný tok navazuje migrační quality gate. `migration` musí úspěšně dokončit změnu schématu ještě před startem `hr-backend`, jinak je nasazení ukončeno. U služeb vrstvy inteligentního zpracování dat zůstává princip shodný, ale deploy bundle navíc obsahuje runtime parametry pro přístup k `RabbitMQ`, `SeaweedFS`, `Apache Tika` a `Ollama`. Frontendy oproti tomu využívají hlavně build-time konfiguraci veřejných URL a analytiky.
+U backendové části na tento obecný tok navazuje migrační quality gate. `migration` musí úspěšně dokončit změnu schématu ještě před startem `hr-backend`, jinak je nasazení ukončeno. U služeb vrstvy inteligentního zpracování dat zůstává princip shodný, ale deploy bundle navíc obsahuje runtime parametry pro přístup k `RabbitMQ`, `SeaweedFS`, `Apache Tika` a `Ollama`. Tyto služby současně běží na odděleném výpočetním hostu s vlastním runtime profilem a lokální GPU akcelerací, takže nejsou svázány se stejným provozním režimem jako transakční backend. Frontendy oproti tomu využívají hlavně build-time konfiguraci veřejných URL a analytiky.
 
 Rollback je v tomto modelu realizován návratem ke staršímu release tagu a opětovným spuštěním Compose nad starším image. Výhodou image-based přístupu je, že rollback nevyžaduje nový build ze zdrojových kódů, ale pouze výběr dříve publikovaného artefaktu.
 
