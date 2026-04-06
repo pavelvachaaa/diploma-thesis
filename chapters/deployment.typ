@@ -1,9 +1,9 @@
 #import "../template/abbreviations.typ": abbr
 
-Navržený systém má hodnotu jen tehdy, pokud jej lze provozně udržet v podmínkách #abbr("KZ", none). V této kapitole proto nepopisuji nasazení jako technický dovětek k implementaci, ale jako samostatnou vrstvu návrhu, která musí respektovat požadavky na on-premise provoz (NF07), dostupnost (NF04), auditovatelnost (NF11) a interoperabilitu (NF12). Nasazení se netýká jediné aplikace, ale soustavy spolupracujících frontendových, backendových, integračních a výpočetních služeb, které dohromady tvoří jeden provozní celek.
+Navržený systém má hodnotu jen tehdy, pokud jej lze provozně udržet v podmínkách #abbr("KZ", none). Nasazení proto v této práci nevystupuje jako technický dovětek k implementaci, ale jako samostatná vrstva návrhu, která musí respektovat požadavky na on-premise provoz (NF07), dostupnost (NF04), auditovatelnost (NF11) a interoperabilitu (NF12). Nejde o uvedení jediné aplikace do běhu, ale o koordinaci spolupracujících frontendových, backendových, integračních a výpočetních služeb, které dohromady tvoří jeden provozní celek.
 
 == Kontejnerizační model a síťová segmentace
-Jednotlivé části systému distribuuji jako samostatné kontejnerové image a provozuji je pomocí `Docker Compose`. Tento přístup jsem zvolil proto, že odpovídá cílovému on-premise prostředí a současně nevyžaduje zavedení rozsáhlejšího orchestracečního rámce již v pilotní fázi. Bezstavové služby jsou aktualizovány výměnou image, zatímco stavové komponenty používají perzistentní volumes nebo sdílenou databázovou vrstvu. Přehled hlavních služeb uvádím v @tab:deployment-services.
+Jednotlivé části systému distribuuji jako samostatné kontejnerové image a provozuji je pomocí `Docker Compose`. Tento přístup odpovídá cílovému on-premise prostředí a současně nevyžaduje zavedení rozsáhlejšího orchestračního rámce už v pilotní fázi. Bezstavové služby jsou aktualizovány výměnou image, zatímco stavové komponenty používají perzistentní volumes nebo sdílenou databázovou vrstvu. Přehled hlavních služeb uvádím v @tab:deployment-services.
 
 #figure(
   [
@@ -45,12 +45,12 @@ Jednotlivé části systému distribuuji jako samostatné kontejnerové image a 
 
 Síťový model používá čtyři logické segmenty. `app-network` nese hlavní aplikační komunikaci mezi frontendy, backendem a stavovými službami. `adapter-internal` odděluje interní adaptéry `qualification-adapter` a `user-search-adapter`, které jsou přístupné pouze službě `hr-backend`. `monitoring_network` je vyhrazena pro sběr logů a metrik. Síť `kz` propojuje host vrstvy inteligentního zpracování dat s procesory `cv_processor`, `job_processor`, `Apache Tika` a `Ollama`. Interní adaptéry záměrně nemají publikovaný host port, protože jejich rozhraní slouží jen pro komunikaci mezi službami a nepatří do veřejného síťového perimetru.
 
-TODO: Rozhodnout se ještě jestli zminovat DMZ, zabix fiewall atsd-... 
+Podrobnější síťová opatření, například konkrétní firewallová pravidla nebo umístění jednotlivých služeb do širší infrastruktury organizace, závisejí na cílovém prostředí #abbr("KZ", none). V této práci proto zachycuji především logické segmenty a důvody jejich oddělení, nikoli detailní síťovou konfiguraci konkrétní instalace.
 
 == Nasazení aplikačního stacku `hiring_backend`
-Aplikační stack tvoří `hr-backend`, migrační služba `migration`, interní adaptéry `qualification-adapter` a `user-search-adapter`, stavové služby `PostgreSQL`, `SeaweedFS`, `RabbitMQ` a doprovodná analytická služba `Umami`. Toto rozdělení jsem zvolil proto, aby transakční API zůstalo oddělené od integračních detailů i od pomocných provozních funkcí.
+Aplikační stack tvoří `hr-backend`, migrační služba `migration`, interní adaptéry `qualification-adapter` a `user-search-adapter`, stavové služby `PostgreSQL`, `SeaweedFS`, `RabbitMQ` a doprovodná analytická služba `Umami`. Toto rozdělení zachovává transakční API oddělené od integračních detailů i od pomocných provozních funkcí.
 
-Startovací posloupnost má explicitní pořadí:
+Startovací posloupnost má explicitní pořadí, protože právě na ní závisí, zda se nové nasazení rozběhne konzistentně vůči databázi a interním závislostem:
 
 1. Nejprve se startuje `PostgreSQL` a čeká se na úspěšný `healthcheck`.
 2. Následně se spustí jednorázová služba `migration`, která aplikuje SQL migrace a představuje quality gate mezi novou verzí aplikace a databázovým schématem.
@@ -68,7 +68,7 @@ Asynchronní persistenci auditu zajišťuje samostatný worker `audit_writer_pro
 `audit_writer_processor` nemá veřejné HTTP rozhraní a je provozován pouze jako interní asynchronní worker. Jeho provozními závislostmi jsou `RabbitMQ`, `PostgreSQL` a aplikační síť, v níž jsou obě služby dostupné. V textu je důležité odlišovat tento worker od samotné tabulky `audit_events`; tabulka je datová struktura, zatímco worker představuje vykonávací provozní komponentu.
 
 == Nasazení vrstvy inteligentního zpracování dat
-Vrstva inteligentního zpracování dat je provozována na samostatném hostu, aby byla výpočetně náročná inference oddělena od transakční části systému. Tento host obsluhuje `cv_processor`, `job_processor`, pomocnou službu `Apache Tika` a lokální inferenční backend `Ollama`. Oddělení této vrstvy omezuje riziko, že dlouhé nebo GPU náročné úlohy zhorší dostupnost `hr-backend`.
+Vrstva inteligentního zpracování dat je provozována na samostatném hostu, aby byla výpočetně náročná inference oddělena od transakční části systému. Tento host obsluhuje `cv_processor`, `job_processor`, pomocnou službu `Apache Tika` a lokální inferenční backend `Ollama`. Oddělení této vrstvy omezuje riziko, že dlouhé nebo GPU náročné úlohy zhorší dostupnost `hr-backend`, a současně umožňuje nastavovat odlišný runtime profil než u hlavního aplikačního hostu.
 
 `cv_processor` je navázán na asynchronní tok přes `RabbitMQ`. Po přijetí události stáhne dokument ze `SeaweedFS`, předá jej do `Apache Tika` pro extrakci textu, zavolá `Ollama` pro analýzu a generování embeddingů a výsledek publikuje zpět do messaging vrstvy. Naproti tomu `job_processor` vystupuje jako samostatná HTTP/SSE služba, kterou `hr-backend` volá synchronně při generování nebo úpravě obsahu pracovních inzerátů. Oba procesory sdílejí stejný inferenční backend, ale plní odlišné integrační role. Přehled vrstvy inteligentního zpracování dat uvádím v @tab:deployment-ai-services.
 
@@ -94,7 +94,7 @@ Vrstva inteligentního zpracování dat je provozována na samostatném hostu, a
 Výpočetní host využívá lokální `Ollama` akcelerovanou GPU kartou NVIDIA A10 s kapacitou 24 GB VRAM. Tento údaj v kontextu nasazení neuvádím jako marketingový parametr, ale jako provozní zdůvodnění, proč je vrstva inteligentního zpracování dat oddělena na samostatný uzel a proč má vlastní runtime konfiguraci.
 
 == Release workflow, distribuce image a aktualizace služeb
-Nasazení celého ekosystému popisuji jako jednotný image-based `CI/CD` model. Vývojář po dokončení změny publikuje release tag `vX.Y.Z`, který aktivuje workflow na Gitea runneru. Ten ověří formát tagu, podle povahy služby provede build a testy, sestaví produkční image a publikuje jej do interního registru kontejnerových image `docker.kzcr.eu`.
+Nasazení celého ekosystému stavím na jednotném image-based `CI/CD` modelu. Vývojář po dokončení změny publikuje release tag `vX.Y.Z`, který aktivuje workflow na Gitea runneru. Ten ověří formát tagu, podle povahy služby provede build a testy, sestaví produkční image a publikuje jej do interního registru kontejnerových image `docker.kzcr.eu`.
 
 Po úspěšném buildu workflow vytváří minimální deploy bundle. U frontendů jde typicky o `compose.yaml` a `.env.deploy`, u backendových a worker služeb se přidává runtime konfigurace nebo pomocný deploy skript. Bundle je přenesen přes `SSH` na cílový host, kde se následně provede `docker login`, `docker compose pull` a `docker compose up -d --remove-orphans`. Cílový server proto nepotřebuje pracovní checkout repozitáře; postačuje mu Docker, `Docker Compose` plugin, runtime konfigurace a přístup do interní registry.
 
@@ -140,7 +140,7 @@ Konkrétní role jednotlivých komponent dohledové vrstvy shrnuje @tab:deployme
 ) <tab:deployment-observability>
 
 == Provozní omezení a mitigace
-Navržený model nasazení představuje pragmatický kompromis mezi rychlostí implementace, provozní jednoduchostí a mírou infrastrukturní vyspělosti. Oproti jednodušší monolitické aplikaci přináší vyšší počet samostatných image, více release artefaktů a nutnost koordinovat aplikační host s odděleným hostem vrstvy inteligentního zpracování dat. Provoz je navíc závislý na interní registry kontejnerových image a na správné správě environment konfigurace na cílových serverech.
+Navržený model nasazení představuje pragmatický kompromis mezi rychlostí implementace, provozní jednoduchostí a mírou infrastrukturní vyspělosti. Oproti jednodušší monolitické aplikaci přináší vyšší počet samostatných obrazů, více release artefaktů a nutnost koordinovat aplikační host s odděleným hostem vrstvy inteligentního zpracování dat. Provoz je navíc závislý na interním registru kontejnerových obrazů a na správné správě environment konfigurace na cílových serverech.
 
 Další omezení plyne ze zvolené orchestrace pomocí `Docker Compose`. Tento přístup je dobře obhajitelný pro pilotní a menší produkční prostředí, ale neposkytuje vlastnosti běžné u vyšších orchestrátorů, například automatické rozložení zátěže mezi více uzly, nativní self-healing napříč hosty nebo deklarativní správu rozsáhlého clusteru. Část provozních rozhodnutí je navíc stále založena více na logové analýze než na plně formalizovaném modelu `SLO`, protože pokrytí všech komponent metrikami se průběžně rozšiřuje.
 

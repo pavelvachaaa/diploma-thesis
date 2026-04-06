@@ -1,0 +1,85 @@
+@startuml
+left to right direction
+hide stereotype
+
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam defaultFontName Arial
+skinparam defaultTextAlignment center
+skinparam dpi 160
+skinparam ranksep 30
+skinparam nodesep 30
+skinparam ArrowColor #475569
+skinparam ArrowThickness 1.0
+skinparam RoundCorner 14
+
+skinparam rectangle {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  FontColor #0F172A
+}
+
+skinparam rectangle<<frontend>> {
+  BackgroundColor #EAF2FF
+  BorderColor #2B5AA6
+}
+
+skinparam rectangle<<service>> {
+  BackgroundColor #E8FFF8
+  BorderColor #0F766E
+}
+
+skinparam rectangle<<external>> {
+  BackgroundColor #F1F5F9
+  BorderColor #64748B
+}
+
+skinparam actor {
+  BorderColor #64748B
+  FontColor #0F172A
+}
+
+title Platforma naboru a adaptace KZ - system v kontextu roli a externich sluzeb
+
+actor "Uchazec" as Candidate
+actor "HR pracovnik" as HR
+actor "Vedouci zamestnanec" as Manager
+actor "Nastupujici zamestnanec" as Employee
+actor "Spravce systemu" as Admin
+
+rectangle "Systemova hranice: Platforma naboru a adaptace KZ" {
+  package "Verejne a interni vstupni body" {
+    rectangle "Karierni portal" <<frontend>> as CareerPortal
+    rectangle "Administracni a onboardingove rozhrani" <<frontend>> as InternalPortal
+  }
+
+  rectangle "Transakcni a integracni jadro" <<service>> as Core
+}
+
+rectangle "SSO / OIDC" <<external>> as SSO
+rectangle "NRZP" <<external>> as NRZP
+rectangle "SMTP server" <<external>> as SMTP
+rectangle "Vema\n[R5 - planovano]" <<external>> as Vema
+
+Candidate --> CareerPortal : prohlizi pozice\npodava prihlasky
+HR --> InternalPortal : ridi nabor\nspravuje agendu
+Manager --> InternalPortal : schvaluje nastup\nsleduje adaptaci
+Employee --> InternalPortal : plni onboarding
+Admin --> InternalPortal : spravuje role\na organizace
+
+CareerPortal --> Core
+InternalPortal --> Core
+
+Core --> SSO : OIDC
+Core --> NRZP : overeni kvalifikace
+Core --> SMTP : transakcni e-maily
+Core --> Vema : personalni data
+
+CareerPortal -[hidden]down-> InternalPortal
+SSO -[hidden]down-> NRZP
+NRZP -[hidden]down-> SMTP
+SMTP -[hidden]down-> Vema
+
+@enduml

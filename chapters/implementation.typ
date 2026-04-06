@@ -1,13 +1,13 @@
 #import "../template/abbreviations.typ": abbr
 
-V této kapitole popisuji, jak jsem architektonický návrh převedl do konkrétní implementace. Nejde mi o úplný výpis všech tříd, tabulek a endpointů, ale o vysvětlení, jaké implementační problémy bylo nutné vyřešit, jaké prostředky jsem pro to zvolil a proč jsou tato rozhodnutí důležitá pro cíl celé práce.
+Architektonický návrh má smysl jen tehdy, pokud se podaří převést jeho principy do konkrétní implementace bez toho, aby se po cestě rozpadly pod tlakem technologických kompromisů. V této kapitole proto nesleduji úplný výpis všech tříd, tabulek a endpointů, ale ta rozhodnutí, na nichž se láme rozdíl mezi formálně správným návrhem a skutečně provozně použitelným systémem.
 
-Implementační popis se soustředí na části, které nesou hlavní architektonickou logiku systému a to především na modulární backend, hexagonální rozdělení odpovědností, spolehlivou asynchronní komunikaci, datovou vrstvu, bezpečnostní model a oddělenou vrstvu inteligentního zpracování dat. Právě v těchto částech se rozhoduje, zda návrh zůstane jen formálním modelem, nebo se promění v provozně použitelný systém.
+Pozornost soustředím především na modulární backend, hexagonální rozdělení odpovědností, spolehlivou asynchronní komunikaci, datovou vrstvu, bezpečnostní model a oddělenou vrstvu inteligentního zpracování dat. Právě v těchto částech se ukazuje, zda navržená architektura dokáže unést reálné procesní a provozní požadavky #abbr("KZ", none).
 
 == Struktura řešení
-Celé řešení je implementováno jako sada spolupracujících aplikací a služeb s oddělenými odpovědnostmi. Transakční část systému je realizována v prostředí Node.js/Express, webové portály jsou postaveny na Next.js a podpůrné zpracovatelské či integrační služby běží převážně v jazyce Go. Takové rozdělení jsem zvolil proto, že každá část řeší jiný problém. Backend vyžaduje doménovou konzistenci, frontendy rychlý rozvoj rozhraní a procesory vrstvy inteligentního zpracování dat efektivní práci s asynchronními úlohami.
+Celé řešení je implementováno jako sada spolupracujících aplikací a služeb s oddělenými odpovědnostmi. Transakční část systému je realizována v prostředí Node.js/Express, webové portály jsou postaveny na Next.js a podpůrné zpracovatelské či integrační služby běží převážně v jazyce Go. Toto rozdělení nevyplývá z technologické preference samo o sobě, ale z rozdílného charakteru jednotlivých problémů. Backend vyžaduje doménovou konzistenci, frontendy rychlý rozvoj rozhraní a procesory vrstvy inteligentního zpracování dat efektivní práci s asynchronními úlohami.
 
-Vedle hlavního backendu tak řešení zahrnuje i samostatné služby pro auditní zápis, integrační adaptéry a inteligentní zpracování dokumentů či textů pracovních pozic. Tyto komponenty spolu komunikují přes HTTP rozhraní nebo přes `RabbitMQ`. Praktickým důsledkem je, že mohu odděleně nasazovat a škálovat části s odlišným provozním profilem, aniž bych rozděloval celý systém na síťově fragmentovaný soubor mikroslužeb.
+Vedle hlavního backendu tak řešení zahrnuje i samostatné služby pro auditní zápis, integrační adaptéry a inteligentní zpracování dokumentů či textů pracovních pozic. Tyto komponenty spolu komunikují přes HTTP rozhraní nebo přes `RabbitMQ`. Praktickým důsledkem je možnost odděleně nasazovat a škálovat části s odlišným provozním profilem, aniž by se celý systém rozpadl na síťově fragmentovaný soubor mikroslužeb.
 
 #figure(
   image(
@@ -42,13 +42,30 @@ Z fyzického hlediska je backend rozdělen do pěti hlavních částí. `src/rou
   caption: [Implementační realizace hexagonální architektury backendu],
 ) <tab:impl-backend-layers>
 
+=== Použité návrhové a integrační vzory v hiring_backend
+Architektonická kapitola obhajuje principy backendu na koncepční úrovni. Z pohledu implementace je ale důležité ukázat, že nejde o abstraktní slovník pojmů, nýbrž o soubor konkrétních vzorů, které společně drží `hiring_backend` čitelný, rozšiřitelný a provozně stabilní.
+
+Nejvýrazněji je přítomen vzor `Ports and Adapters`, tedy hexagonální architektura. Řeší problém, jak oddělit doménovou logiku od technologií a integračních detailů tak, aby se business pravidla nerozpadla při každé změně databáze, messaging vrstvy nebo externí služby. V `hiring_backend` se tento vzor promítá do kontraktů ve `src/shared/contracts/ports`, do technologických adaptérů ve `src/platform/*` i do rozdělení vstupních a výstupních hranic aplikace. Praktickým přínosem je, že doména vyjadřuje pouze schopnosti, které potřebuje, zatímco konkrétní infrastruktura zůstává uzavřena v adaptační vrstvě.
+
+S hexagonálním uspořádáním úzce souvisí vzor `Repository`. Jeho smyslem je oddělit práci s perzistencí od aplikačních služeb tak, aby use-cases nemusely nést detailní znalost SQL dotazů a fyzického schématu. V backendu se tento přístup projevuje přímo v modulové struktuře `src/domain/*/repository`, kde každý kontext zapouzdřuje vlastní datový přístup. Přínosem je menší vazba mezi business logikou a databázovou vrstvou a současně čitelnější hranice odpovědnosti uvnitř jednotlivých modulů.
+
+Dalším důležitým vzorem je `Dependency Injection`. Ten řeší problém skládání závislostí v aplikaci, která už není malým monolitickým skriptem, ale systémem s porty, adaptéry, službami a moduly s odlišnými rolemi. V `hiring_backend` tuto úlohu plní kontejner `Awilix` spolu s registrací vazeb v `src/container.registry.js`. Praktickým přínosem je, že jednotlivé části backendu nejsou pevně svázány konkrétní implementací při vytváření objektů, což zjednodušuje výměnu adaptérů, testování i dlouhodobou údržbu.
+
+Pro zápisové a integrační toky je klíčový vzor `Transactional Outbox`. Řeší problém, jak bezpečně navázat vedlejší efekty na doménovou transakci bez rizika, že se business data uloží, ale navazující notifikace, audit nebo publikační událost se kvůli chybě nikdy nevykoná. V backendu se tento vzor realizuje pomocí tabulky `side_effect_outbox`, samostatného workeru a outbox handlerů. Praktickým přínosem je vyšší konzistence mezi databází a integrační vrstvou a menší náchylnost systému k chybám v mezistavech.
+
+Na outbox navazuje vzor `Idempotency`. Ten řeší opačný, ale stejně důležitý problém: aby opakovaný požadavek nebo duplicitní zpracování nezpůsobilo opětovné provedení stejné zápisové operace. V textu backendu se tento přístup promítá zejména do `command_idempotency` a do řízení zápisových toků, kde je potřeba odlišit nový požadavek od opakovaného doručení. Praktickým přínosem je vyšší odolnost vůči nestabilní síti, opakovanému kliknutí uživatele nebo znovudoručení zprávy v integračním řetězci.
+
+Posledním důležitým vzorem je `Adapter`, přesněji integrační mezivrstva blízká `Anti-Corruption Layer`. Řeší problém, jak ochránit doménu před cizími protokoly, datovými modely a chybovými stavy externích systémů. V `hiring_backend` se tento princip projevuje například přes `qualification-adapter` a `user-search-adapter`, zatímco doména pracuje pouze s kontrolovaným interním kontraktem. Praktickým přínosem je, že změna integračního detailu nebo specifik externího systému neprotéká přímo do business logiky backendu.
+
+`hiring_backend` tedy nestojí na jednom izolovaném vzoru, ale na jejich kombinaci. Hexagonální uspořádání omezuje vazby mezi doménou a infrastrukturou, `Repository` abstrahuje přístup k datům, `Dependency Injection` řídí skládání závislostí, `Transactional Outbox` a `Idempotency` stabilizují integrační a zápisové toky a integrační adaptéry chrání doménu před cizími rozhraními. Právě tato kombinace umožňuje, aby backend zůstal čitelný i v situaci, kdy musí současně řešit business pravidla, bezpečnost, messaging a více externích vazeb.
+
 === Implementace doménové vrstvy
-Doménové jádro je členěno do modulů odpovídajících hlavním kontextům systému. Prakticky jde například o správu uchazečů (`applicants`), pracovních pozic (`jobs`), pohovorů (`interviews`), zaměstnanců (`employees`), organizací (`organizations`), číselníků (`catalog`) nebo interních uživatelů (`internal_users`). Každý modul má vlastní use-cases, repozitáře a události, takže změna v jedné oblasti nemusí automaticky rozbíjet zbytek systému.
+Doménové jádro je členěno do modulů odpovídajících hlavním kontextům systému. Prakticky jde například o správu uchazečů (`applicants`), pracovních pozic (`jobs`), pohovorů (`interviews`), zaměstnanců (`employees`), organizací (`organizations`), číselníků (`catalog`) nebo interních uživatelů (`internal_users`). Každý modul má vlastní use-cases, repozitáře a události, takže změna v jedné oblasti nemusí automaticky rozbít zbytek systému.
 
 Toto členění řeší dva problémy současně. Zaprvé omezuje přímé závislosti mezi nesouvisejícími částmi backendu. Zadruhé umožňuje číst a rozvíjet konkrétní oblast bez nutnosti držet v hlavě celou aplikaci. Právě tato vlastnost je důležitá pro dlouhodobou udržitelnost projektu.
 
 === Implementace hexagonální architektury
-Hexagonální architekturu jsem v implementaci nepoužil jen jako pojmenování složek, ale jako způsob práce se závislostmi. Porty představují explicitní kontrakty, které určují, co smí doména požadovat od svého okolí. Jsou soustředěny ve složce `src/shared/contracts/ports` a vytvářeny pomocí helperu `createServicePort`, který vystaví jen povolené metody a uzamkne je do neměnného rozhraní.
+Hexagonální architekturu jsem v implementaci nepoužil jen jako pojmenování složek, ale jako základní návrhový vzor pro práci se závislostmi. Porty představují explicitní kontrakty, které určují, co smí doména požadovat od svého okolí. Jsou soustředěny ve složce `src/shared/contracts/ports` a vytvářeny pomocí helperu `createServicePort`, který vystaví jen povolené metody a uzamkne je do neměnného rozhraní.
 
 Konkrétní technické detaily jsou potom uzavřeny v adaptérech ve složce `src/platform`. Například `platform/qualification` převádí doménový požadavek na interní HTTP volání služby `qualification-adapter`, `platform/userSearch` komunikuje se službou `user-search-adapter`, `platform/audit` řeší auditní transport a `platform/outbox` se stará o spolehlivé doručování vedlejších efektů. Doména tak neřeší, zda je komunikace realizována přes SQL, HTTP, AMQP nebo objektové úložiště.
 
@@ -58,7 +75,7 @@ Architektonická pravidla nestačí pouze deklarovat. Proto jsem je v implementa
 Tento mechanismus je důležitý hlavně proto, že architektonická kázeň má tendenci upadat právě v okamžiku, kdy projekt roste a přibývá tlak na rychlé úpravy. Testy zde fungují jako technická pojistka proti tomu, aby se výjimka z pravidla stala novým standardem.
 
 === Implementace spolehlivé asynchronní komunikace
-Klíčovým implementačním problémem bylo zajistit, aby vedlejší efekty navázané na doménovou transakci byly spolehlivě doručeny i při chybách integrační vrstvy. Tento problém řeším tabulkou `side_effect_outbox` a samostatným workerem. Doménová operace zapisuje business data i záznam do outboxu v jedné transakci; až po commit fázi worker položku vyzvedne a publikuje.
+Klíčovým implementačním problémem bylo zajistit, aby vedlejší efekty navázané na doménovou transakci byly spolehlivě doručeny i při chybách integrační vrstvy a současně nebyly prováděny duplicitně. Tento problém řeším kombinací vzorů `Transactional Outbox` a `Idempotency`, konkrétně tabulkou `side_effect_outbox`, samostatným workerem a řízením zápisových toků nad idempotency vrstvou. Doménová operace zapisuje business data i záznam do outboxu v jedné transakci; až po commit fázi worker položku vyzvedne a publikuje.
 
 #figure(
   [
@@ -91,7 +108,7 @@ Vrstva inteligentního zpracování dat je implementována jako samostatné slu�
 
 Služba `cv_processor` zpracovává životopisy asynchronně. Po přijetí události z `RabbitMQ` načte dokument z objektového úložiště, extrahuje text a provede jeho strukturovanou analýzu i generování embeddingů. Výsledek pak publikuje zpět do systému jako integrační událost. Služba `job_processor` je zaměřena na práci s textem pracovních pozic a obsluhuje scénáře, ve kterých backend potřebuje inteligentní generování nebo úpravu obsahu.
 
-Praktickým přínosem tohoto rozdělení je to, že dočasná nedostupnost AI vrstvy neblokuje základní náborové a onboardingové funkce. Systém tak degraduje řízeně: přijdou o část rozšířené funkcionality, nikoli o samotné transakční jádro.
+Praktickým přínosem tohoto rozdělení je, že dočasná nedostupnost AI vrstvy neblokuje základní náborové a onboardingové funkce. Systém tak degraduje řízeně. Uživatelé mohou přijít o část rozšířené funkcionality, nikoli o samotné transakční jádro.
 
 #figure(
   image(
@@ -153,7 +170,6 @@ Role check v middleware tedy není poslední autorizační krok, ale jen vstupn�
 == Implementace onboardingového portálu
 Onboardingový portál jsem implementoval jako Next.js aplikaci oddělenou od veřejného kariérního portálu. Toto rozdělení řeší problém, že HR pracovníci a nastupující zaměstnanci potřebují pracovat s odlišnými typy úloh i s jiným bezpečnostním režimem. Na úrovni implementace jsem proto oddělil layouty, cesty i stavovou logiku podle role uživatele.
 
-
 todo: rozšířit asi třeba o obrázek a nějaké kecy okolo
 
 == Implementace kariérního portálu
@@ -170,7 +186,7 @@ Vzhledem k tomu, že backend vrací popis pozice ve formátu HTML, řešil jsem 
 === Integrace analytického nástroje Umami
 Pro analytické účely jsem do portálu integroval nástroj `Umami`. Jeho smyslem není zasahovat do rozhodování systému, ale měřit průchod uživatelů portálem a identifikovat místa, kde uchazeči proces opouštějí. Inicializace analytiky je provedena centrálně v kořenové komponentě aplikace, aby bylo zajištěno jednotné měření napříč stránkami.
 
-Sleduji zejména interakce s katalogem pozic, otevření detailu nabídky, zahájení reakce na pozici, práci s formulářem a výsledek jeho odeslání. Tato data slouží jako podpůrný vstup pro další iterace portálu a doplňují kvalitativní poznatky z uživatelského testování.
+Sleduji zejména interakce s katalogem pozic, otevření detailu nabídky, zahájení reakce na pozici, práci s formulářem a výsledek jeho odeslání. Tato data slouží jako podpůrný vstup pro další iterace portálu a doplňují kvalitativní poznatky z pilotního uživatelského ověření.
 
 == Implementace dohledové vrstvy
 Dohledovou vrstvu jsem implementoval jako kombinaci strukturovaného logování, metrik a centralizovaného dashboardingu. Tento krok řeší problém, že v distribuovanějším systému už nestačí číst lokální logy jednotlivých služeb. Potřebuji sledovat request kontext, zdraví asynchronní vrstvy i chování oddělených procesorů z jednoho místa.
@@ -180,7 +196,7 @@ Na úrovni aplikace generuji strukturované logy a publikuji metriky pro kritick
 == Komunikace s národními registry
 Napojení na národní registry jsem řešil primárně pro Národní registr zdravotnických pracovníků (`NRZP`) spravovaný #abbr("ÚZIS", none). Praktická zkušenost ukázala, že samotné technické rozhraní ještě neznamená funkční integraci. Vedle klientského certifikátu bylo nutné řešit i přidělení externích identifikačních údajů a odpovídajících oprávnění na straně poskytovatele služby.
 
-Z architektonického hlediska jsem proto integrační logiku neumístil přímo do `hiring_backend`, ale oddělil ji do interní služby `qualification-adapter`. Backend vystavuje pouze administrační endpoint `POST /api/v1/admin/qualifications/lookup`, který je dostupný vybraným rolím. Doménová služba podporuje dotaz podle čísla pracovníka v `NRZP` i podle rodného čísla, vstup normalizuje a validuje a teprve potom volá platformní adaptér.
+Z architektonického hlediska jsem proto integrační logiku neumístil přímo do `hiring_backend`, ale zarámoval ji jako adaptační mezivrstvu blízkou vzoru `Adapter / Anti-Corruption Layer` a oddělil ji do interní služby `qualification-adapter`. Backend vystavuje pouze administrační endpoint `POST /api/v1/admin/qualifications/lookup`, který je dostupný vybraným rolím. Doménová služba podporuje dotaz podle čísla pracovníka v `NRZP` i podle rodného čísla, vstup normalizuje a validuje a teprve potom volá platformní adaptér.
 
 `qualification-adapter` běží pouze v interní Docker síti a funguje jako mezivrstva mezi backendem a existující integrační vrstvou nad `InterSystems IRIS`. Tento mezistupeň řeší tři problémy najednou: izoluje specifika SOAP/WSDL rozhraní mimo business logiku, sjednocuje chybové stavy do kontrolovaného HTTP kontraktu a zjednodušuje případnou výměnu integračního detailu bez zásahu do domény.
 

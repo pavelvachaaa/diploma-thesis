@@ -39,16 +39,16 @@
 #include "chapters/introduction.typ"
 
 = Analýza současného stavu
-Efektivní digitalizace podnikových procesů vyžaduje důkladné porozumění stávajícímu stavu organizace, jejím procesům a specifickým potřebám. V souladu s metodikou procesního řízení dle Řepy @repa2007podnikove je prvním krokem identifikace a dokumentace klíčových procesů, jejich aktérů, vstupů, výstupů a rozhodovacích bodů. Teprve na základě této analýzy je možné formulovat požadavky na informační systém, který tyto procesy podpoří nebo nahradí.
+Efektivní digitalizaci nelze stavět na domněnkách o tom, jak organizace funguje, ale na přesném porozumění skutečnému průběhu procesů, jejich aktérům a slabým místům. V souladu s metodikou procesního řízení dle Řepy @repa2007podnikove proto analytická část nejprve mapuje výchozí stav a teprve na tomto základě formuluje požadavky na budoucí informační systém.
 
-Tato kapitola se zabývá analýzou současného stavu procesů náboru a adaptace pracovníků v Krajské Zdravotní a.s. Nejprve je představena organizace a její specifika v kontextu řízení lidských zdrojů ve zdravotnictví. Následně jsou podrobně popsány klíčové procesy pomocí notace BPMN (Business Process Model and Notation), identifikována úzká místa a formulovány požadavky na digitalizaci ve formě funkcionálních a nefunkcionálních požadavků.
+Analýza současného stavu procesů náboru a adaptace pracovníků v Krajské zdravotní, a.s. proto nejprve ukotvuje organizační a doménová specifika zdravotnického prostředí. Následně zachycuje klíčové procesy pomocí notace BPMN (Business Process Model and Notation), identifikuje jejich úzká místa a převádí zjištěné nedostatky do podoby funkčních a nefunkčních požadavků.
 
 #include "chapters/analysis.typ"
 
 = Existující softwarová řešení
-Před návrhem vlastního řešení je nezbytné provést systematickou rešerši existujících softwarových produktů a posoudit jejich vhodnost pro pokrytí definovaných požadavků. Cílem této kapitoly je analyzovat dostupné produkty z kategorie ATS (Applicant Tracking Systems), onboardingových platforem a integrovaných HR systémů, identifikovat jejich silné a slabé stránky v kontextu požadavků KZ a zdůvodnit rozhodnutí o vývoji vlastního řešení.
+Rozhodnutí o vlastním vývoji je obhajitelné jen tehdy, pokud je zřejmé, proč dostupné produkty nedokážou naplnit požadavky dané organizace bez nepřiměřených kompromisů. Rešeršní kapitola proto porovnává dostupná řešení z kategorií ATS (Applicant Tracking Systems), onboardingových platforem a integrovaných HR systémů a hodnotí je optikou podmínek #abbr("KZ", none).
 
-Při hodnocení existujících řešení byla zohledněna kritéria pokrytí požadavků na digitalizaci procesů uvedených v @tab:pozadavky-digitalizace, české jazykové prostředí a lokalizace, cenová dostupnost, přizpůsobitelnost procesům zdravotnické organizace a možnost provozování na vlastní infrastruktuře (on-premise).
+Při hodnocení jsou zohledněna zejména kritéria pokrytí požadavků na digitalizaci procesů uvedených v @tab:pozadavky-digitalizace, české jazykové prostředí a lokalizace, přizpůsobitelnost procesům zdravotnické organizace a možnost provozování na vlastní infrastruktuře. Cílem není najít obecně nejznámější produkt na trhu, ale určit, zda některé z existujících řešení dokáže obhájit procesní, architektonické i provozní nároky této práce.
 
 #include "chapters/research.typ"
 

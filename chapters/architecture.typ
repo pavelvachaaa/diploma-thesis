@@ -1,15 +1,14 @@
 #import "../template/abbreviations.typ": abbr
 
-Architektura navrženého řešení musela odpovědět na otázku, jak digitalizovat nábor a adaptaci v prostředí, které je zároveň organizačně členité, regulatorně citlivé a provozně omezené on-premise infrastrukturou. Nešlo mi tedy o návrh obecně elegantního systému, ale o takovou architekturu, která bude obhajitelná vůči požadavkům Krajské zdravotní, a.s. a současně zůstane dlouhodobě udržitelná.
+Architektura navrženého řešení musela odpovědět na praktickou otázku, jak digitalizovat nábor a adaptaci v prostředí, které je současně organizačně členité, regulatorně citlivé a provozně omezené on-premise infrastrukturou. Nešlo tedy o návrh obecně elegantního systému, ale o takovou architekturu, která bude obhajitelná vůči požadavkům Krajské zdravotní, a.s. a zároveň zůstane dlouhodobě udržitelná.
 
-== Architektonické cíle a návrhové faktory
+== Architektonické východisko a volba cílového stylu
 Architektonická rozhodnutí jsem odvozoval přímo z provozního kontextu #abbr("KZ", none). Organizace není startup na zelené louce s jedním produktem a jedním týmem. Jde o holding se sedmi odštěpnými závody, regulovanými daty, heterogenními uživatelskými rolemi a omezenými provozními kapacitami. Z toho plyne, že architektura musí být nejen technicky správná, ale i srozumitelná pro další rozvoj a bezpečně provozovatelná.
 
 Nejsilnějším strukturálním požadavkem je multi-tenantní izolace dat (R1). Každý závod musí pracovat se svými daty, ale centrální vedení potřebuje průřezový pohled. Tento požadavek proto nelze řešit jen na úrovni oprávnění v uživatelském rozhraní. Musí být propsán do datového modelu, aplikačních služeb i do způsobu, jakým se vyhodnocují přístupová pravidla. Vedle toho musí systém pokrýt celý tok od zveřejnění pozice přes nábor a vstupní agendu až po adaptaci zaměstnance (R2-R4), být připraven na napojení externích služeb (R5) a poskytovat data pro řízení procesu (R6).
 
 Z kvalitativních atributů @bass2003software jsem kladl největší důraz na bezpečnost, auditovatelnost a provozní udržitelnost. V prostředí zdravotnictví není auditní stopa doplňkem, ale základní podmínkou důvěryhodnosti systému. Stejně tak on-premise provoz znamená, že nemohu spoléhat na komfort cloudových managed služeb. Architektura proto musí minimalizovat zbytečnou distribuovanou složitost a současně připustit řízený růst tam, kde je skutečně potřebný.
 
-== Architektura systému
 Při volbě architektonického stylu jsem porovnával čtyři varianty: klasický monolit, modulární monolit, přístup microservices-first a hybridní model. Rozhodnutí jsem nevázal na technologickou módnost, ale na to, jak dobře daný přístup unese požadavky na modularitu, integrace, provozní jednoduchost a budoucí rozšiřitelnost.
 
 #figure(
@@ -35,104 +34,81 @@ Klasický monolit by sice zjednodušil první implementační kroky, ale rychle 
 
 Jako cílový styl jsem proto zvolil hybridní architekturu. Transakční jádro systému jsem navrhl jako modulární monolit s využitím principů Domain-Driven Design a Ports and Adapters, zatímco vrstvu inteligentního zpracování dat jsem oddělil do specializovaných komponent `cv_processor` a `job_processor`. Výsledkem je kompromis, který zachovává jednoduchost hlavního jádra, ale nepřenáší výpočetní zátěž a integrační rizika do kritické transakční cesty.
 
-=== Vhled do celku systému
-Než přejdu k jednotlivým technickým pohledům, považuji za důležité zachytit systém jako jeden souvislý celek. Pro interní orientaci a validaci vazeb mezi byznysovou a technickou vrstvou jsem proto pracoval i s ArchiMate modelem @openGroupArchiMate2019 @langlois2013enterprise. Jeho smyslem nebylo nahradit detailní diagramy, ale ukázat, jak na sebe navazují aktéři, procesy, aplikační služby a infrastruktura.
+Další výklad proto neorganizuji podle jedné univerzální diagramové taxonomie, ale podle otázek, na které musí výsledná architektura odpovědět. Nejprve ukazuji celkový obraz řešení, poté vnitřní strukturu backendu, následně datové a integrační vazby a nakonec bezpečnostní a provozní důsledky zvoleného návrhu. Takový postup lépe odpovídá tomu, co je v této práci skutečně potřeba obhájit.
 
-//TODO: Export SVG z Archi a doplnit cestu
-// #figure(
-//   image("../procesy/architecture/archimate/kz_onboarding_suite.svg", width: 100%),
-//   caption: [ArchiMate model systému — od byznysových aktérů po technologickou vrstvu]
-// ) <obr:archimate>
-
-Na úrovni aktérů rozlišuji čtyři hlavní skupiny uživatelů: uchazeče o zaměstnání, nastupující zaměstnance, HR pracovníky a vedoucí zaměstnance. Každá z těchto skupin vstupuje do systému v jiném okamžiku a sleduje jiný cíl. To je důvod, proč architekturu nestavím kolem jedné univerzální aplikace, ale kolem více rozhraní nad společným doménovým jádrem.
-
-Byznysová vrstva zahrnuje správu pracovních pozic, uchazečů, pohovorů, zaměstnanců, dokumentů a adaptace. Na ni navazuje aplikační vrstva realizovaná backendem, veřejným kariérním portálem, onboardingovým portálem a specializovanými integračními či zpracovatelskými službami. Technologická vrstva pak zajišťuje perzistenci, messaging, práci s dokumenty, observabilitu a inteligentní zpracování dat. Tento pohled je důležitý hlavně proto, že připomíná, že technická architektura nevzniká sama pro sebe, ale jako přímá odpověď na procesní požadavky předchozích kapitol.
-
-== Hexagonální architektura a doménové hranice
-Jádro backendu stavím na hexagonální architektuře, kterou Cockburn popsal jako vzor Ports and Adapters @cockburnHexagonalArchitecture2005. V praktickém smyslu to znamená, že doménová logika nesmí být závislá na konkrétní databázi, messaging knihovně ani HTTP frameworku. Doména pouze vyjadřuje, jaké schopnosti od okolí potřebuje, a konkrétní technologie tyto potřeby naplňují v adaptační vrstvě.
-
-Tento přístup kombinuji s principy doménově orientovaného návrhu @evansDomaindrivenDesignTackling2003. Důvod je jednoduchý. V systému se pracuje s pojmy, které mají v prostředí #abbr("KZ", none) přesný význam. Uchazeč, pozice, pohovor, vstupní agenda nebo adaptace nejsou jen názvy entit v databázi, ale samostatné procesní celky se svými pravidly a odpovědnostmi. Oddělení těchto kontextů snižuje riziko, že se celý systém postupně změní v jednu neurčitou vrstvu služeb bez jasných hranic.
-
-V návrhu rozlišuji vstupní a výstupní adaptéry. Vstupní adaptéry převádějí vnější požadavek na use-case domény. V praxi jde o HTTP routy, middleware nebo konzumenty integračních událostí. Výstupní adaptéry naopak převádějí požadavky domény do konkrétní infrastruktury, například do SQL dotazu, práce s `RabbitMQ`, objektového úložiště, auditu, `OIDC`, registru `NRZP` nebo interního vyhledávání uživatelů. Port zde neznamená síťový port, ale pojmenovaný kontrakt mezi jádrem a okolím jako je například „ověř kvalifikaci pracovníka“, „vyhledej interního uživatele“  nebo „zapiš auditní událost“.
-
-Je důležité odlišit architektonickou hranici od hranice nasazovací. Hexagonální architektura sama o sobě neznamená, že každý adaptér musí být samostatná služba. Naopak většina adaptérů běží uvnitř jednoho backendového procesu. Samostatně odděluji jen ty části, jejichž runtime, provozní profil nebo integrační režim se od jádra skutečně liší.
-
-=== Důvody volby tohoto přístupu
-Prvním důvodem pro volbu hexagonální architektury je multi-tenantní charakter systému. Organizační kontext musí být nesen od vstupu do aplikace až po datovou vrstvu a nesmí se ztratit při přechodu mezi moduly. Explicitní porty a doménové hranice snižují riziko, že některá část implementace začne s daty pracovat mimo tento rámec.
-
-Druhým důvodem je integrační připravenost. Systém musí komunikovat s externími registry, interními službami i asynchronní vrstvou inteligentního zpracování dat. Pokud by byla tato logika promíchaná přímo v doméně, každá změna integračního detailu by zvyšovala riziko regrese v business logice. Adaptérový vzor umožňuje tyto vazby vyvíjet a testovat odděleně.
-
-Třetím důvodem je provozní a týmová udržitelnost. Projekt je vyvíjen bez velkého specializovaného architektonického týmu (projekt vyvíjí pouze autor práce), takže kód musí zůstat čitelný i pro budoucí předání. Modularita a oddělení odpovědností zde nejsou akademickým cílem, ale praktickou obranou proti tomu, aby se systém stal obtížně rozšiřitelným už po několika iteracích.
-
-== Kontextová architektura (C4 L1)
-Pro zachycení architektury na různých úrovních abstrakce používám model C4 @brownC4ModelSoftware2018. Kontextový pohled (L1) slouží jako orientační mapa. Neřeší vnitřní strukturu systému, ale ukazuje, kdo se systémem pracuje a jaké externí služby jsou pro jeho chod důležité.
-TODO: předělat asi do UML, ten c1 diagram vypadá fakt otřesně why the hell people use this shit
-#figure(
-  image(
-    "../procesy/architecture/c4-l1-context.svg",
-    width: 100%,
-  ),
-  caption: [C4 L1 — Kontextový pohled na systém a jeho aktéry]
-) <obr:c4-l1>
-
-Z @obr:c4-l1 jsou patrné tři hlavní skupiny uživatelů. Personalisté a HR manažeři pracují s administračním rozhraním, uchazeči vstupují do systému přes kariérní portál a noví zaměstnanci používají onboardingové rozhraní. Na straně externích služeb jsou zásadní `SSO/OIDC` pro autentizaci interních uživatelů, `NRZP` pro ověření odborné způsobilosti a e-mailová infrastruktura pro transakční komunikaci. Kontextový diagram tak potvrzuje, že systém není izolovaná interní aplikace, ale integrační uzel propojující více rolí a více zdrojů pravdy.
-
-== Kontejnerová architektura (C4 L2)
-Kontejnerový pohled (L2) rozkládá řešení na nasaditelné stavební bloky. V terminologii C4 nejde nutně o Docker kontejnery, ale o samostatně nasaditelné části s jasnou odpovědností @brownC4ModelSoftware2018. Právě na této úrovni je dobře vidět, kde jsem ponechal jednoduchost modulárního jádra a kde jsem naopak zvolil oddělení služeb.
+== Celkový obraz řešení
+Prvním krokem je zachytit systém v kontextu rolí a externích služeb. Tím se vyjasní, proč řešení nevzniklo jako jedna univerzální interní aplikace, ale jako soustava více vstupních bodů nad společným transakčním a integračním jádrem.
 
 #figure(
   image(
-    "../procesy/architecture/c4-l2-containers.svg",
+    "../procesy/architecture/system-context-overview.svg",
     width: 100%,
   ),
-  caption: [C4 L2 — Kontejnerový pohled na technické stavební bloky systému]
-) <obr:c4-l2>
+  caption: [Systém v kontextu rolí a externích služeb]
+) <obr:arch-context>
 
-@obr:c4-l2 zachycuje šest hlavních funkčních celků. `hiring_backend` tvoří transakční jádro systému. Nad ním stojí administrační frontend `onboarding.kzcr.eu` a veřejný kariérní portál. Perzistenci zajišťuje `PostgreSQL` s rozšířením `pgvector`, dokumenty ukládá `SeaweedFS` a asynchronní komunikaci nese `RabbitMQ`.
+Z @obr:arch-context je patrné, že systém obsluhuje několik odlišných skupin uživatelů s různými cíli a různou mírou oprávnění. Uchazeči vstupují přes veřejný kariérní portál, zatímco HR pracovníci, vedoucí zaměstnanci a nastupující pracovníci používají interní rozhraní nad stejným doménovým jádrem. Na straně externích vazeb jsou rozhodující `SSO/OIDC`, `NRZP` a e-mailová infrastruktura. Právě tyto závislosti potvrzují, že řešení musí být navrženo jako integrační uzel, nikoli jen jako izolovaná evidence.
 
-Vrstva inteligentního zpracování dat je oddělena od transakčního jádra a provozována na samostatném výpočetním hostu. `cv_processor` zajišťuje extrakci a analýzu životopisů, zatímco `job_processor` podporuje tvorbu a úpravy textů pracovních inzerátů. Oddělení těchto služeb není motivováno snahou o „mikroslužby za každou cenu“, ale snahou ochránit dostupnost hlavního systému před výpočetně náročnými nebo dočasně nestabilními operacemi.
-
-== Komponentová architektura backendu (C4 L3)
-Komponentový pohled (L3) detailně zachycuje vnitřní strukturu backendu jako nejdůležitějšího kontejneru celého systému. Tato úroveň je důležitá proto, že ukazuje, jak se architektonické principy z předchozích sekcí skutečně promítají do rozdělení odpovědností uvnitř jediné aplikace.
+Na kontextový pohled navazuje logická kompozice řešení. Jejím smyslem není popsat konkrétní nasazovací topologii ani technologickou skladbu, ale ukázat, z jakých stavebních bloků se systém skládá a proč jsou hranice mezi nimi vedeny právě tímto způsobem.
 
 #figure(
   image(
-    "../procesy/architecture/c4-l3-components.svg",
+    "../procesy/architecture/solution-composition.svg",
+    width: 84%,
+  ),
+  caption: [Logická kompozice řešení]
+) <obr:arch-composition>
+
+Systém musí současně zvládat transakční agendu náboru a adaptace, komunikaci s okolními službami, výpočetně náročné zpracování i průběžné vyhodnocování procesu. Pokud by se tyto odpovědnosti soustředily do jedné vrstvy, docházelo by ke míchání stabilní domény s proměnlivými integračními a analytickými požadavky, což by vedlo ke ztrátě přehlednosti i rozšiřitelnosti.
+
+Na tuto situaci odpovídá @obr:arch-composition. V centru návrhu stojí transakční jádro náboru a adaptace, které nese business pravidla a hlavní procesní tok. K němu se připojuje prezentační vrstva obsluhující veřejný kariérní portál i interní rozhraní, datová vrstva uchovávající stav procesu, samostatná messaging vrstva pro asynchronní předávání úloh a událostí, integrační vrstva zajišťující řízený kontakt s okolím, auditní stopa pro dohledatelnost změn a oddělená AI vrstva pro výpočetně náročné zpracování. Diagram záměrně abstrahuje od konkrétních technologií, protože jejich realizační rozpad patří až do implementační kapitoly. Na architektonické úrovni je důležité obhájit logiku hranic, ne vyjmenovat každou nasazenou službu.
+
+Návrh vychází přímo z požadavků R1–R6. Požadavky R2–R4 definují tři navazující situace (veřejný vstup, interní řízení, adaptace), což vede k oddělení prezentační vrstvy od jednotného transakčního jádra. Požadavek R1 pak promítá holdingovou strukturu KZ do datové vrstvy, která tak nese nejen stav systému, ale i organizační kontext.
+
+Oddělení řídicí a analytické vrstvy je klíčové. Systém nemá pouze evidovat průběh náboru a adaptace, ale také poskytovat podklady pro jeho řízení a průběžné zlepšování. Proto do této vrstvy patří nejen vyhodnocování průchodnosti náboru a adaptace, ale i analytika kariérního portálu. Ta umožňuje sledovat, jak se potenciální uchazeči na portálu chovají, kde ztrácejí pozornost, ve kterých krocích proces opouštějí a které části nabídky nebo formulářů snižují konverzi. Právě proto je tato vrstva oddělena od technického provozního dohledu. `Provozní dohled` odpovídá na otázku, zda systém běží zdravě, zatímco řídicí a analytická vrstva vysvětluje, co se v náborovém procesu skutečně děje.
+
+Samostatné zachycení auditní stopy je přímou odpovědí na problém `P4`, tedy absenci auditní stopy v původním procesu, i na nefunkcionální požadavek `NF11`. V logické kompozici ji proto nevedu jako další byznysovou oblast, ale jako podpůrnou architektonickou schopnost systému. Auditní událost vzniká v jádře, je předána přes messaging a následně perzistována do datové vrstvy. Tím zůstává audit mimo hlavní cestu požadavků a současně je zachována dohledatelnost změn nad klíčovými entitami.
+
+Stejně podstatná je integrační vrstva. Její role nespočívá jen v napojení na `NRZP`, které přímo vychází z požadavku R5. Stejně důležitá je schopnost bezpečně připojovat i další okolní systémy a služby, které se promítají do každodenního provozu náboru a adaptace, například identitní služby, `VEMA`, národní registry nebo komunikační infrastrukturu. Nejde tedy o jednu konkrétní integraci, ale o řízenou hranici vůči vnějšímu prostředí. Smyslem této vrstvy je převzít integrační složitost na sebe, aby se nepropisovala přímo do transakční logiky.
+
+Vedle ní stojí messaging vrstva, která neřeší, na jaký externí systém se systém napojuje, ale jak jsou úlohy a události předávány mimo hlavní transakční tok. 
+
+== Vrstvy řešení a struktura backendu
+Nejcitlivější částí celého řešení je backend, protože právě v něm se setkávají business pravidla, datové hranice, bezpečnost i integrace. Jádro backendu proto stavím na hexagonální architektuře, kterou Cockburn popsal jako vzor Ports and Adapters @cockburnHexagonalArchitecture2005, a současně ji opírám o principy doménově orientovaného návrhu @evansDomaindrivenDesignTackling2003. V praktickém smyslu to znamená, že doménová logika nesmí být závislá na konkrétní databázi, messaging knihovně ani HTTP frameworku a že klíčové procesní pojmy mají vlastní ohraničené kontexty se samostatnou odpovědností.
+
+Tento přístup je důležitý ze tří důvodů. Zaprvé udržuje multi-tenantní a organizační kontext pod kontrolou od vstupu do systému až po datovou vrstvu. Zadruhé chrání doménu před přímou závislostí na integračních detailech, které se mohou v čase měnit. Zatřetí vytváří čitelnou strukturu, kterou lze dlouhodobě rozvíjet i bez velkého specializovaného architektonického týmu.
+
+V návrhu proto rozlišuji vstupní a výstupní hranice. Vstupní adaptéry převádějí vnější požadavky na use-cases domény. V praxi jde o HTTP routy, middleware a konzumenty integračních událostí. Výstupní adaptéry naopak převádějí doménové požadavky do konkrétní infrastruktury, například do práce s `PostgreSQL`, `RabbitMQ`, objektovým úložištěm, `OIDC`, registrem `NRZP` nebo interním vyhledáváním uživatelů. Port zde neoznačuje síťový port, ale pojmenovaný kontrakt mezi jádrem a jeho okolím.
+
+Současně je důležité odlišit architektonickou hranici od hranice nasazovací. Hexagonální architektura sama o sobě neznamená, že každý adaptér musí být samostatná služba. Naopak většina adaptérů běží uvnitř jednoho backendového procesu a samostatně odděluji jen ty části, jejichž runtime, provozní profil nebo integrační režim se od jádra skutečně liší.
+
+#figure(
+  image(
+    "../procesy/architecture/backend-structure.svg",
     width: 100%,
   ),
-  caption: [C4 L3 — Komponentová architektura backendu]
-) <obr:c4-l3>
+  caption: [Struktura backendu a jeho hranice]
+) <obr:arch-backend>
 
-Backend je na @obr:c4-l3 členěn do čtyř vrstev odpovídajících hexagonálnímu uspořádání. HTTP a middleware vrstva představuje vstupní adaptéry, které přijímají požadavky, ověřují identitu, připravují request kontext a předávají řízení do use-case vrstvy. Tato část nesmí obsahovat business logiku. Její úlohou je překlad mezi webovým rozhraním a doménou.
+Backend je na @obr:arch-backend členěn do čtyř vrstev odpovídajících hexagonálnímu uspořádání. Vstupní adaptéry přijímají požadavky, připravují kontext a předávají řízení do doménových modulů. Doménová vrstva soustřeďuje ohraničené kontexty, jako jsou uchazeči, pracovní pozice, pohovory, zaměstnanci, onboarding nebo notifikace. Port kontrakty určují, jaké schopnosti může doména požadovat od okolí, a platformní adaptéry zajišťují konkrétní napojení na databázi, messaging, audit, autorizaci nebo externí registry. Tím se omezuje šíření skrytých vazeb a současně vzniká jasná hranice mezi stabilnější business logikou a proměnlivější integrační infrastrukturou.
 
-Doménová vrstva je tvořena ohraničenými kontexty, jako jsou uchazeči, pracovní pozice, pohovory, zaměstnanci, onboarding nebo notifikace. Každý modul zapouzdřuje vlastní pravidla, aplikační služby, repozitáře a události. Komunikace mezi moduly je vedena přes explicitní rozhraní, nikoli přes přímé závislosti na cizích implementacích. Tím se omezuje šíření skrytých vazeb.
+== Datový model a integrační toky
+Architektonická rozhodnutí by zůstala neúplná, pokud by se nepropsala i do datového modelu. Ten tvoří přibližně šedesát tabulek organizovaných do sedmi doménových skupin. Cílem této části proto není vypsat celé schéma, ale vysvětlit, jaké logické celky model obsahuje a proč je navržen právě tímto způsobem. Technické detaily migrací a fyzické perzistence rozvádím v následující implementační kapitole.
 
-Platformní vrstva poskytuje doméně přístup k infrastrukturním službám a to zejména k databázi, objektovému úložišti, messagingu, e-mailu, auditu, autentizaci, autorizaci i externím registrům. Doménové moduly tyto technologie přímo neznají. Získávají pouze schopnost, kterou potřebují, a konkrétní technické řešení zůstává uzavřeno v adaptéru.
+Základ datového modelu tvoří organizace a návazné členství interních uživatelů. Právě tato skupina entit nese organizační kontext, bez něhož by nebylo možné bezpečně oddělit data jednotlivých závodů a současně zachovat centrální reporting. Další oblast tvoří model pracovních pozic, který propojuje klasifikaci rolí, typy úvazků, vazbu na inzerát i návaznost na onboardingové workflow. Pozice zde není pouze text inzerátu, ale procesní uzel, kolem něhož se soustřeďují kandidáti, pohovory, dokumenty a odpovědnosti.
 
-== Datový návrh
-Datový model systému tvoří přibližně šedesát tabulek organizovaných do sedmi doménových skupin. Cílem této části není vypsat celé schéma, ale vysvětlit, jaké logické celky model obsahuje a proč je model navržen právě tímto způsobem. Technické detaily migrací a fyzické perzistence rozvádím v následující implementační kapitole.
+Náborová oblast pokrývá uchazeče, jejich přihlášky, přiložené dokumenty a výstupy kvalifikačních nebo analytických kroků. Na ni navazuje pohovorová agenda, která propojuje kandidáta, interní účastníky a organizační kontext. Onboardingová oblast pak modeluje workflow nástupu, jednotlivé kroky, dokumenty a jejich stav plnění. Samostatnou skupinu tvoří zájemci o práci bez vazby na konkrétní pozici a poslední vrstvu představují průřezové záznamy podporující auditovatelnost a provozní spolehlivost, zejména evidence změn, idempotence a asynchronních vedlejších efektů.
 
-=== Doménové skupiny datového modelu
-Základ datového modelu tvoří organizace a návazné členství interních uživatelů. Právě tato skupina entit nese organizační kontext, bez něhož by nebylo možné bezpečně oddělit data jednotlivých závodů a současně zachovat centrální reporting.
-
-Další oblast tvoří model pracovních pozic. Ten zachycuje klasifikaci rolí, typy úvazků, vazbu na inzerát i návaznost na onboardingové workflow. Pozice zde není pouze text inzerátu, ale procesní uzel, kolem něhož se soustřeďují kandidáti, pohovory, dokumenty a odpovědnosti.
-
-Náborová oblast pokrývá uchazeče, jejich přihlášky, přiložené dokumenty a výstupy kvalifikačních nebo analytických kroků. Na ni navazuje pohovorová agenda, která propojuje kandidáta, interní účastníky a organizační kontext. Onboardingová oblast pak modeluje workflow nástupu, jednotlivé kroky, dokumenty a jejich stav plnění.
-
-Samostatnou skupinu tvoří zájemci o práci bez vazby na konkrétní pozici. Tento model je důležitý, protože umožňuje budovat databázi kontaktů využitelnou i pro další náborové vlny. Poslední skupinu představují průřezové záznamy podporující auditovatelnost a provozní spolehlivost, zejména evidence změn, idempotence a asynchronních vedlejších efektů.
-
-=== ER diagram — přehled hlavních entit
 #figure(
   image(
     "../procesy/architecture/conceptual-data-model.svg",
     width: 100%,
   ),
-  caption: [Konceptuální ER diagram — hlavní entity a jejich vztahy]
+  caption: [Konceptuální ER diagram hlavních entit a jejich vztahů]
 ) <obr:er-diagram>
 
 @obr:er-diagram zachycuje hlavní entity sedmi doménových skupin a jejich vzájemné vazby. Z důvodu rozsahu (přibližně 60 tabulek) nejsou zobrazeny všechny referenční číselníky, pomocné indexační tabulky ani historické záznamy stavů. Diagram slouží především k tomu, aby bylo vidět, že nábor, vstupní agenda a adaptace nejsou v návrhu oddělené ostrovy, ale propojené části jednoho datového modelu.
 
-=== Klíčová návrhová rozhodnutí
 Prvním důležitým rozhodnutím je použití flexibilní JSON struktury pro onboardingové formuláře a odpovědi zaměstnanců. Zvolil jsem ji proto, že tato část procesu se může průběžně měnit podle role, pracoviště i interních pravidel. Pevně relační model by zde vedl k častým schématickým změnám i kvůli drobným úpravám obsahu formulářů.
 
 Druhým rozhodnutím je využití `pgvector` přímo v databázi `PostgreSQL`. Embeddingy životopisů a pracovních pozic tak lze ukládat vedle transakčních dat a vyhledávání zůstává součástí jednoho technologického celku. Nevolím tedy samostatné vektorové úložiště, protože by v této fázi projektu přineslo více integrační složitosti než praktického přínosu.
@@ -141,29 +117,35 @@ Třetím rozhodnutím je explicitní vazba mezi uchazečem a vzniklým zaměstna
 
 Čtvrtým rozhodnutím je důsledné nesení atributu `organization_id` u klíčových entit. Multi-tenantní charakter systému nesmí být jen pravidlem v dokumentaci, ale musí být fyzicky přítomen v datech a následně respektován v aplikační logice.
 
-== Integrační a asynchronní architektura
-Integrační vrstvu navrhuji kombinací synchronní a asynchronní komunikace. Synchronní volání používám tam, kde uživatel očekává okamžitou odezvu, například při práci s administračním rozhraním nebo při generování konkrétního výstupu. Asynchronní komunikaci naopak využívám pro vedlejší efekty a časově náročnější operace, u nichž by blokování requestu zhoršovalo použitelnost systému.
+Na datový model přímo navazuje způsob, jakým systém komunikuje s okolními službami a jak zpracovává vedlejší efekty. Integrační vrstvu proto navrhuji kombinací synchronní a asynchronní komunikace. Synchronní volání používám tam, kde uživatel očekává okamžitou odezvu, například při práci s administračním rozhraním nebo při generování konkrétního výstupu. Asynchronní komunikaci naopak využívám pro vedlejší efekty a časově náročnější operace, u nichž by blokování requestu zhoršovalo použitelnost systému.
 
-Klíčovým vzorem je zde transactional outbox. Doménová operace nejprve uloží business data i odpovídající integrační událost do jedné transakce a teprve následně je událost publikována do integrační vrstvy. Tím se vyhýbám problému, kdy by změna v databázi proběhla, ale vedlejší efekt se kvůli chybě v messaging vrstvě nikdy nevykonal.
+#figure(
+  image(
+    "../procesy/architecture/seq-outbox-rabbitmq-ai.svg",
+    width: 100%,
+  ),
+  caption: [Hlavní runtime tok integrační a asynchronní vrstvy]
+) <obr:arch-runtime-flow>
+
+@obr:arch-runtime-flow ukazuje, jak se architektonická rozhodnutí promítají do běhu systému. Klíčovým vzorem je transactional outbox. Doménová operace nejprve uloží business data i odpovídající integrační událost do jedné transakce a teprve následně je událost publikována do integrační vrstvy. Tím se vyhýbám problému, kdy by změna v databázi proběhla, ale vedlejší efekt se kvůli chybě v messaging vrstvě nikdy nevykonal.
 
 Pro průběžné informování klienta o stavu vybraných operací doplňuji architekturu o Server-Sent Events (SSE). Tento mechanismus je vhodný tam, kde potřebuji klientovi zobrazovat postup nebo změny stavu bez zbytečně komplikovaného plně duplexního kanálu.
 
-== Bezpečnostní architektura
-Bezpečnostní architekturu navrhuji ve třech vrstvách: autentizace, autorizace a datový rozsah. Autentizace je řešena prostřednictvím `OIDC/SSO`, aby interní uživatelé nemuseli spravovat oddělené identity pouze pro tento systém. Tento krok zároveň snižuje provozní režii spojenou se správou účtů.
+== Bezpečnost a provozní dohled
+Jakmile systém propojuje více rolí, více závodů a citlivé personální údaje, stává se bezpečnostní architektura jedním z rozhodujících kritérií návrhu. Proto ji navrhuji ve třech vrstvách: autentizace, autorizace a datový rozsah. Autentizace je řešena prostřednictvím `OIDC/SSO`, aby interní uživatelé nemuseli spravovat oddělené identity pouze pro tento systém. Tento krok zároveň snižuje provozní režii spojenou se správou účtů.
 
 Autorizaci nestavím jen na klasickém `RBAC`, ale na kombinaci globálních rolí a `ReBAC` (`relationship-based access control`). Vedl mě k tomu proces, kde vedoucí pracovník může potřebovat přístup jen k jedné konkrétní pozici nebo skupině kandidátů, nikoli k celému závodu. Samotná role tak popisuje typ uživatele, zatímco vztah ke zdroji rozhoduje o skutečném rozsahu dat.
 
 Součástí bezpečnostního návrhu je i princip nejnižších oprávnění a auditovatelnost operací nad citlivými daty (NF11). Změny nad klíčovými entitami musí být zpětně dohledatelné, a to nejen kvůli bezpečnosti, ale i kvůli schopnosti vysvětlit průběh náboru nebo adaptace při interním přezkumu.
 
-== Monitorování systému
-Provozní dohled navrhuji jako samostatnou vrstvu oddělenou od business logiky systému. V on-premise prostředí nemohu spoléhat na cloudové monitorovací služby, proto stavím na kombinaci `Promtail`, `Loki`, `Prometheus` a `Grafana`. Tento stack umožňuje sběr logů, metrik i jejich společnou interpretaci z jednoho místa.
+Bezpečnostní vrstva však sama nestačí. V on-premise prostředí je stejně důležité včas rozpoznat, že se systém začíná odchylovat od očekávaného chování. Proto architekturu uzavírá samostatná vrstva provozního dohledu. Kombinace `Promtail`, `Loki`, `Prometheus` a `Grafana` umožňuje sběr logů, metrik i jejich společnou interpretaci z jednoho místa, aniž by bylo nutné zasahovat do business logiky systému.
 
 #figure(
   image(
     "../procesy/architecture/seq-observability.svg",
     width: 100%,
   ),
-  caption: [Tok dat v monitorovací vrstvě — od aplikace přes sběr až po vizualizaci]
+  caption: [Tok dat v monitorovací vrstvě od aplikace po vizualizaci]
 ) <obr:seq-observability>
 
 Vedle samotného sběru dat navrhuji i dva typy alertovacích mechanismů. Provozní alerty mají zachytit zhoršení dostupnosti nebo latencí klíčových endpointů. `SLO` alerty pak sledují zdraví asynchronní vrstvy, například stáří nejstarší nevyřízené zprávy nebo počet zpráv, které selhaly po maximálním počtu pokusů. Smyslem této vrstvy není produkovat více dashboardů, ale dát provozu včasný signál, že se systém začíná odchylovat od očekávaného chování.

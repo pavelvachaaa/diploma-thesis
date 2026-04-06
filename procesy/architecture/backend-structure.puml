@@ -1,0 +1,153 @@
+@startuml
+top to bottom direction
+hide stereotype
+
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam defaultFontName Arial
+skinparam defaultTextAlignment center
+skinparam dpi 160
+skinparam ranksep 28
+skinparam nodesep 26
+skinparam ArrowColor #475569
+skinparam ArrowThickness 1.0
+skinparam RoundCorner 14
+
+skinparam rectangle {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  FontColor #0F172A
+}
+
+skinparam rectangle<<frontend>> {
+  BackgroundColor #EAF2FF
+  BorderColor #2B5AA6
+}
+
+skinparam rectangle<<service>> {
+  BackgroundColor #E8FFF8
+  BorderColor #0F766E
+}
+
+skinparam rectangle<<external>> {
+  BackgroundColor #F1F5F9
+  BorderColor #64748B
+}
+
+skinparam rectangle<<obs>> {
+  BackgroundColor #EEF2FF
+  BorderColor #4F46E5
+}
+
+skinparam database {
+  BackgroundColor #FFF3E0
+  BorderColor #C97A10
+  FontColor #7C2D12
+}
+
+skinparam folder {
+  BackgroundColor #FFF3E0
+  BorderColor #C97A10
+  FontColor #7C2D12
+}
+
+skinparam queue {
+  BackgroundColor #FFF3E0
+  BorderColor #C97A10
+  FontColor #7C2D12
+}
+
+title hiring_backend - struktura a architektonicke hranice
+
+package "Vstupni adaptery" {
+  rectangle "HTTP routes a controllery\n(src/routes, src/domain/*/controller)" <<frontend>> as ROUTES
+  rectangle "Middleware pipeline\n(authn, authz, org scope,\nrequest context, validace)" <<frontend>> as MW
+  rectangle "Konzumenti integracnich udalosti\n a SSE vstupy" <<frontend>> as CONSUMERS
+}
+
+package "Domenove moduly a use-cases" {
+  package "Bounded contexts" {
+    rectangle "applicants" <<service>> as M_APP
+    rectangle "jobs" <<service>> as M_JOBS
+    rectangle "interviews" <<service>> as M_INT
+    rectangle "employees / onboarding" <<service>> as M_EMP
+    rectangle "notifications / operations" <<service>> as M_OTHER
+  }
+
+  rectangle "Port kontrakty\n(src/shared/contracts/ports)" as PORTS
+}
+
+package "Platformni adaptery (src/platform)" {
+  rectangle "DB a repository adaptery" as ADB
+  rectangle "Outbox a messaging adaptery" as AOUTBOX
+  rectangle "Storage a e-mail adaptery" as ASTORAGE
+  rectangle "OIDC / ReBAC adaptery" as ASEC
+  rectangle "Qualification / user-search adaptery" as AINT
+  rectangle "Audit adapter" as AAUDIT
+}
+
+rectangle "DI kontejner\n(Awilix, composition root)" <<obs>> as DI
+
+database "PostgreSQL" as DB
+folder "SeaweedFS" as S3
+queue "RabbitMQ" as MQ
+rectangle "SSO / OIDC" <<external>> as SSO
+rectangle "NRZP a interni sluzby" <<external>> as EXT
+rectangle "SMTP" <<external>> as SMTP
+
+ROUTES --> MW
+MW --> M_APP
+MW --> M_JOBS
+MW --> M_INT
+MW --> M_EMP
+MW --> M_OTHER
+CONSUMERS --> M_APP
+CONSUMERS --> M_JOBS
+CONSUMERS --> M_OTHER
+
+M_APP --> PORTS
+M_JOBS --> PORTS
+M_INT --> PORTS
+M_EMP --> PORTS
+M_OTHER --> PORTS
+
+PORTS --> ADB
+PORTS --> AOUTBOX
+PORTS --> ASTORAGE
+PORTS --> ASEC
+PORTS --> AINT
+PORTS --> AAUDIT
+
+ADB --> DB
+AOUTBOX --> MQ
+ASTORAGE --> S3
+ASTORAGE --> SMTP
+ASEC --> SSO
+AINT --> EXT
+AAUDIT --> MQ
+
+DI ..> M_APP
+DI ..> M_JOBS
+DI ..> M_INT
+DI ..> M_EMP
+DI ..> M_OTHER
+DI ..> ADB
+DI ..> AOUTBOX
+DI ..> ASTORAGE
+DI ..> ASEC
+DI ..> AINT
+DI ..> AAUDIT
+
+M_APP -[hidden]right-> M_JOBS
+M_JOBS -[hidden]right-> M_INT
+M_INT -[hidden]right-> M_EMP
+M_EMP -[hidden]right-> M_OTHER
+ADB -[hidden]right-> AOUTBOX
+AOUTBOX -[hidden]right-> ASTORAGE
+ASTORAGE -[hidden]right-> ASEC
+ASEC -[hidden]right-> AINT
+AINT -[hidden]right-> AAUDIT
+
+@enduml

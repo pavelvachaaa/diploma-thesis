@@ -33,7 +33,7 @@ Samostatnou dlouhodobou oblastí je také kapacitní a kvalitativní rozvoj vrst
 == Řízení změny a organizační předpoklady
 Úspěch dalšího rozvoje nebude záviset jen na technických rozhodnutích, ale i na tom, zda organizace udrží pravidelný cyklus vyhodnocování změn. Do tohoto cyklu musí vstupovat vývoj, provoz i vlastníci HR procesů. Bez společného vyhodnocení hrozí, že technické priority začnou sledovat interní pohodlí týmu místo reálných problémů uživatelů.
 
-Stejně důležitá je průběžná práce se zpětnou vazbou. Pilotní testování ukázalo, že i drobná nejasnost v názvu stavu nebo ve zobrazení odpovědnosti může zpomalit celý proces více než absence nové funkce. Změny proto doporučuji nasazovat inkrementálně, ověřovat je na konkrétních scénářích a teprve poté rozšiřovat do širšího provozu.
+Stejně důležitá je průběžná práce se zpětnou vazbou. Pilotní uživatelské ověření ukázalo, že i drobná nejasnost v názvu stavu nebo ve zobrazení odpovědnosti může zpomalit celý proces více než absence nové funkce. Změny proto doporučuji nasazovat inkrementálně, ověřovat je na konkrétních scénářích a teprve poté rozšiřovat do širšího provozu.
 
 == Závěrečné doporučení kapitoly
 Pro další směřování vývoje považuji za nejvhodnější evoluční postup. Nejprve je potřeba stabilizovat provoz a odstranit bariéry zjištěné při uživatelském ověření, poté rozšiřovat analytiku, integrace a automatizaci a teprve nakonec otevírat otázku hlubších strukturálních změn. Takto zvolený postup dává nejvyšší šanci, že systém bude dlouhodobě podporovat cíle digitalizace náboru a adaptace bez zbytečného provozního rizika.

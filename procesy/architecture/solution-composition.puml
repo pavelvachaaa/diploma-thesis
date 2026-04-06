@@ -1,0 +1,95 @@
+@startuml
+left to right direction
+hide stereotype
+
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam defaultTextAlignment center
+skinparam arrowFontSize 13
+skinparam dpi 160
+skinparam ranksep 24
+skinparam nodesep 18
+skinparam ArrowColor #475569
+skinparam ArrowThickness 1.0
+skinparam RoundCorner 14
+
+skinparam rectangle {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  FontColor #0F172A
+}
+
+skinparam rectangle<<frontend>> {
+  BackgroundColor #EAF2FF
+  BorderColor #2B5AA6
+}
+
+skinparam rectangle<<service>> {
+  BackgroundColor #E8FFF8
+  BorderColor #0F766E
+}
+
+skinparam rectangle<<external>> {
+  BackgroundColor #F1F5F9
+  BorderColor #64748B
+}
+
+skinparam rectangle<<obs>> {
+  BackgroundColor #EEF2FF
+  BorderColor #4F46E5
+}
+
+skinparam rectangle<<data>> {
+  BackgroundColor #FFF3E0
+  BorderColor #C97A10
+  FontColor #7C2D12
+}
+
+rectangle "Platforma náboru\na adaptace KZ" as SystemBoundary {
+  together {
+    rectangle "Prezentační\nvrstva" <<frontend>> as Presentation
+    rectangle "Transakční jádro\nnáboru\na adaptace" <<service>> as Core
+    rectangle "Messaging\nvrstva" <<service>> as Messaging
+    rectangle "Integrační\nvrstva" <<service>> as Integration
+  }
+
+  together {
+    rectangle "Datová vrstva" <<data>> as Data
+    rectangle "Auditní\nstopa" <<service>> as AuditTrail
+    rectangle "Řídicí a\nanalytická vrstva" <<service>> as Analytics
+    rectangle "AI vrstva" <<service>> as AiLayer
+  }
+}
+
+rectangle "Externí systémy\na služby" <<external>> as ExternalServices
+
+rectangle "Provozní\ndohled" <<obs>> as Observability
+
+Presentation --> Core
+Core --> Messaging
+Messaging --> Integration
+Core -down-> Data
+Data --> Analytics
+Messaging -down-> AuditTrail
+AuditTrail --> Data
+Messaging -down-> AiLayer
+Integration -down-> ExternalServices
+
+Observability ..> SystemBoundary
+
+Presentation -[hidden]-> Core
+Core -[hidden]-> Messaging
+Messaging -[hidden]-> Integration
+Data -[hidden]-> AuditTrail
+AuditTrail -[hidden]-> Analytics
+Analytics -[hidden]-> AiLayer
+Core -[hidden]down-> Data
+Messaging -[hidden]down-> AuditTrail
+Integration -[hidden]down-> AiLayer
+Integration -[hidden]down-> ExternalServices
+
+@enduml
