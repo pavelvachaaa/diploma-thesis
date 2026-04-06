@@ -59,43 +59,43 @@ skinparam queue {
   FontColor #7C2D12
 }
 
-title Navrh hranic backendu v hexagonalnim usporadani
+title Návrh hranic backendu v hexagonálním uspořádání
 
-package "Vstupni adaptery" {
+package "Vstupní adaptéry" {
   rectangle "HTTP vstupy a controllery" <<frontend>> as ROUTES
-  rectangle "Vstupni middleware\nkontext, validace, autentizace" <<frontend>> as MW
-  rectangle "Konzumenti udalosti\n a SSE vstupy" <<frontend>> as CONSUMERS
+  rectangle "Vstupní middleware\nkontext, validace, autentizace" <<frontend>> as MW
+  rectangle "Konzumenti událostí\n a SSE vstupy" <<frontend>> as CONSUMERS
 }
 
-package "Domenove jadro a use-cases" {
-  package "Ohranicene kontexty" {
-    rectangle "Uchazeci" <<service>> as M_APP
+package "Doménové jádro a use-cases" {
+  package "Ohraničené kontexty" {
+    rectangle "Uchazeči" <<service>> as M_APP
     rectangle "Pracovni pozice" <<service>> as M_JOBS
     rectangle "Pohovory" <<service>> as M_INT
-    rectangle "Zamestnanci a adaptace" <<service>> as M_EMP
-    rectangle "Notifikace a provozni logika" <<service>> as M_OTHER
+    rectangle "Zaměstnanci a adaptace" <<service>> as M_EMP
+    rectangle "Notifikace a provozní logika" <<service>> as M_OTHER
   }
 
   rectangle "Port kontrakty" as PORTS
 }
 
-package "Sekundarni adaptery" {
-  rectangle "Datove adaptery" as ADB
+package "Sekundární adaptéry" {
+  rectangle "Datové adaptéry" as ADB
   rectangle "Messaging a outbox" as AOUTBOX
   rectangle "Dokumenty a e-mail" as ASTORAGE
   rectangle "Autentizace a autorizace" as ASEC
-  rectangle "Integrace s okolnimi sluzbami" as AINT
-  rectangle "Auditni adapter" as AAUDIT
+  rectangle "Integrace s okolními službami" as AINT
+  rectangle "Auditní adaptér" as AAUDIT
 }
 
 rectangle "Composition root\n a DI kontejner" <<obs>> as DI
 
-database "PostgreSQL" as DB
-folder "SeaweedFS" as S3
-queue "RabbitMQ" as MQ
-rectangle "SSO / OIDC" <<external>> as SSO
-rectangle "Registry a interni sluzby" <<external>> as EXT
-rectangle "SMTP" <<external>> as SMTP
+database "Relační databáze" as DB
+folder "Objektové úložiště" as S3
+queue "Message broker" as MQ
+rectangle "Identitní provider" <<external>> as SSO
+rectangle "Externí registry a interní služby" <<external>> as EXT
+rectangle "E-mailová infrastruktura" <<external>> as SMTP
 
 ROUTES --> MW
 MW --> M_APP
