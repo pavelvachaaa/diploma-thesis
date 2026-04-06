@@ -47,7 +47,7 @@ Prvním krokem je zachytit systém v kontextu rolí a externích služeb. Tím s
   caption: [Systém v kontextu rolí a externích služeb]
 ) <obr:arch-context>
 
-Z @obr:arch-context je patrné, že systém obsluhuje několik odlišných skupin uživatelů s různými cíli a různou mírou oprávnění. Uchazeči vstupují přes veřejný kariérní portál, zatímco HR pracovníci, vedoucí zaměstnanci a nastupující pracovníci používají interní rozhraní nad stejným doménovým jádrem. Na straně externích vazeb jsou rozhodující `SSO/OIDC`, `NRZP` a e-mailová infrastruktura. Právě tyto závislosti potvrzují, že řešení musí být navrženo jako integrační uzel, nikoli jen jako izolovaná evidence.
+Z @obr:arch-context je patrné, že systém obsluhuje několik odlišných skupin uživatelů s různými cíli a různou mírou oprávnění. Uchazeči vstupují přes veřejný kariérní portál, interní náborová agenda je soustředěna do administračního portálu a nástup se sledováním adaptace do onboardingového portálu nad stejným doménovým jádrem. Na straně externích vazeb jsou rozhodující `SSO/OIDC`, `NRZP` a e-mailová infrastruktura. Právě tyto závislosti potvrzují, že řešení musí být navrženo jako integrační uzel, nikoli jen jako izolovaná evidence.
 
 Na kontextový pohled navazuje logická kompozice řešení. Jejím smyslem není popsat konkrétní nasazovací topologii ani technologickou skladbu, ale ukázat, z jakých stavebních bloků se systém skládá a proč jsou hranice mezi nimi vedeny právě tímto způsobem.
 

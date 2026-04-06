@@ -1,5 +1,5 @@
 @startuml
-left to right direction
+top to bottom direction
 hide stereotype
 
 skinparam backgroundColor transparent
@@ -7,10 +7,12 @@ skinparam shadowing false
 skinparam linetype ortho
 skinparam packageStyle rectangle
 skinparam defaultFontName Arial
+skinparam defaultFontSize 15
 skinparam defaultTextAlignment center
+skinparam arrowFontSize 13
 skinparam dpi 160
-skinparam ranksep 30
-skinparam nodesep 30
+skinparam ranksep 28
+skinparam nodesep 22
 skinparam ArrowColor #475569
 skinparam ArrowThickness 1.0
 skinparam RoundCorner 14
@@ -41,45 +43,66 @@ skinparam actor {
   FontColor #0F172A
 }
 
-title Platforma naboru a adaptace KZ - system v kontextu roli a externich sluzeb
-
-actor "Uchazec" as Candidate
-actor "HR pracovnik" as HR
-actor "Vedouci zamestnanec" as Manager
-actor "Nastupujici zamestnanec" as Employee
-actor "Spravce systemu" as Admin
-
-rectangle "Systemova hranice: Platforma naboru a adaptace KZ" {
-  package "Verejne a interni vstupni body" {
-    rectangle "Karierni portal" <<frontend>> as CareerPortal
-    rectangle "Administracni a onboardingove rozhrani" <<frontend>> as InternalPortal
-  }
-
-  rectangle "Transakcni a integracni jadro" <<service>> as Core
+together {
+  actor "Uchazeč" as Candidate
+  actor "HR pracovník" as HR
+  actor "Vedoucí zaměstnanec" as Manager
+  actor "Nastupující zaměstnanec" as Employee
+  actor "Správce systému" as Admin
 }
 
-rectangle "SSO / OIDC" <<external>> as SSO
-rectangle "NRZP" <<external>> as NRZP
-rectangle "SMTP server" <<external>> as SMTP
-rectangle "Vema\n[R5 - planovano]" <<external>> as Vema
+rectangle "Platforma náboru a adaptace KZ" {
+  package "Vstupní portály" {
+    together {
+      rectangle "Kariérní\nportál" <<frontend>> as CareerPortal
+      rectangle "Administrační\nportál" <<frontend>> as AdminPortal
+      rectangle "Onboardingový\nportál" <<frontend>> as OnboardingPortal
+    }
+  }
 
-Candidate --> CareerPortal : prohlizi pozice\npodava prihlasky
-HR --> InternalPortal : ridi nabor\nspravuje agendu
-Manager --> InternalPortal : schvaluje nastup\nsleduje adaptaci
-Employee --> InternalPortal : plni onboarding
-Admin --> InternalPortal : spravuje role\na organizace
+  rectangle "Transakční a integrační jádro" <<service>> as Core
+}
+
+together {
+  rectangle "SSO / OIDC" <<external>> as SSO
+  rectangle "NRZP\n(ověření kvalifikace)" <<external>> as NRZP
+  rectangle "SMTP server\n(transakční e-maily)" <<external>> as SMTP
+  rectangle "Vema\n(personální data)\n[R5 - plánováno]" <<external>> as Vema
+}
+
+Candidate ..> CareerPortal
+HR ..> AdminPortal
+HR ..> OnboardingPortal
+Manager ..> AdminPortal
+Manager ..> OnboardingPortal
+Employee ..> OnboardingPortal
+Admin ..> AdminPortal
 
 CareerPortal --> Core
-InternalPortal --> Core
+AdminPortal --> Core
+OnboardingPortal --> Core
 
-Core --> SSO : OIDC
-Core --> NRZP : overeni kvalifikace
-Core --> SMTP : transakcni e-maily
-Core --> Vema : personalni data
+Core --> SSO : přihlášení
+Core --> NRZP
+Core --> SMTP
+Core --> Vema
 
-CareerPortal -[hidden]down-> InternalPortal
-SSO -[hidden]down-> NRZP
-NRZP -[hidden]down-> SMTP
-SMTP -[hidden]down-> Vema
+Candidate -[hidden]right-> HR
+HR -[hidden]right-> Manager
+Manager -[hidden]right-> Employee
+Employee -[hidden]right-> Admin
+
+CareerPortal -[hidden]right-> AdminPortal
+AdminPortal -[hidden]right-> OnboardingPortal
+
+SSO -[hidden]right-> NRZP
+NRZP -[hidden]right-> SMTP
+SMTP -[hidden]right-> Vema
+
+Candidate -[hidden]down-> CareerPortal
+HR -[hidden]down-> AdminPortal
+Employee -[hidden]down-> OnboardingPortal
+CareerPortal -[hidden]down-> Core
+Core -[hidden]down-> NRZP
 
 @enduml
