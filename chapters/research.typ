@@ -1,9 +1,13 @@
 #import "../template/abbreviations.typ": abbr
 
-== Metodika rešerše a hodnoticí rámec
-Rešerši dostupných softwarových řešení jsem provedl jako strukturované komparativní posouzení produktů ze tří skupin. Jedná se o  #abbr("ATS", "Applicant Tracking System"), onboardingových platforem a integrovaných #abbr("HCM", "Human Capital Management") suite. Hodnocení vychází z veřejně dostupné produktové dokumentace výrobců, z oficiálních ceníků a z produktových stránek. Stav zdrojů odpovídá datu *21. 11. 2025*.
 
-V této kapitole nehledám obecně nejlepší systém na trhu. Hledám řešení, které by bylo nejbližší podmínkám #abbr("KZ", none), tedy zdravotnickému holdingu s požadavkem na on-premise provoz, auditovatelnost, multi-tenantní členění a návaznost na české procesy ověřování odborné způsobilosti zdravotnických pracovníků.
+= Existující softwarová řešení
+Rozhodnutí o vlastním vývoji je obhajitelné pouze tehdy, pokud je zřejmé, proč dostupná řešení nedokážou naplnit požadavky organizace bez nepřiměřených kompromisů. Tato kapitola proto porovnává vybraná řešení hodnotí jejich vhodnost vzhledem k podmínkám KZ.
+
+
+== Metodika rešerše
+Rešerše byla provedena jako komparativní posouzení řešení ze tří kategorií. #abbr("ATS", "Applicant Tracking System"), onboardingové platformy (vstupní agenda a adaptace) a  #abbr("HCM", "Human Capital Management") systémy. Na základě analyzovaných požadavků vznikla kritéria pro hodnocení uvedené níže v @tab:research-kriteria.
+
 
 #figure(
   [
@@ -16,7 +20,7 @@ V této kapitole nehledám obecně nejlepší systém na trhu. Hledám řešení
       stroke: 0.5pt + gray,
 
       [ID], [Hodnoticí kritérium], [Vazba na požadavky], [Typ],
-      [K1], [Pokrytí náborového procesu (pozice, kandidáti, pipeline)], [R2, R3], [Must],
+      [K1], [Pokrytí celého náborového procesu], [R2, R3], [Must],
       [K2], [Pokrytí vstupní agendy a adaptace zaměstnance], [R4], [Must],
       [K3], [Podpora holdingového členění (oddělená data + centrální dohled)], [R1], [Must],
       [K4], [Integrace a rozšiřitelnost (API, datové vazby)], [R5], [Must],
@@ -29,10 +33,12 @@ V této kapitole nehledám obecně nejlepší systém na trhu. Hledám řešení
   caption: [Hodnoticí rámec rešerše dostupných řešení]
 ) <tab:research-kriteria>
 
+Hodnocení vychází z veřejně dostupné dokumentace výrobců, produktových stránek a oficiálních ceníků *(stav k 21. 11. 2025)*.
+
 Pro účely rozhodnutí byla kritéria typu *Must* chápána jako diskvalifikační. Pokud řešení nesplní kterékoli kritérium K1-K5, není vhodné jako cílová platforma pro digitalizaci procesů #abbr("KZ", none), i když může být přínosné jako dílčí integrační komponenta.
 
 == Specializované ATS platformy
-Specializované ATS nástroje jsou navrženy především pro akviziční část náboru. Silné bývají tam, kde je potřeba spravovat pozice, kandidátské workflow, komunikaci s uchazeči a publikaci pracovních nabídek. Otázkou pro tuto práci však není jen to, jak dobře umí nábor zahájit, ale zda dokážou přirozeně pokračovat do vstupní agendy a adaptační fáze, které jsou v prostředí zdravotnické organizace podstatně náročnější než v běžném komerčním náboru.
+Specializované ATS nástroje jsou zaměřeny především na počáteční fázi náboru. Silné jsou zejména v oblasti správy pracovních pozic, evidence uchazečů, komunikace s nimi a zveřejňování pracovních nabídek. Pro účely této práce však není klíčové pouze to, jak efektivně dokážou nábor zahájit, ale zda na něj dokážou plynule navázat i v oblasti vstupní agendy a adaptačního procesu. Právě tyto fáze jsou v prostředí zdravotnické organizace výrazně složitější než v běžném komerčním náboru.
 
 === Teamio (Alma Career)
 Teamio lze považovat za referenční ATS řešení českého trhu, zejména díky jeho úzkému propojení s dominantními inzertními kanály Jobs.cz a Práce.cz. Tato vazba je v podmínkách #abbr("KZ", none) významná, protože umožňuje snížit transakční náklady spojené s publikací inzerce a konsolidací reakcí uchazečů. Oficiální dokumentace současně uvádí možnost automatického importu pozic z interních systémů i z portálů provozovaných Alma Career. @teamioAutoImport2026
@@ -144,7 +150,7 @@ Specifickým požadavkem zdravotnického prostředí je napojení na ověřován
 == Identifikovaná omezení dostupných produktů a volba cílového přístupu
 Zjištění ukazují, že hlavní limit dostupných produktů neleží v absenci jednotlivých funkcí. Leží v nesouladu mezi jejich produktovou logikou a cílovou architekturou #abbr("KZ", none). První omezení představuje provozní model. Významná část funkčně robustních enterprise platforem je koncipována jako cloud-native služba, zatímco #abbr("KZ", none) vyžaduje provoz na vlastní infrastruktuře z důvodu interní governance, bezpečnostních politik a provozní autonomie.
 
-Druhé omezení se týká procesní kontinuity. U specializovaných ATS řešení je často vysoká kvalita náborové části, avšak adaptační proces bývá realizován v odděleném nástroji. Vzniká tak architektura "best of breed", která je funkčně flexibilní, ale z pohledu provozu přináší rizika fragmentace dat, složitější správu identit a vyšší náklady na dlouhodobé integrační testování.
+Druhé omezení se týká procesní kontinuity. U specializovaných ATS řešení je často vysoká kvalita náborové části, avšak adaptační proces bývá realizován v odděleném nástroji. Vzniká tak architektura "best of breed", která je funkčně flexibilní, ale z pohledu provozu přináší rizika roztříštěnosti dat, složitější správu identit a vyšší náklady na dlouhodobé integrační testování.
 
 Třetí omezení spočívá v doménové specificitě českého zdravotnictví. Hodnocené produkty jsou navrženy jako obecně použitelné HR platformy pro více odvětví a zemí. To je jejich komerční výhoda, ale současně limit v situaci, kdy organizace potřebuje cíleně implementovat lokální procesní logiku, například ověřování odborné způsobilosti, auditovatelný průchod zdravotnickou adaptací nebo detailní vazbu na interní předpisy jednotlivých závodů.
 

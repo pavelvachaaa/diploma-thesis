@@ -45,11 +45,6 @@ Analýza současného stavu procesů náboru a adaptace pracovníků v Krajské 
 
 #include "chapters/analysis.typ"
 
-= Existující softwarová řešení
-Rozhodnutí o vlastním vývoji je obhajitelné jen tehdy, pokud je zřejmé, proč dostupné produkty nedokážou naplnit požadavky dané organizace bez nepřiměřených kompromisů. Rešeršní kapitola proto porovnává dostupná řešení z kategorií ATS (Applicant Tracking Systems), onboardingových platforem a integrovaných HR systémů a hodnotí je optikou podmínek #abbr("KZ", none).
-
-Při hodnocení jsou zohledněna zejména kritéria pokrytí požadavků na digitalizaci procesů uvedených v @tab:pozadavky-digitalizace, české jazykové prostředí a lokalizace, přizpůsobitelnost procesům zdravotnické organizace a možnost provozování na vlastní infrastruktuře. Cílem není najít obecně nejznámější produkt na trhu, ale určit, zda některé z existujících řešení dokáže obhájit procesní, architektonické i provozní nároky této práce.
-
 #include "chapters/research.typ"
 
 = Návrh softwarové architektury
