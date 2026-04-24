@@ -8,7 +8,7 @@ V roce 2021 se struktura #abbr("KZ", none) dále rozšířila. Do společnosti b
 S více než jedenácti tisíci zaměstnanci patří #abbr("KZ", none) mezi největší zaměstnavatele v Ústeckém kraji. Pro tuto práci je podstatné zejména to, že značnou část personálu tvoří zdravotničtí pracovníci s regulovanou odbornou způsobilostí. Nábor a adaptace zde proto nejsou jen administrativní agendou, ale procesem, který musí současně splnit provozní, legislativní i odborné požadavky.
 
 === Organizační struktura z pohledu řízení lidských zdrojů
-Organizační uspořádání #abbr("KZ", none) kombinuje centrální řízení s vysokou mírou provozní autonomie jednotlivých nemocnic. Každý odštěpný závod má vlastní personální zázemí #abbr("HR", "Human Resources") pro operativní agendu, správu smluv, docházku i řízení adaptace, ale současně se řídí jednotnou metodikou a strategickými cíli holdingu.
+ #abbr("KZ", none) je řízená centrálně, avšak jednotlivé nemocnice mají zároveň prostor samostatně řešit běžné provozní a personální záležitosti. Každý odštěpný závod má vlastní personální zázemí #abbr("HR", "Human Resources") pro operativní agendu, správu smluv, docházku i řízení adaptace, ale současně se řídí jednotnou metodikou a strategickými cíli holdingu.
 
 Z pohledu digitalizace je důležité, že systém nesmí uvažovat organizaci jako jeden homogenní celek. Musí respektovat samostatnost jednotlivých závodů a zároveň umožnit centrální dohled, reporting a správu pravidel. V architektonické terminologii jde o požadavek na _multi-tenantní_ řešení, ve kterém každý odštěpný závod vystupuje jako samostatný tenant sdílející společnou infrastrukturu i metodické řízení.
 
@@ -55,7 +55,7 @@ Informační systém proto musí umět validovat doklady o dosaženém vzdělán
 
 Dalším specifikem je *kontinuální nábor*. Na rozdíl od prostředí, kde se nábor spouští jen při výjimečné potřebě, musí zdravotnická organizace dlouhodobě reagovat na fluktuaci, demografický vývoj i celorepublikový nedostatek pracovníků, zejména mimo hlavní centra. @mzd2025TiskovkaNedostatek Systém proto musí být připraven na opakované a souběžné zpracování velkého množství pozic i uchazečů.
 
-Po náboru navíc nekončí práce organizace podpisem pracovní smlouvy. Následuje *vícestupňový adaptační proces*, který zahrnuje nejen standardní nástupní agendu a školení #abbr("BOZP", "Bezpečnost a ochrana zdraví při práci"), ale i odborné zapracování, práci s interní dokumentací, seznámení s nemocničními systémy a ověření připravenosti na konkrétním pracovišti. Právě vazba mezi náborem, vstupní agendou a adaptací je proto v této práci klíčová.
+Podpisem pracovní smlouvy končí práce náboráře a personalního oddělení. Následuje *vícestupňový adaptační proces*, který zahrnuje nejen standardní nástupní agendu a školení #abbr("BOZP", "Bezpečnost a ochrana zdraví při práci"), ale i odborné zapracování, práci s interní dokumentací, seznámení s nemocničními systémy a ověření připravenosti na konkrétním pracovišti. Právě vazba mezi náborem, vstupní agendou a adaptací je proto v této práci klíčová.
 
 == Současný stav procesů náboru pracovníků<kapitola-soucasny-stav>
 Před zahájením digitalizace stojí správa uchazečů v #abbr("KZ", none) převážně na „svaté dvojici“ sdílených tabulek a e-mailové komunikace, kterou doplňují lokální zvyklosti jednotlivých závodů. Takové řešení může fungovat v menší organizaci, ale v podmínkách zdravotnického holdingu začíná postupně brzdit celý proces. Nábor zde pak nepůsobí jako jeden plynulý celek, ale jako řada navazujících administrativních kroků, mezi nimiž se informace ztrácejí nebo zbytečně přepisují.
@@ -65,7 +65,7 @@ Pro účely analýzy jsem proto mapoval skutečný průběh procesů pomocí str
 Pro zajištění terminologické konzistence jsou v této kapitole používány následující pojmy:
 
 - *Uchazeč* o zaměstnání je fyzická osoba, která reaguje na konkrétní zveřejněnou pracovní pozici a doručí zaměstnavateli svou přihlášku (životopis, motivační dopis nebo jinou formu reakce).
-- *Kandidát* je uchazeč, který prošel prvotním screeningem a byl vybrán do další fáze výběrového řízení (např. k osobnímu pohovoru nebo odbornému posouzení).
+- *Kandidát* je uchazeč, který prošel prvotním roztříděním a byl vybrán do další fáze výběrového řízení (např. k osobnímu pohovoru nebo odbornému posouzení).
 - *Zájemce* o zaměstnání je osoba, která projeví zájem o zaměstnání v KZ bez vazby na konkrétní vyhlášenou pracovní pozici (tzv. talent pool).
 
 === Proces inzerce volných pozic
@@ -78,7 +78,7 @@ Inzerce volných pracovních pozic je v současném stavu rozložena mezi někol
 
 Absence vlastního kariérního portálu znamená, že uchazeč nemá jednotný vstupní bod, ve kterém by našel aktuální nabídky všech závodů, základní informace o zaměstnavateli i možnost okamžitě reagovat na pozici. Už na této úrovni tedy vzniká roztříštěnost, kterou organizace dále přenáší i do interní práce s inzeráty.
 
-Proces začíná tím, že vedoucí oddělení identifikuje potřebu obsadit pozici a předává ji personálnímu oddělení. Vstupní informace však nejsou standardizované. Rozsah i kvalita zadání se liší podle konkrétního vedoucího, takže HR často nejprve doplňuje chybějící údaje a až poté připravuje text inzerátu. Samotné schvalování proto probíhá v několika e-mailových iteracích a místo plynulého workflow vzniká komunikační smyčka.
+Proces začíná tím, že vedoucí oddělení identifikuje potřebu obsadit pozici a předává ji personálnímu oddělení. Vstupní informace však nejsou standardizované. Rozsah i kvalita zadání se liší podle konkrétního vedoucího, takže HR často nejprve doplňuje chybějící údaje a až poté připravuje text inzerátu. Samotné schvalování proto probíhá v několika e-mailových iteracích a místo plynulého procesu vzniká komunikační smyčka.
 
 Po schválení textu následuje ruční publikace na jednotlivých platformách. Každý portál má vlastní formulář, vlastní strukturu dat i vlastní způsob následné aktualizace. Změna termínu nebo úprava požadavků proto neznamená jednu opravu v centrálním systému, ale opakování stejné práce na více místech. Důsledkem je nízká transparentnost, vyšší časová náročnost a slabý přehled vedoucích pracovníků o tom, kde se jejich pozice právě nachází a jaké reakce na ni přišly.
 #figure(
@@ -118,9 +118,9 @@ Po schválení textu následuje ruční publikace na jednotlivých platformách.
 === Proces příjmu a výběru potenciálních kandidátů
 Přihlášky dnes přicházejí z různých zdrojů a náborář je musí ručně sjednocovat do tabulek a lokálně uložených příloh. Samotné získání přehledu o kandidátech je tak oddělenou administrativní činností, nikoli přirozenou součástí náborového systému. Výsledkem je nekonzistence dat mezi pracovišti a nízká dohledatelnost dokumentů.
 
-Prvotní screening uchazečů probíhá převážně manuálně. U zdravotnických pozic to znamená vyhledávat v každém životopise údaje o vzdělání, odborné způsobilosti a další podmínky, které rozhodují o dalším postupu. Bez automatických filtrů a strukturovaných dat je tento krok pomalý a zároveň náchylný k přehlédnutí důležitých informací. Užší výběr se následně předává vedoucím oddělení znovu e-mailem, takže rozhodovací proces zůstává roztříštěný.
+Prvotní třídění uchazečů probíhá převážně manuálně. U zdravotnických pozic to znamená vyhledávat v každém životopise údaje o vzdělání, odborné způsobilosti a další podmínky, které rozhodují o dalším postupu. Bez automatických filtrů a strukturovaných dat je tento krok pomalý a zároveň náchylný k přehlédnutí důležitých informací. Užší výběr se následně předává vedoucím oddělení znovu e-mailem, takže rozhodovací proces zůstává roztříštěný.
 
-Kritickým nedostatkem je i absence systematické databáze uchazečů a zájemců. Informace o kandidátech, kteří nebyli přijati nebo reagovali bez vazby na konkrétní pozici, se dále nevyužívají. Organizace tím přichází o možnost vracet se k relevantním kontaktům při dalším náboru a zvyšuje si závislost na opakované inzerci.
+Kritickým nedostatkem je i absence systematické databáze uchazečů a zájemců. Informace o kandidátech, kteří nebyli přijati nebo reagovali bez vazby na konkrétní pozici, se dále nevyužívají. Organizace tím přichází o možnost vracet se k relevantním kontaktům při dalším náboru a zvyšuje si závislost na opakované inzerci, která sebou nese finanční zátěž.
 
 #figure(
   table(
@@ -143,6 +143,7 @@ Kritickým nedostatkem je i absence systematické databáze uchazečů a zájemc
   ),
   caption: [Proces P02 - Příjem a výber kandidátů k oslovení],
 ) <tab:proces-p02>
+
 
 #figure(
   image(
@@ -182,6 +183,8 @@ Proces tak sice formálně vede k uzavření pracovní smlouvy, ale z provozníh
 ) <tab:proces-p03>
 
 
+Celý proces je znázorněn na diagramu níže (viz obr. @obr:proces-p03), který zachycuje jednotlivé kroky od pohovoru až po podpis pracovní smlouvy. Diagram ukazuje návaznost činností mezi kandidátem, vedoucím oddělení a personálním oddělením. Zároveň je z obrázků hned patrná roztříštěnost procesu, zejména v oblasti předávání dokumentů a koordinace jednotlivých kroků.
+
 #figure(
   image(
     "../procesy/p03_prijmuti_a_pohovor.svg",
@@ -193,7 +196,7 @@ Proces tak sice formálně vede k uzavření pracovní smlouvy, ale z provozníh
 === Proces zajištění vstupní agendy
 V okamžiku nástupu zaměstnance začíná fáze, ve které je třeba připravit člověka na skutečný výkon práce. Patří sem vydání identifikační karty, nastavení docházky, přístupových oprávnění a v některých případech i prostředků pro elektronické podepisování. Z pohledu procesu je důležité, že tyto kroky nevykonává jediná role, ale více útvarů s rozdílnou odpovědností.
 
-Vedle technických přístupů probíhá i útvarová orientace nového zaměstnance. Vedoucí pracovník jej seznamuje s pracovištěm, provozním řádem, dokumentací a očekáváním spojeným s výkonem práce. Problém současného stavu nespočívá v tom, že by tyto kroky neexistovaly, ale v tom, že nejsou vedeny v jednotném přehledu. Organizace proto obtížně zjišťuje, co bylo splněno, co se zdrželo a kde se nový zaměstnanec může zaseknout ještě před plným nástupem do role.
+Vedle technických přístupů probíhá i útvarová orientace nového zaměstnance. Vedoucí pracovník jej seznamuje s pracovištěm, provozním řádem, dokumentací a očekáváním spojeným s výkonem práce. Problém současného stavu nespočívá v tom, že by tyto kroky neexistovaly, ale v tom, že nejsou vedeny v jednotném přehledu. Organizace proto obtížně zjišťuje, co bylo splněno, co se zdrželo a kde se nový zaměstnanec může zaseknout ještě před plným nástupem do své nové role.
 
 #figure(
   table(
@@ -271,7 +274,7 @@ Na základě analýzy současného stavu procesů náboru a adaptace v KZ, konzu
 
 Identifikované problémy mají kumulativní charakter a v provozní praxi se vzájemně zesilují. Významným akceleračním faktorem je vysoká personální dynamika organizace, která dosahuje průměrně 110 nástupů měsíčně (v sezónních špičkách až 180). Typická měsíční struktura nástupů přitom zahrnuje přibližně 10 pracovníků kategorie #abbr("LZ", none), 50 #abbr("NLZP", none) a 50 #abbr("THP", "technickohospodářských pracovníků")/dělnických profesí. V takovém objemu se manuální administrativa stává kritickým omezením propustnosti celého procesu.
 
-Z analytického pohledu lze problémy rozdělit do tří tematických oblastí. První oblast představuje *datová fragmentace* (P1-P3), kdy jsou informace rozptýleny mezi e-mailovou komunikaci, lokální soubory a tabulkové přehledy jednotlivých závodů. Druhou oblast tvoří *procesní a řídicí nedostatky* (P4-P9), zejména chybějící auditní stopa, nízká standardizace rozhodování a slabá transparentnost stavu náboru i vstupní agendy. Třetí oblast je *digitální nepodpořená adaptace* (P10), která omezuje možnost systematicky řídit zapracování nových zaměstnanců a vyhodnocovat jeho úspěšnost.
+Z analytického pohledu lze problémy rozdělit do tří tematických oblastí. První oblast představuje *datová fragmentace* (P1-P3), kdy jsou informace rozptýleny mezi e-mailovou komunikaci, lokální soubory a tabulkové přehledy jednotlivých závodů. Druhou oblast tvoří *procesní a řídicí nedostatky* (P4-P9), zejména chybějící auditní stopa, nízká standardizace rozhodování a slabá transparentnost stavu náboru i vstupní agendy. Třetí oblast je *digitálně nepodpořená adaptace* (P10), která omezuje možnost systematicky řídit zapracování nových zaměstnanců a vyhodnocovat jeho úspěšnost.
 
 #figure(
   [
@@ -309,7 +312,7 @@ Požadavky R1-R6 představují minimální funkční rámec cílového systému.
   [
     #set par(justify: false)
     #table(
-      columns: (auto, 1.7fr, 2.8fr, auto),
+      columns: (auto, 2fr, 4fr, 1fr),
       inset: 7pt,
       align: left,
       fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
@@ -318,12 +321,12 @@ Požadavky R1-R6 představují minimální funkční rámec cílového systému.
 
       [R1],
       [Multi-tenantní architektura],
-      [Respektovat holdingovou strukturu KZ (závody jako samostatní tenanti) a současně umožnit centrální řízení a reporting.],
+      [Respektovat strukturu KZ (samostatné závody) a umožnit centrální řízení a reporting.],
       [P1, P2, P5],
 
       [R2],
       [Veřejný kariérní portál],
-      [Poskytnout jednotný vstupní bod s aktuálními nabídkami, online přihláškou a registrací zájemce (talent pool).],
+      [Poskytnout jednotný vstupní bod s aktuálními nabídkami, online přihláškou a registrací zájemce (tzv. talent pool).],
       [P2, P3, P6, P7],
 
       [R3],
@@ -350,11 +353,16 @@ Požadavky R1-R6 představují minimální funkční rámec cílového systému.
   caption: [Požadavky na digitalizaci a jejich vazba na identifikované problémy],
 ) <tab:pozadavky-digitalizace>
 
+
+Tabulka výše ukazuje, že jednotlivé požadavky nepokrývají izolované části procesu, ale řeší problémy napříč celým životním cyklem kandidáta. Současně je patrná snaha o propojení náboru a adaptace do jednoho integrovaného systému, který umožní lepší přehled, efektivnější koordinaci a kvalitnější rozhodování na úrovni jednotlivých závodů i centrály.
+
 == Specifikace funkcionálních a nefunkcionálních požadavků
 Na základě formulovaných požadavků na digitalizaci (R1-R6) jsem v této sekci provedl jejich dekompozici na konkrétní funkcionální a nefunkcionální požadavky, které slouží jako vstup pro návrh softwarové architektury a implementaci systému.
 
 === Funkcionální požadavky
 Funkcionální požadavky definují konkrétní chování systému, tedy co systém musí umožňovat svým uživatelům nebo jakých výstupů musí být schopen. Požadavky jsou kategorizovány podle oblastí systému a prioritizovány metodou MoSCoW (Must have, Should have, Could have, Won't have).
+
+@tab:fp-portal shrnuje funkcionální požadavky na veřejnou část systému, tedy kariérní portál určený pro uchazeče. Požadavky se zaměřují na vytvoření jednoho a plně digitálního vstupního bodu pro uchazeče. Cílem je eliminace ostatních komunikačních kanálů, zejména e-mailu, telefonické a papírové komunikace, které v současném stavu vedou k roztříštěnosti dat a zvýšené administrativní zátěži.
 
 #figure(
   [
@@ -391,11 +399,19 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
       [Detail pracovní nabídky obsahuje strukturovaný popis pozice, požadavky na kvalifikaci, nabízené podmínky a kontaktní informace],
       [Must],
       [R2],
+
+      [F06],
+      [Systém umožní uchazeči kontaktovat organizaci prostřednictvím kontaktního formuláře],
+      [Should],
+      [R2],
+
     )
   ],
   caption: [Funkcionální požadavky — Kariérní portál],
 ) <tab:fp-portal>
 
+
+@tab:fp-admin shrnuje funkcionální požadavky na interní část systému určenou pro nábořáře, personální a mzdové oddělení a vedoucí oddělení. Požadavky pokrývají celý průběh náboru od založení požadavku na obsazení pozice až po výběr kandidáta. 
 
 #figure(
   [
@@ -408,29 +424,29 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
       stroke: 0.5pt + gray,
       [ID], [Požadavek], [Priorita], [Vazba],
 
-      [F06],
-      [Systém umožní založení a správu požadavku na obsazení pozice včetně schvalovacího workflow mezi vedoucím oddělení a HR],
-      [Must],
-      [R3],
-
       [F07],
-      [Systém bude vést centrální evidenci kandidátů s historií změn stavů napříč celým náborovým procesem],
+      [Systém umožní založení a správu požadavku na obsazení pozice včetně schvalovacího procesu mezi vedoucím oddělení a HR],
       [Must],
       [R3],
 
       [F08],
-      [Systém umožní plánování pohovorů, přiřazení odpovědných osob a evidenci výsledků jednotlivých kol],
+      [Systém bude vést centrální evidenci kandidátů s historií změn stavů napříč celým náborovým procesem],
       [Must],
       [R3],
 
       [F09],
+      [Systém umožní plánování pohovorů, přiřazení odpovědných osob a evidenci výsledků jednotlivých kol],
+      [Must],
+      [R3],
+
+      [F10],
       [Systém poskytne standardizované komunikační šablony (pozvánka, zamítnutí, žádost o doplnění podkladů) a jejich evidenci],
       [Should],
       [R3],
 
-      [F10], [Systém umožní strukturované hodnocení kandidátů dle předem definovaných kritérií], [Should], [R3, R6],
+      [F11], [Systém umožní strukturované hodnocení kandidátů dle předem definovaných kritérií], [Should], [R3, R6],
 
-      [F11],
+      [F12],
       [Vedoucí oddělení bude mít online přehled o stavu svých náborových požadavků bez nutnosti ad-hoc e-mailových dotazů],
       [Must],
       [R3, R6],
@@ -439,7 +455,7 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
   caption: [Funkcionální požadavky — Interní řízení náboru],
 ) <tab:fp-admin>
 
-
+@tab:fp-integrace shrnuje funkcionální požadavky na integraci systému s externími zdroji. Součástí je také auditní stopa v souladu s principy řízené správy dat.
 #figure(
   [
     #set par(justify: false)
@@ -451,59 +467,18 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
       stroke: 0.5pt + gray,
       [ID], [Požadavek], [Priorita], [Vazba],
 
-      [F13], [Systém vytvoří vstupní checklist nástupu podle typu pozice a organizační jednotky], [Must], [R3, R4],
+      [F13],
+      [Systém umožní automatizované ověření odborné způsobilosti pracovníků napojením na národní registr zdravotnických pracovníků],
+      [Should],
+      [R5],
 
       [F14],
-      [Systém umožní evidovat plnění přednástupních povinností (BOZP, vstupní prohlídka, smluvní dokumentace, identifikační karta, přístupová oprávnění)],
-      [Must],
-      [R3, R4],
+      [Systém upozorní náboráře, pokud uchazeč nemá platný záznam v NRZP nebo má omezenou způsobilost],
+      [Should],
+      [R5],
 
       [F15],
-      [Systém bude automaticky upozorňovat odpovědné role na blížící se termíny nebo prodlení u vstupní agendy],
-      [Should],
-      [R4],
-
-      [F16],
-      [Vedoucí nebo školitel bude moci založit adaptační plán obsahující úkoly, termíny a hodnoticí milníky],
-      [Must],
-      [R4],
-
-      [F17],
-      [Systém umožní průběžné hodnocení plnění adaptačního plánu a evidenci hodnoticích rozhovorů],
-      [Must],
-      [R4, R6],
-
-      [F18], [Systém poskytne přehled stavu adaptací podle závodu, oddělení a typu pracovní pozice], [Should], [R4, R6],
-    )
-  ],
-  caption: [Funkcionální požadavky — Vstupní agenda a adaptace],
-) <tab:fp-adaptace>
-
-
-
-#figure(
-  [
-    #set par(justify: false)
-    #table(
-      columns: (auto, 2.8fr, auto, auto),
-      inset: 7pt,
-      align: left,
-      fill: (x, y) => if y == 0 { rgb("#cecece") } else { white },
-      stroke: 0.5pt + gray,
-      [ID], [Požadavek], [Priorita], [Vazba],
-
-      [F20],
-      [Systém umožní automatizované ověření odborné způsobilosti pracovníků prostřednictvím API napojení na národní registr zdravotnických pracovníků],
-      [Should],
-      [R5],
-
-      [F21],
-      [Systém upozorní náboráře v případě, že uchazeč nemá platný záznam v NRZP nebo jeho způsobilost je omezena],
-      [Should],
-      [R5],
-
-      [F22],
-      [Systém eviduje výsledky ověření kvalifikací jako součást auditní stopy s časovým razítkem a identifikací zdroje ověření],
+      [Systém eviduje výsledky ověření kvalifikace včetně časového razítka a zdroje],
       [Must],
       [R3, R5],
     )
@@ -512,6 +487,8 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
 ) <tab:fp-integrace>
 
 
+@tab:fp-adaptace shrnuje funkcionální požadavky na digitalizaci vstupní agendy a adaptačního procesu. Požadavky reagují na  manuální řízení těchto činností zavedením strukturovaných seznamů, evidence plnění a upozornění.
+
 #figure(
   [
     #set par(justify: false)
@@ -523,22 +500,64 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
       stroke: 0.5pt + gray,
       [ID], [Požadavek], [Priorita], [Vazba],
 
-      [F23],
+      [F16], [Systém vytvoří vstupní checklist nástupu podle typu pozice a organizační jednotky], [Must], [R3, R4],
+
+      [F17],
+      [Systém umožní evidovat plnění přednástupních povinností (BOZP, vstupní prohlídka, smluvní dokumentace, identifikační karta, přístupová oprávnění)],
+      [Must],
+      [R3, R4],
+
+      [F18],
+      [Systém bude automaticky upozorňovat odpovědné role na blížící se termíny nebo prodlení u vstupní agendy],
+      [Should],
+      [R4],
+
+      [F19],
+      [Vedoucí nebo školitel bude moci založit adaptační plán obsahující úkoly, termíny a hodnoticí milníky],
+      [Must],
+      [R4],
+
+      [F20],
+      [Systém umožní průběžné hodnocení plnění adaptačního plánu a evidenci hodnoticích rozhovorů],
+      [Must],
+      [R4, R6],
+
+      [F21], [Systém poskytne přehled stavu adaptací podle závodu, oddělení a typu pracovní pozice], [Should], [R4, R6],
+    )
+  ],
+  caption: [Funkcionální požadavky — Vstupní agenda a adaptace],
+) <tab:fp-adaptace>
+
+
+@tab:fp-reporting shrnuje požadavky na oddělení dat a centrální pohled na nábor.
+
+#figure(
+  [
+    #set par(justify: false)
+    #table(
+      columns: (auto, 2.8fr, auto, auto),
+      inset: 7pt,
+      align: left,
+      fill: (x, y) => if y == 0 { rgb("#cecece") } else { white },
+      stroke: 0.5pt + gray,
+      [ID], [Požadavek], [Priorita], [Vazba],
+
+      [F22],
       [Systém podporuje multi-tenantní model, kde každý odštěpný závod je samostatným tenantem s vlastními daty, uživateli a konfigurací],
       [Must],
       [R1],
 
-      [F24],
+      [F23],
       [Uživatelé s rolí centrálního administrátora mají přístup k datům a reportům napříč všemi tenanty],
       [Must],
       [R1, R6],
 
-      [F25],
-      [Systém poskytuje dashboardy s klíčovými metrikami (počet otevřených pozic, průměrná doba obsazení, poměr přihlášek/přijetí, stav adaptací) na úrovni závodu i celé organizace],
+      [F24],
+      [Systém poskytuje přehled s klíčovými metrikami (počet otevřených pozic, průměrná doba obsazení, poměr přihlášek/přijetí, stav adaptací) na úrovni závodu i celé organizace],
       [Should],
       [R6],
 
-      [F26], [Systém umožní export reportů do formátu PDF a CSV], [Could], [R6],
+      [F25], [Systém umožní export reportů do formátu PDF a CSV], [Could], [R6],
     )
   ],
   caption: [Funkcionální požadavky — Reporting a multi-tenantní správa],
@@ -571,17 +590,17 @@ Nefunkcionální požadavky definují kvalitativní vlastnosti systému, které 
 
       [NF03],
       [Bezpečnost],
-      [Systém musí implementovat přístup řízený rolemi (RBAC) s minimálně třemi úrovněmi — centrální administrátor, HR pracovník závodu, vedoucí oddělení],
+      [Systém musí podporovat řízení přístupů podle rolí alespoň ve stupních:  administrátor, HR pracovník a vedoucí oddělení],
 
       [NF04], [Dostupnost], [Systém musí dosahovat dostupnosti alespoň 99,5 % v pracovních dnech v čase 6:00-22:00],
 
       [NF05],
       [Výkon],
-      [Odezva uživatelského rozhraní nesmí v 95. percentilu překročit 2 sekundy pro standardní operace (zobrazení seznamu, detail záznamu) při běžné zátěži],
+      [Odezva běžných operací nesmí v 95. percentilu překročit 2 sekundy.],
 
       [NF06],
       [Přístupnost],
-      [Kariérní portál musí být responzivní, použitelný na mobilních zařízeních a navržený v souladu se zásadami WCAG 2.1 na úrovni AA],
+      [Kariérní portál musí být responzivní a navržený v souladu se zásadami WCAG 2.1 na úrovni AA],
 
       [NF07],
       [Nasaditelnost],
