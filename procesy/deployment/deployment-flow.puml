@@ -1,14 +1,19 @@
 @startuml
+
 skinparam shadowing false
+skinparam defaultFontSize 50
+skinparam maxMessageSize 400
+
+
 actor "Vývojář" as Dev
-participant "Gitea repozitář" as Repo
-participant "Gitea Actions runner" as Runner
+participant "Gitea\nrepozitář" as Repo
+participant "Gitea Actions\nrunner" as Runner
 database "Container registry\n(docker.kzcr.eu)" as Registry
-participant "Deploy bundle\n(compose.yaml, env, skripty)" as Bundle
+participant "Deploy bundle\n(compose.yaml,\nenv, skripty)" as Bundle
 participant "Cílový host" as Host
-participant "Docker Compose" as Compose
+participant "Docker\nCompose" as Compose
 participant "Migrační služba\n(jen backend)" as Migration
-participant "Kontejner služby" as App
+participant "Kontejner\nslužby" as App
 
 Dev -> Repo: push změn a release tagu vX.Y.Z
 Repo -> Runner: trigger workflow na refs/tags/vX.Y.Z

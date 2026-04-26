@@ -1,35 +1,47 @@
 #import "../template/abbreviations.typ": abbr
 
-Navržený systém má hodnotu jen tehdy, pokud jej lze provozně udržet v podmínkách #abbr("KZ", none). Nasazení proto v této práci nevystupuje jako technický dovětek k implementaci, ale jako samostatná vrstva návrhu, která musí respektovat požadavky na on-premise provoz (NF07), dostupnost (NF04), auditovatelnost (NF11) a interoperabilitu (NF12). Nejde o uvedení jediné aplikace do běhu, ale o koordinaci spolupracujících frontendových, backendových, integračních a výpočetních služeb, které dohromady tvoří jeden provozní celek.
+Navržený systém má skutečnou hodnotu pouze tehdy, pokud je dlouhodobě provozně udržitelný v reálném prostředí, ve kterém bude nasazen. Klíčovou roli přitom hraje schopnost systém nejen jednorázově nasadit, ale opakovaně a spolehlivě reprodukovat jeho nasazení v různých prostředích. Stejně důležité je zavedení řízení změn, které umožňuje bezpečně provádět úpravy bez narušení stability provozu.
+
+Neméně podstatná je schopnost systému včas signalizovat provozní odchylky, tedy situace, kdy se jeho chování odchyluje od očekávaného stavu. V praxi se může jednat například o prodlouženou dobu odezvy, zvýšenou chybovost, nedostupnost služby, neobvyklé zatížení infrastruktury nebo narušení komunikace mezi jednotlivými komponentami. Včasná identifikace těchto stavů je předpokladem pro jejich rychlou diagnostiku a minimalizaci dopadů na uživatele i navazující procesy.
+
+Cílem této kapitoly je proto shrnout způsob, jakým bylo navržené řešení připraveno pro nasazení do cílového prostředí. Pozornost je věnována zejména kontejnerizaci jednotlivých částí systému, distribuci verzovaných obrazů, správě konfigurace, oddělení provozních zón a mechanismům umožňujícím dohled nad během systému.
 
 == Kontejnerizační model a síťová segmentace
-Jednotlivé části systému distribuuji jako samostatné kontejnerové image a provozuji je pomocí `Docker Compose`. Tento přístup odpovídá cílovému on-premise prostředí a současně nevyžaduje zavedení rozsáhlejšího orchestračního rámce už v pilotní fázi. Bezstavové služby jsou aktualizovány výměnou image, zatímco stavové komponenty používají perzistentní volumes nebo sdílenou databázovou vrstvu. Přehled hlavních služeb uvádím v @tab:deployment-services.
+Jednotlivé části systému distribuuji jako samostatné obrazy a jsou provozovány pomocí `Docker Compose`. Tento přístup odpovídá pilotnímu a on-premise charakteru řešení. Umožňuje zachovat oddělené běhové jednotky bez toho, aby bylo nutné zavést rozsáhlejší orchestraci už v první fázi projektu.
+
+Provozní přínos kontejnerizace spočívá v tom, že stejný obraz může projít testem i cílovým nasazením bez dodatečného přestavování hostitelského prostředí. Tím se snižuje riziko rozdílů mezi prostředími a zjednodušuje se návrat ke starší verzi. Omezením naopak zůstává správa většího počtu obrazů, jejich průběžné bezpečnostní aktualizace a absence některých schopností, které poskytují robustnější orchestrátory.
+
+Přehled  služeb v @tab:deployment-services zachycuje provozní členění nasazení podle jejich role, stavového charakteru a míry expozice vůči okolnímu prostředí. Tabulka slouží jako orientační pohled na to, které komponenty tvoří cílové nasazení a jakou provozní odpovědnost v něm zastávají.
 
 #figure(
   [
     #set par(justify: false)
     #table(
-      columns: (1.4fr, 2.6fr, 1.6fr, 1.8fr),
+      columns: (2.3fr, 2.2fr, 1.35fr, 1.2fr),
       inset: 7pt,
       align: left,
       fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
       stroke: 0.5pt + gray,
 
-      [Služba], [Role], [Stav], [Expozice],
+      [Název služby], [Role], [Stav], [Expozice],
 
       [`kariera.kzcr.eu`], [Kariérní portál pro publikaci inzerátů a podání přihlášek], [Bezstavová], [Veřejná],
 
-      [`onboarding.kzcr.eu`], [Onboardingový portál pro HR a zaměstnance], [Bezstavová], [Interní web],
+      [`onboarding.kzcr.eu`], [Onboardingový portál pro HR a zaměstnance], [Bezstavová], [Veřejná],
 
-      [`hr-backend`], [Transakční API a integrační logika], [Bezstavová (PostgreSQL, SeaweedFS)], [Interní API],
+      [`hr-backend`], [Transakční API a integrační logika], [Bezstavová], [Interní],
 
       [`migration`], [Migrace databázového schématu], [Bezstavová], [Bez expozice],
 
-      [`qualification-adapter`], [Lookup kvalifikací z NRZP], [Bezstavová], [Interní],
+      [`qualification-adapter`], [Vyhledání kvalifikací z NRZP], [Bezstavová], [Interní],
 
-      [`user-search-adapter`], [Lookup interních uživatelů], [Bezstavová], [Interní],
+      [`user-search-adapter`], [Vyhledání interních uživatelů], [Bezstavová], [Interní],
 
-      [`audit_writer_processor`], [Zápis auditních událostí], [Bezstavová (RabbitMQ → PostgreSQL)], [Bez HTTP],
+      [`audit_writer_ processor`], [Zápis auditních událostí], [Bezstavová], [Interní],
+
+      [`cv_processor`], [Inteligentní zpracování životopisů], [Bezstavová], [Interní],
+
+      [`job_processor`], [Generování popisků pozic], [Bezstavová], [Interní],
 
       [`PostgreSQL (pgvector)`], [Transakční a auditní data], [Stavová], [Interní],
 
@@ -37,57 +49,54 @@ Jednotlivé části systému distribuuji jako samostatné kontejnerové image a 
 
       [`RabbitMQ`], [Fronta zpráv pro asynchronní zpracování], [Stavová], [Interní],
 
-      [`Umami`], [Webová analytika], [Stavová (PostgreSQL)], [Omezená interní],
+      [`Umami`], [Webová analytika], [Stavová (PostgreSQL)], [Interní],
     )
   ],
   caption: [Hlavní služby v nasazení],
 ) <tab:deployment-services>
 
-Síťový model používá čtyři logické segmenty. `app-network` nese hlavní aplikační komunikaci mezi frontendy, backendem a stavovými službami. `adapter-internal` odděluje interní adaptéry `qualification-adapter` a `user-search-adapter`, které jsou přístupné pouze službě `hr-backend`. `monitoring_network` je vyhrazena pro sběr logů a metrik. Síť `kz` propojuje host vrstvy inteligentního zpracování dat s procesory `cv_processor`, `job_processor`, `Apache Tika` a `Ollama`. Interní adaptéry záměrně nemají publikovaný host port, protože jejich rozhraní slouží jen pro komunikaci mezi službami a nepatří do veřejného síťového perimetru.
+Z hlediska provozního návrhu je významné zejména rozlišení mezi veřejně dostupnými službami, interními aplikačními komponentami a stavovými infrastrukturními službami. Veřejně dostupná část systému plní roli vstupního bodu pro externí uživatele, zatímco interní služby zajišťují zpracování aplikační logiky, integraci s okolními systémy a práci s daty. Stavové služby, jako jsou databáze, objektové úložiště nebo fronta zpráv, představují kritickou infrastrukturu, která nemá být přímo vystavena mimo vymezený provozní prostor.
 
-Podrobnější síťová opatření, například konkrétní firewallová pravidla nebo umístění jednotlivých služeb do širší infrastruktury organizace, závisejí na cílovém prostředí #abbr("KZ", none). V této práci proto zachycuji především logické segmenty a důvody jejich oddělení, nikoli detailní síťovou konfiguraci konkrétní instalace.
+Síťová segmentace proto vychází z principu omezení přímé dosažitelnosti komponent pouze na nezbytné komunikační vztahy. V praxi to znamená, že veřejná vrstva komunikuje s interní aplikační vrstvou, zatímco přístup ke stavovým službám je omezen na komponenty, které je ke své činnosti skutečně potřebují. Tento přístup podporuje princip nejmenších oprávnění a obranu v hloubce, tedy návrh, ve kterém bezpečnost systému není založena na jediném ochranném mechanismu, ale na kombinaci více vzájemně se doplňujících vrstev. Pokud by došlo k narušení jedné části systému, ostatní vrstvy stále omezují rozsah možného dopadu.
 
-== Nasazení aplikačního stacku `hiring_backend`
-Aplikační stack tvoří `hr-backend`, migrační služba `migration`, interní adaptéry `qualification-adapter` a `user-search-adapter`, stavové služby `PostgreSQL`, `SeaweedFS`, `RabbitMQ` a doprovodná analytická služba `Umami`. Toto rozdělení zachovává transakční API oddělené od integračních detailů i od pomocných provozních funkcí.
+V kontextu této práce je síťová segmentace chápána především jako logický model oddělení provozních zón. Její konkrétní prosazení na úrovni firewallových pravidel, reverzní proxy, VLAN, směrování nebo dalších prvků síťové infrastruktury přesahuje rozsah aplikačního návrhu a spadá do kompetence oddělení odpovědného za provoz infrastruktury organizace #abbr("KZ", none). Podstatné však je, že navržený model nasazení s tímto oddělením počítá a nevystavuje všechny komponenty systému stejnému bezpečnostnímu perimetru.
 
-Startovací posloupnost má explicitní pořadí, protože právě na ní závisí, zda se nové nasazení rozběhne konzistentně vůči databázi a interním závislostem:
+== Vydání a nasazení
+Nasazení celého ekosystému služeb stavím na jednotném toku vydání založeném na obrazech. Nová verze vzniká v návaznosti na vydaný tag, prochází sestavením a ověřením a teprve poté je publikována do interního registru. Na cílový host se tak nepřenáší zdrojový kód k novému sestavení, ale již vytvořený obraz určený k provozu.
 
-1. Nejprve se startuje `PostgreSQL` a čeká se na úspěšný `healthcheck`.
-2. Následně se spustí jednorázová služba `migration`, která aplikuje SQL migrace a představuje quality gate mezi novou verzí aplikace a databázovým schématem.
-3. Po úspěšné migraci se uvede do běhu interní adaptéry `qualification-adapter` a `user-search-adapter` a vyžaduji jejich `healthcheck`.
-4. Teprve poté se startuje `hr-backend`, navázané infrastrukturní služby a analytická služba `Umami`.
-5. Při prvním nebo změněném nasazení `Umami` se doplňují jednorázové inicializační kroky `umami-db-init` a `umami-bootstrap`, které připraví databázi a základní konfiguraci analytického prostředí.
+Z hlediska řízení změn je tento postup podstatný tím, že omezuje rozdíly mezi prostředím sestavení a prostředím nasazení. V organizaci s konzervativnějším změnovým režimem je výhodnější pracovat s již ověřeným obrazem než s variantou vzniklou až na cílovém serveru. Stejný princip zároveň zlepšuje dohledatelnost toho, která verze byla kdy nasazena, a usnadňuje návrat k dříve ověřenému stavu.
 
-Význam migrační služby spočívá v tom, že brání startu API proti nekompatibilní verzi schématu. `qualification-adapter` a `user-search-adapter` běží jako interní Node.js služby s vlastním `healthcheck`em. `Umami` v tomto modelu nepředstavuje byznysové jádro systému, ale provozní doplněk pro měření používání portálů. Samotný `hr-backend` je zároveň připojen do `monitoring_network`, aby bylo možné centrálně sbírat jeho logy a metriky.
+Praktickou realizaci tohoto toku zajišťuje automatizace v `Gitea Actions`, která po vydání nové verze provede sestavení obrazu, jeho publikaci do registru a podle typu služby také předání minimálního nasazovacího balíčku na cílový host. Pro text práce je však podstatnější samotný princip reprodukovatelného vydání než konkrétní syntaxe použité pipeline.
 
-Z hlediska hexagonální architektury je důležité, že nasazovací hranice nejsou totožné s hranicemi portů a adaptérů. Většina vstupních adaptérů (`routes`, kontrolery, middleware) i většina výstupních adaptérů (`audit`, `outbox`, `storage`, `ReBAC`) běží uvnitř procesu `hr-backend` a nejsou samostatnými nasazovacími jednotkami. Samostatně nasazuji pouze ty adaptéry a workery, které mají odlišný runtime, síťové oddělení nebo vlastní provozní životní cyklus, konkrétně `qualification-adapter`, `user-search-adapter`, `audit_writer_processor`, `cv_processor` a `job_processor`. `audit_writer_processor` je v tomto modelu provozován jako interní worker bez veřejného HTTP rozhraní, zatímco vrstva inteligentního zpracování dat běží na samostatném výpočetním hostu.
-
-== Release workflow, distribuce image a aktualizace služeb
-Nasazení celého ekosystému stavím na jednotném image-based `CI/CD` modelu. Vývojář po dokončení změny publikuje release tag `vX.Y.Z`, který aktivuje workflow na Gitea runneru. Ten ověří formát tagu, podle povahy služby provede build a testy, sestaví produkční image a publikuje jej do interního registru kontejnerových image `docker.kzcr.eu`.
-
-Po úspěšném buildu workflow vytváří minimální deploy bundle. U frontendů jde typicky o `compose.yaml` a `.env.deploy`, u backendových a worker služeb se přidává runtime konfigurace nebo pomocný deploy skript. Bundle je přenesen přes `SSH` na cílový host, kde se následně provede `docker login`, `docker compose pull` a `docker compose up -d --remove-orphans`. Cílový server proto nepotřebuje pracovní checkout repozitáře; postačuje mu Docker, `Docker Compose` plugin, runtime konfigurace a přístup do interní registry.
+Obrázek @obr:deployment-flow schematicky zachycuje tento tok vydání od vzniku nové verze přes její ověření a uložení do registru až po distribuci na cílový host.
 
 #figure(
   image(
     "../procesy/deployment/deployment-flow.svg",
     width: 100%,
   ),
-  caption: [Obecný image-based release tok služby s distribucí do registry a nasazením na cílový host],
+  caption: [Obecný tok vydání založený na obrazech s distribucí do registru a nasazením na cílový host],
 ) <obr:deployment-flow>
 
-U backendové části na tento obecný tok navazuje migrační quality gate. `migration` musí úspěšně dokončit změnu schématu ještě před startem `hr-backend`, jinak je nasazení ukončeno. U služeb vrstvy inteligentního zpracování dat zůstává princip shodný, ale deploy bundle navíc obsahuje runtime parametry pro přístup k `RabbitMQ`, `SeaweedFS`, `Apache Tika` a `Ollama`. Tyto služby současně běží na odděleném výpočetním hostu s vlastním runtime profilem a lokální GPU akcelerací, takže nejsou svázány se stejným provozním režimem jako transakční backend. Frontendy oproti tomu využívají hlavně build-time konfiguraci veřejných URL a analytiky.
+U různých částí řešení se tento obecný princip uplatňuje s odlišnou mírou provozní vazby. Backend je svázán s migracemi schématu a s konzistencí sdílených dat. V provozním modelu proto běží kontejner `migration` jako povinná závislost před startem služby `hr-backend` a při neúspěšném dokončení migrace se backend nespustí. Jiné služby se liší spíše typem konfigurace nebo hardwarovými požadavky. Společným jmenovatelem však zůstává, že nasazení vychází z již vytvořeného obrazu, *nikoli z ručních zásahů* na cílovém serveru.
 
-Rollback je v tomto modelu realizován návratem ke staršímu release tagu a opětovným spuštěním Compose nad starším image. Výhodou image-based přístupu je, že rollback nevyžaduje nový build ze zdrojových kódů, ale pouze výběr dříve publikovaného artefaktu.
+Významnou provozní vlastností je i možnost návratu ke starší verzi výběrem dříve publikovaného obrazu. Omezením zůstává závislost na interním registru a na disciplíně při verzování a uchování vydaných obrazů.
 
 == Správa konfigurace a bezpečnost provozu
-Konfiguraci služeb rozděluji do tří vrstev. První vrstvu tvoří build-time parametry frontendů, například veřejná URL API nebo parametry analytiky `Umami`, které vstupují přímo do sestavení výsledného image. Druhou vrstvu tvoří runtime konfigurace backendových, integračních a worker služeb, předávaná přes environment soubory na cílovém hostu. Třetí vrstvu představují server-only tajné údaje, které zůstávají mimo repozitář i mimo veřejně přenášené deploy bundle.
 
-Tento model je důležitý z bezpečnostního hlediska. CI spravuje jen netajné parametry releasu a reference na image, zatímco citlivé hodnoty zůstávají odděleně na cílovém serveru. To se týká přístupových údajů k databázi, `RabbitMQ`, SMTP, objektovému úložišti i interním registrům. Interní služby současně používají oddělené neveřejné přístupové údaje pro vzájemnou komunikaci a integrační vazby. U vrstvy inteligentního zpracování dat obdobně odděluji netajnou runtime konfiguraci od tajných údajů pro `RabbitMQ` a `SeaweedFS`, aby release tok nezpřístupňoval citlivé provozní hodnoty.
+Konfigurace systému je v navrženém řešení pojata jednotně jako vrstva oddělená od aplikačního kódu a od samotného obrazu. Základním principem je rozlišení mezi nasazovaným obrazem, běžnou provozní konfigurací a citlivými údaji. Tento přístup umožňuje použít shodný obraz ve více prostředích a jeho konkrétní chování přizpůsobit až při nasazení, aniž by bylo nutné zasahovat do zdrojového kódu nebo vytvářet odlišné varianty aplikace pro každé prostředí zvlášť.
+
+V praktické rovině se tento princip projevuje prostřednictvím konfiguračních souborů a proměnných prostředí předávaných mimo verzovaný repozitář. U části řešení jsou vybrané netajné proměnné vloženy už ve fázi sestavení, kdy je automatizace v `Gitea Actions` předá procesu tvorby obrazu a jejich hodnoty se promítnou do výsledného obrazu. Typicky jde o parametry, které musí být známy již při sestavení klientské aplikace. Naproti tomu provozní a citlivé údaje nejsou do obrazu zapisovány, ale jsou připojeny až při nasazení, a to buď prostřednictvím hostitelské konfigurace, nebo pomocí minimálního nasazovacího balíčku obsahujícího soubor `compose.yaml` a odpovídající konfigurační proměnné pro konkrétní verzi.
+
+U služeb typu `hiring_backend`, `cv_processor` i `onboarding.kzcr.eu` tak zůstávají citlivé hodnoty, jako jsou přístupové údaje k databázi, integrační klíče nebo certifikáty, odděleny od obrazu aplikace. Přínosem tohoto modelu je omezení rizika nechtěného zveřejnění citlivých údajů při distribuci systému. Nevýhodou naopak zůstává závislost na disciplinovaném provozním postupu a na správném předání konfigurace do cílového prostředí.
+
+Z hlediska dalšího rozvoje by bylo vhodné tento princip posílit zavedením centralizované samostatně provozované správy citlivých údajů, která by odpovídala požadavkům on-premise prostředí #abbr("KZ", none). Takové řešení by omezilo závislost na lokálních souborech a dílčích předávacích mechanismech, zlepšilo dohledatelnost přístupů k tajným hodnotám a podpořilo jednotnější správu konfigurace v rámci celého ekosystému služeb.
+
 
 == Dohledová vrstva
-Dohledovou vrstvu provozuji odděleně od aplikační i výpočetní části vrstvy inteligentního zpracování dat. Tvoří ji `Promtail`, `Loki`, `Prometheus` a `Grafana`. Smyslem této vrstvy je soustředit provozní diagnostiku mimo business logiku a umožnit operátorům sledovat stav systému z jednoho místa.
+Dohledová vrstva slouží k průběžnému sledování stavu nasazeného systému. V on-premise prostředí nelze spoléhat na dohled poskytovaný cloudovou platformou, a proto musí být součástí řešení vlastní mechanismy pro sběr, ukládání a vyhodnocování provozních dat. Ta pomáhají včas rozpoznat výpadek služby, zhoršení odezvy, chybnou konfiguraci nebo zaseknuté asynchronní zpracování.
 
-Konkrétní role jednotlivých komponent dohledové vrstvy shrnuje @tab:deployment-observability; tato vrstva centralizuje logy, metriky a alerting mimo business logiku systému. `Umami` do ní nezařazuji, protože jde o analytickou službu aplikace, nikoli o nástroj provozního dohledu.
+Použité nástroje shrnuje @tab:deployment-observability. Pro tuto práci je však důležitější jejich společná funkce než jednotlivé produktové detaily. Centralizace logů, metrik a upozornění zkracuje dobu mezi vznikem incidentu a jeho pochopením, což je zvlášť důležité tam, kde se provozní problém může projevit až zprostředkovaně v personálním procesu.
 
 #figure(
   [
@@ -99,7 +108,10 @@ Konkrétní role jednotlivých komponent dohledové vrstvy shrnuje @tab:deployme
       fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
       stroke: 0.5pt + gray,
       [Komponenta], [Primární funkce], [Provozní přínos],
-      [`Promtail`], [Sběr a předzpracování logů z kontejnerů], [Centralizovaná diagnostika bez zásahu do business logiky],
+      [`Promtail`],
+      [Sběr a předzpracování logů z kontejnerů],
+      [Centralizovaná diagnostika bez zásahu do business logiky],
+
       [`Loki`], [Uložení a dotazování log streamů], [Rychlá analýza incidentů podle času a štítků],
       [`Prometheus`], [Sběr metrik a trendové vyhodnocení], [Podpora řízení dostupnosti a výkonu],
       [`Grafana`], [Vizualizace a upozornění], [Jednotné operátorské rozhraní pro logy i metriky],
@@ -108,9 +120,15 @@ Konkrétní role jednotlivých komponent dohledové vrstvy shrnuje @tab:deployme
   caption: [Role komponent dohledové vrstvy],
 ) <tab:deployment-observability>
 
+Dohledová vrstva v této pilotní fázi projektu pokrývá především upozornění nad metrikami, které mají přímý vztah k dostupnosti systému a k průchodnosti hlavních procesů. Sleduje se zejména dostupnost endpointu `hr-backend/ready` a kontrolních endpointů dalších interních služeb z @tab:deployment-services, HTTP metriky veřejných i interních rozhraní, především odezva a podíl odpovědí s kódy `5xx`, stáří nejstarší čekající a právě zpracovávané položky v outboxu, počet položek přecházejících do chybového stavu, připravenost konzumentů fronty zpráv a základní kapacitní ukazatele stavových služeb, zejména databáze a objektového úložiště. Do stejné skupiny patří i upozornění na degradaci nebo zpomalování služeb a na neobvyklý nárůst interních chyb, pokud se opakovaně váží ke konkrétní integrační vazbě nebo provozní komponentě.
+
+Z provozního hlediska je tento výběr důležitý tím, že nezachycuje pouze úplný výpadek služby, ale i stav postupné degradace. Ta se v personálním procesu často projeví nepřímo, například opožděným rozesíláním notifikací, zastavením asynchronního zpracování, selháním integrační vazby nebo prodlužováním odezvy při práci s dokumenty. Rozsah dohledové vrstvy je proto pro pilotní nasazení zvolen tak, aby pokrýval jak technickou dostupnost jednotlivých komponent, tak i provozní kontinuitu klíčových procesů, na nichž je navržené řešení závislé.
+
 == Provozní omezení a mitigace
-Navržený model nasazení představuje pragmatický kompromis mezi rychlostí implementace, provozní jednoduchostí a mírou infrastrukturní vyspělosti. Oproti jednodušší monolitické aplikaci přináší vyšší počet samostatných obrazů, více release artefaktů a nutnost koordinovat aplikační host s odděleným hostem vrstvy inteligentního zpracování dat. Provoz je navíc závislý na interním registru kontejnerových obrazů a na správné správě environment konfigurace na cílových serverech.
+Navržený model nasazení není univerzálně nejlepší variantou, ale pragmatickým kompromisem mezi provozní jednoduchostí, reprodukovatelností a oddělením složitějších částí systému. Oproti jediné nasazovací jednotce přináší více obrazů, více závislostí a vyšší nároky na koordinaci změn. Oproti distribuovanému prostředí řízenému plnohodnotným orchestrátorem však zachovává nižší infrastrukturní náročnost.
 
-Další omezení plyne ze zvolené orchestrace pomocí `Docker Compose`. Tento přístup je dobře obhajitelný pro pilotní a menší produkční prostředí, ale neposkytuje vlastnosti běžné u vyšších orchestrátorů, například automatické rozložení zátěže mezi více uzly, nativní self-healing napříč hosty nebo deklarativní správu rozsáhlého clusteru. Část provozních rozhodnutí je navíc stále založena více na logové analýze než na plně formalizovaném modelu `SLO`, protože pokrytí všech komponent metrikami se průběžně rozšiřuje.
+Nejvýraznější omezení plyne ze zvolené orchestrace pomocí `Docker Compose`, která je vhodná pro pilotní a menší produkční rozsah, ale nenabízí vlastnosti běžné u robustnějších orchestrátorů, například automatické rozložení zátěže mezi více uzly nebo samoozdravné mechanismy napříč hosty. Provoz je současně závislý na interním registru obrazů, správném vedení provozní konfigurace a na lokálních administrativních postupech organizace.
 
-Tato omezení zmírňuji kombinací několika opatření. Jednotný image-based `CI/CD` model s release tagy zjednodušuje build, distribuci i rollback. `Healthcheck`y a migrační quality gate snižují riziko startu nefunkční verze. Oddělení tajných údajů od deploy bundle omezuje expozici citlivých hodnot. Samostatná dohledová vrstva a centralizace logů zase zlepšují diagnostiku incidentů v distribuovaném prostředí. Výsledný model proto považuji za přiměřený pro cílový on-premise provoz v podmínkách #abbr("KZ", none).
+Tato omezení jsou v současné fázi částečně kompenzována využitím reprodukovatelného toku vydání, oddělením konfigurace, síťovou segmentací a zavedením dohledové vrstvy. Navržený přístup je proto plně dostačující pro pilotní podmínky #abbr("KZ", none) a představuje stabilní mezikrok.
+
+Vzhledem k plné kontejnerizaci aplikací je však systém architektonicky připraven na budoucí rozvoj. Logickým krokem pro překonání limitů nástroje Docker Compose je migrace na plnohodnotnou orchestraci pomocí Kubernetes. Tento přechod nativně řeší výpadky během aktualizací zavedením plynulého nasazování (rolling updates) a umožňuje dosažení vysoké dostupnosti (HA) včetně dynamického škálování bezstavových komponent napříč více uzly. Zavedení Kubernetes by zároveň poskytlo standardizované prostředí pro nasazení plnohodnotné API Gateway a integraci nástroje pro centralizovanou správu citlivých údajů (např. HashiCorp Vault).
