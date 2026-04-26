@@ -90,7 +90,7 @@ Po schválení textu následuje ruční publikace na jednotlivých platformách.
     },
     align: (left, left),
 
-    [Idenitfikátor procesu:], [P01],
+    [Identfikátor procesu:], [P01],
     [Název procesu:], [Vytvoření inzerátu pro pracovní pozici],
     [Zákazník:], [Vedoucí daného oddělení v odštěpném závodě],
     [Vlastník procesu:], [Náborář, vedoucí daného oddělení v odštěpném závodě],
@@ -120,7 +120,7 @@ Přihlášky dnes přicházejí z různých zdrojů a náborář je musí ručn�
 
 Prvotní třídění uchazečů probíhá převážně manuálně. U zdravotnických pozic to znamená vyhledávat v každém životopise údaje o vzdělání, odborné způsobilosti a další podmínky, které rozhodují o dalším postupu. Bez automatických filtrů a strukturovaných dat je tento krok pomalý a zároveň náchylný k přehlédnutí důležitých informací. Užší výběr se následně předává vedoucím oddělení znovu e-mailem, takže rozhodovací proces zůstává roztříštěný.
 
-Kritickým nedostatkem je i absence systematické databáze uchazečů a zájemců. Informace o kandidátech, kteří nebyli přijati nebo reagovali bez vazby na konkrétní pozici, se dále nevyužívají. Organizace tím přichází o možnost vracet se k relevantním kontaktům při dalším náboru a zvyšuje si závislost na opakované inzerci, která sebou nese finanční zátěž.
+Kritickým nedostatkem je i absence systematické databáze uchazečů a zájemců. Informace o kandidátech, kteří nebyli přijati nebo reagovali bez vazby na konkrétní pozici, se dále nevyužívají. Organizace tím přichází o možnost vracet se k relevantním kontaktům při dalším náboru a zvyšuje si závislost na opakované inzerci, která s sebou nese finanční zátěž.
 
 #figure(
   table(
@@ -130,7 +130,7 @@ Kritickým nedostatkem je i absence systematické databáze uchazečů a zájemc
       if col == 0 { rgb("#cecece") } else { white }
     },
     align: (left, left),
-    [Idenitfikátor procesu:], [P02],
+    [Identfikátor procesu:], [P02],
     [Název procesu:], [Příjem přihlášek a výber kandidátů k oslovení],
     [Zákazník:], [Vedoucí daného oddělení v odštěpném závodě],
     [Vlastník procesu:], [Náborář, vedoucí daného oddělení v odštěpném závodě],

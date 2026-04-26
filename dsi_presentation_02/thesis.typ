@@ -37,7 +37,7 @@
 - Mapování procesů pomocí notace BPMN. Zmapáváno *pět* klíčových procesů pro digitalizaci \ od inzerce až po adaptaci.
 
   - Proces P01 - Vystavení inzerátu
-  - Proces P02 - Příjem a výber kandidátů k oslovení
+  - Proces P02 - Příjem a výběr kandidátů k oslovení
   - Proces P03 - Pohovor a uzavření pracovního poměru
   - Proces P04 - Nástup zaměstnance
   - Proces P05 - Adaptace zaměstnance
@@ -52,7 +52,7 @@
     "p02_prijem_prihlasek.svg",
     width: 100%,
   ),
-  caption: [BPMN Proces P02 - Příjem a výber kandidátů k oslovení]
+  caption: [BPMN Proces P02 - Příjem a výběr kandidátů k oslovení]
 ) <obr:process-p02>
 
 

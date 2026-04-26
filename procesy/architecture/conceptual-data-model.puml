@@ -1,217 +1,95 @@
 @startuml
+!pragma layout smetana
 top to bottom direction
-skinparam linetype ortho
+hide stereotype
+
+skinparam backgroundColor transparent
 skinparam shadowing false
+skinparam linetype ortho
 skinparam packageStyle rectangle
-skinparam nodesep 25
-skinparam ranksep 40
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam defaultTextAlignment center
+skinparam arrowFontSize 13
+skinparam dpi 160
+skinparam ranksep 24
+skinparam nodesep 18
+skinparam ArrowColor #475569
+skinparam ArrowThickness 1.0
+skinparam RoundCorner 14
 
-package "Organizace a identita" #EEF2FF {
-  entity "organizations" as ORG {
-    * id : uuid
-    --
-    name : varchar
-    seat_location : varchar(3)
-  }
-  entity "users" as USR {
-    * id : uuid
-    --
-    + organization_id : uuid
-    + applicant_id : uuid
-    email : varchar
-    onboarding_workflow_id : uuid
-  }
-  entity "organization_memberships" as MEM {
-    * id : uuid
-    --
-    + user_id : uuid
-    + role_id : uuid
-    + organization_id : uuid
-    expires_at : timestamptz
-  }
-  entity "user_roles" as ROLE {
-    * id : uuid
-    --
-    name : varchar
-  }
+skinparam rectangle {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  FontColor #0F172A
 }
 
-package "Pracovní pozice" #F0FFF0 {
-  entity "job_postings" as JP {
-    * id : uuid
-    --
-    + organization_id : uuid
-    + job_role_id : uuid
-    + onboarding_workflow_id : uuid
-    title : varchar
-    status : text
-    expire_date : date
-  }
-  entity "job_roles" as JR {
-    * id : uuid
-    --
-    + organization_id : uuid
-    name : varchar
-  }
-  entity "job_embeddings" as JE {
-    * id : uuid
-    --
-    + job_posting_id : uuid
-    embedding : vector(768)
-  }
+skinparam rectangle<<frontend>> {
+  BackgroundColor #EAF2FF
+  BorderColor #2B5AA6
 }
 
-package "Nábor — uchazeči" #FFFBF0 {
-  entity "applicants" as APP {
-    * id : uuid
-    --
-    + job_posting_id : uuid
-    + organization_id : uuid
-    name, surname : varchar
-    current_status : varchar
-    applied_at : timestamptz
-  }
-  entity "application_attachments" as ATT {
-    * id : uuid
-    --
-    + applicant_id : uuid
-    file_path : text
-    mime_type : varchar
-  }
-  entity "cv_analyses" as CVA {
-    * id : uuid
-    --
-    + applicant_id : uuid
-    + organization_id : uuid
-    skills : text[]
-    evaluation_score : integer
-    embedding : vector(768)
-  }
+skinparam rectangle<<service>> {
+  BackgroundColor #E8FFF8
+  BorderColor #0F766E
 }
 
-package "Pohovory" #FFF0F0 {
-  entity "interview_events" as INT {
-    * id : uuid
-    --
-    + applicant_id : uuid
-    + organization_id : uuid
-    scheduled_at : timestamptz
-    location : text
-    status : text
-  }
-  entity "interview_participants" as INTP {
-    * id : uuid
-    --
-    + interview_id : uuid
-    + user_id : uuid
-  }
+skinparam rectangle<<external>> {
+  BackgroundColor #F1F5F9
+  BorderColor #64748B
 }
 
-package "Onboarding" #F0FAFF {
-  entity "onboarding_workflows" as OW {
-    * id : uuid
-    --
-    + organization_id : uuid
-    name : varchar
-    is_active : boolean
-  }
-  entity "onboarding_steps" as OS {
-    * id : uuid
-    --
-    + workflow_id : uuid
-    form : jsonb
-    step_type : text
-  }
-  entity "user_onboarding_steps" as UOS {
-    * id : uuid
-    --
-    + user_id : uuid
-    + onboarding_step_id : uuid
-    status : text
-    form_response : jsonb
-    completed_at : timestamptz
-  }
-  entity "user_documents" as UDOC {
-    * id : uuid
-    --
-    + user_id : uuid
-    + document_type_id : uuid
-    file_path : text
-    approval_status : text
-  }
+skinparam rectangle<<obs>> {
+  BackgroundColor #EEF2FF
+  BorderColor #4F46E5
 }
 
-package "Zájemci o práci" #F5F0FF {
-  entity "job_seekers" as JS {
-    * id : uuid
-    --
-    + organization_id : uuid
-    name, email : varchar
-  }
-  entity "job_seeker_cv_analyses" as JSCA {
-    * id : uuid
-    --
-    + job_seeker_id : uuid
-    embedding : vector(768)
-  }
+skinparam rectangle<<data>> {
+  BackgroundColor #FFF3E0
+  BorderColor #C97A10
+  FontColor #7C2D12
 }
 
-package "Platforma" #F5F5F5 {
-  entity "side_effect_outbox" as OUTBOX {
-    * id : uuid
-    --
-    event_type : text
-    payload : jsonb
-    status : text
-    attempt_count : integer
-    next_attempt_at : timestamptz
-  }
-  entity "audit_events" as AUDIT {
-    * id : uuid
-    --
-    actor_id : uuid
-    action : text
-    entity_type : text
-    organization_id : uuid
-    created_at : timestamptz
-  }
+title Zjednodušený model hlavních datových entit
+
+package "Organizační rámec" {
+  rectangle "Organizace" <<data>> as ORG
+  rectangle "Interní uživatel / zaměstnanec,\nčlenství a oprávnění" <<data>> as USR
 }
 
-' Organizace a identita
-ORG ||--o{ USR
-ORG ||--o{ MEM
-MEM }o--|| ROLE
-USR ||--o{ MEM
+package "Nábor" {
+  rectangle "Pracovní role" <<data>> as ROLE
+  rectangle "Pracovní pozice" <<data>> as JOB
+  rectangle "Uchazeč" <<data>> as APP
+  rectangle "Pohovor" <<data>> as INT
+}
 
-' Pracovní pozice
-ORG ||--o{ JP
-ORG ||--o{ JR
-JP }o--|| JR
-JP ||--o{ JE
+package "Adaptace" {
+  rectangle "Adaptační postup" <<data>> as WF
+  rectangle "Průběh adaptace\nzaměstnance" <<data>> as PROG
+  rectangle "Dokument zaměstnance" <<data>> as DOC
+}
 
-' Nábor
-JP ||--o{ APP
-APP ||--o{ ATT
-APP ||--o{ CVA
+ORG --> JOB : vypisuje
+ORG --> WF : spravuje
+ORG --> USR : vymezuje členství
+USR --> JOB : má oprávnění k
+ROLE --> JOB : typizuje
+JOB --> APP : přijímá reakce
+APP --> INT : vede k
+APP --> USR : po přijetí se převádí
 
-' Uchazeč → zaměstnanec
-APP |o--o| USR
+JOB --> WF : používá
+USR --> PROG : plní
+WF --> PROG : podle postupu
+USR --> DOC : předkládá
+WF ..> DOC : může vyžadovat
 
-' Pohovory
-APP ||--o{ INT
-INT ||--o{ INTP
-USR ||--o{ INTP
-
-' Onboarding
-ORG ||--o{ OW
-JP }o--|| OW
-OW ||--o{ OS
-OS ||--o{ UOS
-USR ||--o{ UOS
-USR ||--o{ UDOC
-
-' Zájemci
-ORG ||--o{ JS
-JS ||--o{ JSCA
+ORG -[hidden]-> USR
+ROLE -[hidden]-> JOB
+JOB -[hidden]-> APP
+APP -[hidden]-> INT
+WF -[hidden]-> PROG
+PROG -[hidden]-> DOC
 
 @enduml

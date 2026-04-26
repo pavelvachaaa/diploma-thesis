@@ -7,7 +7,11 @@ Pozornost soustředím především na modulární backend, hexagonální rozdě
 == Struktura řešení
 Celé řešení je implementováno jako sada spolupracujících aplikací a služeb s oddělenými odpovědnostmi. Transakční část systému je realizována v prostředí Node.js/Express, webové portály jsou postaveny na Next.js a podpůrné zpracovatelské či integrační služby běží převážně v jazyce Go. Toto rozdělení nevyplývá z technologické preference samo o sobě, ale z rozdílného charakteru jednotlivých problémů. Backend vyžaduje doménovou konzistenci, frontendy rychlý rozvoj rozhraní a procesory vrstvy inteligentního zpracování dat efektivní práci s asynchronními úlohami.
 
+Volba jazyka Go u procesorů přitom nebyla motivována tím, že by právě tento jazyk nabízel zásadně lepší knihovny pro práci s modely. Samotná inference je totiž delegována do `Ollama` a extrakce textu do `Apache Tika`, tedy do oddělených služeb dostupných přes HTTP. Z čistě funkčního hlediska by proto bylo možné procesory implementovat i v `Node.js`, což by sjednotilo technologický stack. Rozhodující byly spíše jejich provozní vlastnosti. `cv_processor` běží jako dlouhožijící worker s více souběžnými konzumenty fronty a `job_processor` jako samostatná `HTTP/SSE` služba. Go v tomto kontextu přináší jednoduchý model souběžnosti, malé samostatně nasaditelné binární soubory a předvídatelné chování u specializovaných služeb, které neřeší rozsáhlou doménovou logiku ani práci s uživatelským rozhraním.
+
 Vedle hlavního backendu tak řešení zahrnuje i samostatné služby pro auditní zápis, integrační adaptéry a inteligentní zpracování dokumentů či textů pracovních pozic. Tyto komponenty spolu komunikují přes HTTP rozhraní nebo přes `RabbitMQ`. Praktickým důsledkem je možnost odděleně nasazovat a škálovat části s odlišným provozním profilem, aniž by se celý systém rozpadl na síťově fragmentovaný soubor mikroslužeb.
+
+Z implementačního hlediska jde o převod architektonické dělby práce do konkrétních runtime prostředků. Cílem není technologická pestrost sama o sobě, ale přiřazení vhodného nástroje ke konkrétnímu typu problému. Přínosem je lepší přizpůsobení jednotlivých částí jejich provoznímu profilu, omezením naopak vyšší nárok na koordinaci buildů, nasazení a provozního dohledu mezi více technologickými celky.
 
 #figure(
   image(
@@ -21,6 +25,8 @@ Vedle hlavního backendu tak řešení zahrnuje i samostatné služby pro auditn
 Backend jsem implementoval jako modulární aplikaci s dominantním hexagonálním uspořádáním. Každý požadavek vstupuje přes route a middleware pipeline, která řeší autentizaci, autorizaci, request kontext a mapování chyb. Teprve potom přechází řízení do doménové služby, kde probíhá business logika.
 
 Z fyzického hlediska je backend rozdělen do pěti hlavních částí. `src/routes` a `src/app.js` tvoří vstupní HTTP adaptéry. `src/domain` obsahuje byznysové moduly, například `jobs`, `applicants`, `employees`, `qualification` nebo `internalUsers`. `src/shared/contracts/ports` drží explicitní kontrakty a `src/platform` soustřeďuje technologické adaptéry pro databázi, audit, messaging, storage, autentizaci, `ReBAC` i interní integrační služby. Vazby mezi těmito částmi spravuje dependency injection kontejner `Awilix`.
+
+Takto navržený backend plní roli autoritativní transakční hranice systému. Právě zde se rozhoduje o tom, zda je konkrétní změna v souladu s doménovými pravidly, s organizačním rozsahem uživatele i s požadavkem na auditní dohledatelnost. Akademicky řečeno jde o koncentraci invariantů do jedné aplikační vrstvy, která omezuje riziko, že se stejná pravidla budou rozcházet mezi frontendem, integračními službami a databázovými skripty.
 
 #figure(
   [
@@ -43,9 +49,9 @@ Z fyzického hlediska je backend rozdělen do pěti hlavních částí. `src/rou
 ) <tab:impl-backend-layers>
 
 === Použité návrhové a integrační vzory v hiring_backend
-Architektonická kapitola obhajuje principy backendu na koncepční úrovni. Z pohledu implementace je ale důležité ukázat, že nejde o abstraktní slovník pojmů, nýbrž o soubor konkrétních vzorů, které společně drží `hiring_backend` čitelný, rozšiřitelný a provozně stabilní.
+Architektonická kapitola obhajuje principy backendu na koncepční úrovni. V implementační části proto již není účelné znovu vysvětlovat, co jednotlivé vzory obecně znamenají, ale ukázat, v jakých konkrétních místech kódu nesou odpovědnost za čitelnost, rozšiřitelnost a provozní stabilitu `hiring_backend`.
 
-Nejvýrazněji je přítomen vzor `Ports and Adapters`, tedy hexagonální architektura. Řeší problém, jak oddělit doménovou logiku od technologií a integračních detailů tak, aby se business pravidla nerozpadla při každé změně databáze, messaging vrstvy nebo externí služby. V `hiring_backend` se tento vzor promítá do kontraktů ve `src/shared/contracts/ports`, do technologických adaptérů ve `src/platform/*` i do rozdělení vstupních a výstupních hranic aplikace. Praktickým přínosem je, že doména vyjadřuje pouze schopnosti, které potřebuje, zatímco konkrétní infrastruktura zůstává uzavřena v adaptační vrstvě.
+Nejviditelněji se to týká hexagonálního uspořádání. V implementaci se neprojevuje jako obecná definice, ale jako konkrétní hranice mezi doménou, kontrakty a technologickými adaptéry. V `hiring_backend` je tato hranice patrná v kontraktech ve `src/shared/contracts/ports`, v adaptérech ve `src/platform/*` i v rozdělení vstupních a výstupních hranic aplikace. Praktickým přínosem je, že doména vyjadřuje pouze schopnosti, které potřebuje, zatímco konkrétní infrastruktura zůstává uzavřena v adaptační vrstvě.
 
 S hexagonálním uspořádáním úzce souvisí vzor `Repository`. Jeho smyslem je oddělit práci s perzistencí od aplikačních služeb tak, aby use-cases nemusely nést detailní znalost SQL dotazů a fyzického schématu. V backendu se tento přístup projevuje přímo v modulové struktuře `src/domain/*/repository`, kde každý kontext zapouzdřuje vlastní datový přístup. Přínosem je menší vazba mezi business logikou a databázovou vrstvou a současně čitelnější hranice odpovědnosti uvnitř jednotlivých modulů.
 
@@ -77,6 +83,8 @@ Tento mechanismus je důležitý hlavně proto, že architektonická kázeň má
 === Implementace spolehlivé asynchronní komunikace
 Klíčovým implementačním problémem bylo zajistit, aby vedlejší efekty navázané na doménovou transakci byly spolehlivě doručeny i při chybách integrační vrstvy a současně nebyly prováděny duplicitně. Tento problém řeším kombinací vzorů `Transactional Outbox` a `Idempotency`, konkrétně tabulkou `side_effect_outbox`, samostatným workerem a řízením zápisových toků nad idempotency vrstvou. Doménová operace zapisuje business data i záznam do outboxu v jedné transakci až po commit fázi worker položku vyzvedne a publikuje.
 
+`RabbitMQ` zde neplní pouze roli technického transportu, ale architektonického oddělovače mezi producentem a konzumentem události. Umožňuje časově oddělit transakční cestu požadavku od zpracování vedlejších efektů, vyrovnat krátkodobé špičky a izolovat lokální selhání konzumentů. Výměnou za to systém přijímá sémantiku opakovaného doručení a potřebu pracovat s eventual consistency. Právě proto musí být konzumenti navrženi idempotentně a provoz doplněn o dohled nad frontami, retry politikami a mrtvými zprávami.
+
 #figure(
   [
     #set par(justify: false)
@@ -103,10 +111,14 @@ Worker používá dávkové zpracování, zamykání položek, řízené opakov�
 
 Verzování událostí pomocí suffixu `v1`, případně dalších verzí, slouží k bezpečné evoluci integračního rozhraní. Pokud se změní struktura zprávy nebo její sémantika, lze zavést novou verzi bez nutnosti rozbít stávající konzumenty v jednom kroku.
 
+Cena za tuto robustnost spočívá ve vyšší implementační i provozní komplexitě. Systém musí evidovat stav zpráv, řešit opakované zpracování, sledovat stáří front a rozlišovat dočasnou chybu od neobnovitelného selhání. Přínosem je však výrazně vyšší konzistence dat a nižší riziko tichého výpadku vedlejších efektů, což je v auditovatelném informačním systému důležitější než minimální počet infrastrukturních komponent.
+
 === Implementace auditní vrstvy
 Auditní stopu nezapisuji synchronně v hlavní request cestě, ale přes samostatný worker `audit_writer_processor`. Ten konzumuje auditní události z `RabbitMQ`, validuje jejich payload a ukládá výsledek do tabulky `audit_events` v `PostgreSQL`. Tím zkracuji odezvu aplikačního API a současně snižuji riziko, že dočasné selhání transportní nebo databázové vrstvy zablokuje běžný transakční tok.
 
 Z implementačního hlediska je důležité odlišovat vykonávací komponentu od datové struktury. `audit_writer_processor` představuje samostatnou zpracovatelskou službu navázanou na messaging vrstvu, zatímco `audit_events` je perzistentní tabulka, do níž se auditní stopa ukládá. Tato dvojice společně zajišťuje, že audit zůstává mimo kritickou request cestu, ale neztrácí vazbu na transakční dění systému.
+
+Takto navržená auditní vrstva řeší napětí mezi dvěma požadavky, které se v personálních systémech často dostávají do konfliktu: vysokou dohledatelností a přijatelnou odezvou aplikace. Přínosem je, že audit nezpomaluje každou zapisovací operaci a lze jej dále zpracovávat jako samostatný datový tok. Omezením je krátké časové okno mezi vznikem události a jejím perzistentním zápisem, a tedy i nutnost provozně sledovat zdraví auditního kanálu stejně pečlivě jako samotného transakčního API.
 
 == Implementace vrstvy inteligentního zpracování dat
 Vrstva inteligentního zpracování dat vznikla jako řešení na provozní tlak popsaný v analytické části práce. V prostředí #abbr("KZ", none) probíhá nábor kontinuálně, takže systém souběžně pracuje s větším množstvím životopisů i průběžně upravovaných pracovních nabídek. Manuální screening životopisů je přitom časově náročný a snadno vede k přehlédnutí důležitých údajů. Transakční jádro proto nemá nést dokumentové a AI úlohy přímo.
@@ -119,8 +131,13 @@ Služba `job_processor` řeší jiný typ úlohy. Vystupuje jako samostatná `HT
 
 Vedle toho běží samostatný asynchronní tok pro embeddingy pracovních pozic. Backend publikuje požadavek `job.embedding.requested.v1`, zpracování připraví text pozice do podoby vhodné pro vektorové porovnávání a výsledný embedding se vrací do tabulky `job_embeddings`. I zde se používá `nomic-embed-text`, takže sémantické porovnávání pracuje nad stejným typem reprezentace jako u životopisů. Oba procesory tak sdílejí stejný inferenční backend, ale plní odlišné implementační role.
 
+Z pohledu ochrany osobních údajů je důležité, že se nevyužívá externí cloudová AI služba. `Ollama` je provozována jako self-hosted inferenční vrstva v rámci on-premise infrastruktury a procesory ji volají lokálně přes interní rozhraní hostitelského serveru. Dokument životopisu, extrahovaný text i výsledné embeddingy se tak pohybují pouze mezi interním objektovým úložištěm, interní vrstvou zpráv, procesory a lokálně provozovaným modelem. Data proto neopouštějí provozní hranici organizace, což je pro prostředí #abbr("KZ", none) podstatný argument z hlediska ochrany osobních údajů a minimalizace regulatorního rizika. Zároveň je zpracování životopisů navázáno na evidenci souhlasu se zpracováním osobních údajů v náborovém toku.
+
 Technické oddělení této vrstvy má přímý provozní důvod. Inference, práce s dokumenty a vektorové výpočty mají jiný latencní i chybový profil než transakční API. Jejich dočasná nedostupnost proto nesmí zablokovat základní náborové a onboardingové funkce. Systém tak degraduje řízeně. Uživatelé mohou přijít o část rozšířené funkcionality, nikoli o samotné transakční jádro.
 
+Současně jde o ukázku řízené distribuce pouze tam, kde přináší prokazatelný přínos. Oddělené procesory snižují tlak na backend a umožňují volit jiný runtime i škálování, ale zároveň zvyšují integrační složitost, potřebu observability a počet míst, kde může vzniknout prodleva nebo chyba přenosu. V implementaci proto tuto vrstvu odděluji jen pro úlohy s odlišným výpočetním profilem, nikoli jako obecné pravidlo pro celý systém.
+
+TODO: Tohle dát do příloh a tady v textu se jen odkázat
 #figure(
   image(
     "../procesy/architecture/seq-outbox-rabbitmq-ai.svg",
@@ -130,9 +147,15 @@ Technické oddělení této vrstvy má přímý provozní důvod. Inference, pr�
 ) <obr:impl-outbox-ai>
 
 == Implementace datové vrstvy a migrací
-Perzistenci dat stavím na `PostgreSQL 17` s rozšířením `pgvector`. Relační část pokrývá transakční agendu náboru a onboardingu, vektorová část podporuje scénáře inteligentního zpracování dat. Toto spojení řeší problém, jak držet konzistentně business data i sémantické reprezentace bez zavádění další samostatné databázové technologie.
+Perzistenci dat stavím na `PostgreSQL 17` s rozšířením `pgvector`. Relační část pokrývá transakční agendu náboru a onboardingu, vektorová část podporuje scénáře inteligentního zpracování dat. Toto spojení řeší problém, jak držet konzistentně byznysová data i sémantické reprezentace bez zavádění další samostatné databázové technologie.
+
+Volba `PostgreSQL` přitom nebyla vedena jen jeho rozšířením `pgvector`. Pro řešený typ systému je podstatné, že kombinuje silné transakční vlastnosti, referenční integritu a vyzrálý relační model s možností pracovat i s pružnějšími strukturami dat. Nábor, přijetí zaměstnance, auditní stopa i outbox obsahují vazby, které musí být konzistentní napříč více tabulkami a více kroky jedné operace. Právě zde je důležitá schopnost spolehlivě provádět atomické zápisy, vynucovat cizí klíče a držet celý životní cyklus procesu nad jedním autoritativním zdrojem pravdy.
+
+Současně jde o databázovou platformu, která v jednom prostředí pokrývá i požadavky, jež by jinak často vedly k nasazení více odlišných technologií. `jsonb` umožňuje ukládat proměnlivé struktury adaptačních formulářů bez zbytečné fragmentace schématu, `pgvector` rozšiřuje databázi o sémantické vyhledávání a standardní provozní vlastnosti `PostgreSQL` podporují zálohování, migrace i dohled v on-premise režimu. 
 
 V implementaci důsledně nesu organizační izolaci přes `organization_id` v klíčových entitách a kontroluji přístupový rozsah v aplikační vrstvě. Auditní stopu ukládám do samostatné struktury s omezením mutací, aby bylo možné doložit práci s citlivými daty i zpětně.
+
+Volba jedné primární databázové platformy podporuje nejen provozní jednoduchost, ale i datovou konzistenci. Multi-tenantní filtr, auditní události, outbox i běžná transakční agenda jsou tak uloženy v jednom prostředí a lze je spravovat společně v rámci stejných zálohovacích a migračních postupů. Alternativou by bylo vyčlenit embeddingy do specializované vektorové databáze, například typu `Qdrant` nebo `Pinecone`, která by přinesla vyšší specializaci a potenciálně lepší škálování podobnostního vyhledávání. V daném měřítku řešení by to však znamenalo další datový subsystém, synchronizaci mezi transakční a vektorovou vrstvou, samostatné zálohování a větší integrační plochu v on-premise provozu. Volba `pgvector` byla proto jednoduchá.
 
 === Fyzický datový model
 Na úrovni fyzického modelu pracuji s tabulkami odpovídajícími doménovým skupinám popsaným v architektuře. V náborové části jsou klíčové zejména `job_postings`, `job_roles`, `applicants`, `interview_events` a návazné pomocné tabulky pro obsah inzerátu, účastníky pohovorů a přílohy. Onboardingová část je realizována nad tabulkami `onboarding_workflows`, `onboarding_steps`, `user_onboarding_steps`, `onboarding_documents` a `user_documents`.
@@ -144,17 +167,21 @@ Konkrétní datové typy volím podle charakteru uložených informací. Formul�
 === Migrace schématu
 Schéma rozvíjím řízeně přes číslované SQL migrace. Tento přístup řeší problém, jak udržet databázový model auditovatelný a současně bezpečně nasaditelný do produkce. Běžné strukturální změny provádím transakčně standardními DDL příkazy, zatímco změny indexů pro živé prostředí odděluji do neblokujících kroků přes `CREATE INDEX CONCURRENTLY`.
 
-Migrace zde zároveň fungují jako quality gate mezi novou binární verzí aplikace a stavem databáze. Backend tak nezačne běžet proti nekompatibilnímu schématu, což je v systému s více službami a asynchronními vazbami zásadní bezpečnostní pojistka.
+Migrace zde zároveň fungují jako `quality gate` mezi novou binární verzí aplikace a stavem databáze. Backend tak nezačne běžet proti nekompatibilnímu schématu, což je v systému s více službami a asynchronními vazbami zásadní bezpečnostní pojistka.
+
+Z teoretického pohledu představují migrace mechanismus řízené evoluce schématu, nikoli jen technický skript pro vytvoření tabulek. Umožňují zpětně doložit, kdy a proč se datový model změnil, a vytvářejí kontrolovaný přechod mezi verzemi systému. Omezením je nutnost disciplinovaně navrhovat i přechodové stavy, aby nová verze aplikace, dlouho běžící workery a stávající data nevytvářely nekompatibilní kombinace.
 
 === Perzistence dokumentů a infrastrukturní tabulky
 Dokumenty uchazečů a zaměstnanců neukládám přímo do relační databáze. Tabulky jako `application_attachments`, `user_documents` nebo `onboarding_documents` obsahují metadata a reference na objektové klíče, zatímco fyzický obsah souborů je uložen v `SeaweedFS` přes S3 kompatibilní rozhraní. Tím řeším problém, jak zachovat výkonnou databázi pro transakční agendu a současně pracovat s většími soubory a jejich verzemi.
 
-Vedle doménových tabulek používám i několik infrastrukturních tabulek. `side_effect_outbox` zajišťuje spolehlivé doručení vedlejších efektů po commit fázi, `command_idempotency` omezuje riziko duplicitního provedení zápisových operací a `audit_events` uchovává auditní stopu citlivých akcí. Tyto struktury nejsou business doménou samy o sobě, ale bez nich by nebylo možné naplnit požadavky na spolehlivost a auditovatelnost.
+Vedle doménových tabulek používám i několik infrastrukturních tabulek. `side_effect_outbox` zajišťuje spolehlivé doručení vedlejších efektů po commit fázi, `command_idempotency` omezuje riziko duplicitního provedení zápisových operací a `audit_events` uchovává auditní stopu citlivých akcí. Tyto struktury nejsou byznysovou doménou samy o sobě, ale bez nich by nebylo možné naplnit požadavky na spolehlivost a auditovatelnost.
 
 === Implementace bezpečnosti a identity
-Bezpečnostní implementaci stavím na více vrstvách. První vrstvou je autentizace uživatele přes session token, který middleware převádí na jednotný request kontext obsahující identitu, role a seznam organizací. Druhou vrstvou jsou endpoint guardy, které rozhodují, zda uživatel smí vstoupit do dané části API. Třetí vrstvou je datová autorizace v `hiring_backend`, realizovaná nad `resource_permissions` a návaznými vazbami na `organization_memberships`.
+Bezpečnost je řešena ve více vrstvách. První vrstvou je autentizace uživatele přes session token, který middleware převádí na jednotný request kontext obsahující identitu, role a seznam organizací. Druhou vrstvou jsou endpoint guardy, které rozhodují, zda uživatel smí vstoupit do dané části API. Třetí vrstvou je datová autorizace v `hiring_backend`, realizovaná nad `resource_permissions` a návaznými vazbami na `organization_memberships`.
 
 V praxi tím odděluji dvě různé otázky. Globální role uložená v `users.role_id` říká, jaký typ uživatele je přihlášen. Vztah ke konkrétní organizaci nebo pracovní pozici pak rozhoduje, k jakým datům skutečně smí přistoupit. `organization_memberships` proto neslouží jako zdroj role, ale jako evidence organizačních přístupů, jejich platnosti a způsobu přidělení.
+
+Toto rozdělení řeší časté napětí mezi centralizovanou identitou a lokální datovou autorizací. SSO odpovídá na otázku, kdo je uživatel, zatímco backend musí samostatně rozhodnout, k jaké části multi-tenantního modelu má tento uživatel přístup. Přínosem je vyšší auditovatelnost a jemnější řízení oprávnění nad konkrétními zdroji. Omezením je vyšší složitost autorizačního modelu, který vyžaduje přesnou synchronizaci rolí, membershipů a odvozených oprávnění.
 
 #figure(
   [
@@ -176,12 +203,15 @@ V praxi tím odděluji dvě různé otázky. Globální role uložená v `users.
   caption: [Globální role a jejich praktický význam v ReBAC modelu backendu],
 ) <tab:impl-rebac-roles>
 
-Role check v middleware tedy není poslední autorizační krok, ale jen vstupní filtr. Samotné čtení, změny a mazání zdrojů vyhodnocuji až na úrovni práce s daty nad `resource_permissions`. Dceřiné entity, například uchazeči, pohovory nebo přílohy, dědí oprávnění z nadřazené pracovní pozice nebo organizace, místo aby se pravidla duplikovala v každé tabulce zvlášť. Změny rolí a membershipů se navíc synchronizují asynchronně přes outbox události, aby model zůstal konzistentní i mimo kritickou request cestu.
+Role check v middleware tedy není poslední autorizační krok, ale jen vstupní filtr. Samotné čtení, změny a mazání zdrojů vyhodnocuji až na úrovni práce s daty nad `resource_permissions`. Dědičnost oprávnění neřeším kopírováním záznamů do každé dceřiné tabulky, ale relačním odvozením z nadřazeného zdroje. `resource_permissions` drží především oprávnění k organizaci a pracovní pozici, zatímco přístup k poznámkám uchazeče, jeho přílohám, pohovorům nebo přílohám pohovoru se vyhodnocuje přes vazbu na uchazeče a jeho `job_posting_id`. Pokud se tedy změní oprávnění k pracovní pozici, změní se automaticky i přístup ke všem navázaným dceřiným entitám bez nutnosti hromadně přepisovat jejich vlastní ACL záznamy. Přínosem je menší redundance a menší riziko zastaralých oprávnění. Omezením naopak složitější SQL dotazy a vyšší závislost na konzistenci relačních vazeb. Změny rolí a membershipů se navíc synchronizují asynchronně přes outbox události, aby model zůstal konzistentní i mimo kritickou request cestu.
 
 == Implementace onboardingového portálu
 Onboardingový portál jsem implementoval jako Next.js aplikaci oddělenou od veřejného kariérního portálu. Toto rozdělení řeší problém, že HR pracovníci a nastupující zaměstnanci potřebují pracovat s odlišnými typy úloh i s jiným bezpečnostním režimem. Na úrovni implementace jsem proto oddělil layouty, cesty i stavovou logiku podle role uživatele.
-
 todo: rozšířit asi třeba o obrázek a nějaké kecy okolo
+
+Na implementační úrovni portál skládá pohled zaměstnance a interních pracovníků nad stejným backendem, ale s odlišnými layouty, trasami a stavovou logikou. Tím se zachovává jednotný zdroj pravdy v API a zároveň se respektuje, že HR role pracuje s přehledem procesu, zatímco nastupující zaměstnanec s konkrétní sadou kroků, termínů a dokumentů. Přínosem je vyšší srozumitelnost práce s onboardingem, omezením naopak nutnost udržovat další frontendovou aplikaci a synchronizovat její vývoj s backendem.
+
+TODO:FOTKY
 
 == Implementace kariérního portálu
 Kariérní portál `kariera.kzcr.eu` jsem implementoval jako veřejný vstup do náborového procesu nad technologiemi `Next.js`, `React` a `TypeScript`. Frontend je oddělen od backendu záměrně. Veřejný portál řeší prezentaci obsahu, navigaci a interakci s uchazečem, zatímco business pravidla pro práci s pozicemi, uchazeči a formulářovými daty zůstávají v jednom autoritativním API.
@@ -193,6 +223,7 @@ Komunikaci s backendem jsem soustředil do centralizované API vrstvy místo př
 Z pohledu uživatelské zkušenosti bylo důležité zachovat kontext při pohybu mezi seznamem a detailem pozice. Pro krátkodobý kontext používá portál `sessionStorage`, například pro návrat na stejné místo v seznamu, zatímco `localStorage` slouží k uchování vybraných pozic mezi jednotlivými navigacemi. Formulář reakce současně provádí klientskou validaci a používá idempotency klíč, aby se snížilo riziko duplicitních žádostí při opakovaném kliknutí nebo nestabilním spojení.
 
 Vzhledem k tomu, že backend vrací popis pozice ve formátu HTML, řešil jsem i bezpečné vykreslení obsahu. HTML proto před zobrazením sanitizuji, aby se do stránky nedostal neověřený nebo škodlivý obsah. Jde o zdánlivý detail, ale právě na podobných místech se láme důvěryhodnost veřejného portálu.
+TODO:FOTKY
 
 === Integrace analytického nástroje Umami
 Pro analytické účely jsem do portálu integroval nástroj `Umami`. Jeho smyslem není zasahovat do rozhodování systému, ale měřit průchod uživatelů portálem a identifikovat místa, kde uchazeči proces opouštějí. Inicializace analytiky je provedena centrálně v kořenové komponentě aplikace, aby bylo zajištěno jednotné měření napříč stránkami.
@@ -202,13 +233,15 @@ Sleduji zejména interakce s katalogem pozic, otevření detailu nabídky, zahá
 == Implementace dohledové vrstvy
 Dohledovou vrstvu jsem implementoval jako kombinaci strukturovaného logování, metrik a centralizovaného dashboardingu. Tento krok řeší problém, že v distribuovanějším systému už nestačí číst lokální logy jednotlivých služeb. Potřebuji sledovat request kontext, zdraví asynchronní vrstvy i chování oddělených procesorů z jednoho místa.
 
-Na úrovni aplikace generuji strukturované logy a publikuji metriky pro kritické toky, například autentizaci, outbox, messaging a vrstvu inteligentního zpracování dat. Tyto výstupy následně vstupují do samostatné monitorovací vrstvy popsané v architektonické kapitole. Dohled tedy nevzniká jako provozní doplněk přidaný na konci projektu, ale jako součást implementace hlavních toků.
+Na úrovni aplikace generuji strukturované logy a publikuji metriky pro kritické toky, například autentizaci, outbox, messaging a vrstvu inteligentního zpracování dat. Tyto výstupy následně vstupují do samostatné monitorovací vrstvy popsané v architektonické kapitole. 
 
 == Komunikace s národními registry
 Napojení na národní registry jsem řešil primárně pro Národní registr zdravotnických pracovníků (`NRZP`) spravovaný #abbr("ÚZIS", none). Praktická zkušenost ukázala, že samotné technické rozhraní ještě neznamená funkční integraci. Vedle klientského certifikátu bylo nutné řešit i přidělení externích identifikačních údajů a odpovídajících oprávnění na straně poskytovatele služby.
 
+Konkrétním integračním problémem bylo, že veřejně popsané `SOAP/WSDL` rozhraní neodpovídalo plně rozhraní, které bylo ve skutečnosti zpřístupněno pro provozní použití. V praxi se tak rozcházel očekávaný způsob napojení s reálně dostupnou vrstvou nad `InterSystems IRIS`, včetně konkrétních metod pro dotaz podle čísla pracovníka a rodného čísla. Součástí řešení proto bylo i doplnění potřebné `WSDL` popisné vrstvy a mapování metod na straně `IRIS`, aby bylo možné službu volat konzistentně a bez přenášení těchto odchylek do aplikační vrstvy. Nebylo proto účelné vázat backend přímo na generovaného `SOAP` klienta, protože by tím přebíral nestabilitu cizího integračního detailu do vlastní doménové logiky.
+
 Z architektonického hlediska jsem proto integrační logiku neumístil přímo do `hiring_backend`, ale zarámoval ji jako adaptační mezivrstvu blízkou vzoru `Adapter / Anti-Corruption Layer` a oddělil ji do interní služby `qualification-adapter`. Backend vystavuje pouze administrační endpoint `POST /api/v1/admin/qualifications/lookup`, který je dostupný vybraným rolím. Doménová služba podporuje dotaz podle čísla pracovníka v `NRZP` i podle rodného čísla, vstup normalizuje a validuje a teprve potom volá platformní adaptér.
 
-`qualification-adapter` běží pouze v interní Docker síti a funguje jako mezivrstva mezi backendem a existující integrační vrstvou nad `InterSystems IRIS`. Tento mezistupeň řeší tři problémy najednou: izoluje specifika SOAP/WSDL rozhraní mimo business logiku, sjednocuje chybové stavy do kontrolovaného HTTP kontraktu a zjednodušuje případnou výměnu integračního detailu bez zásahu do domény.
+`qualification-adapter` běží pouze v interní Docker síti a funguje jako mezivrstva mezi backendem a integrační vrstvou nad `InterSystems IRIS`. Volba `IRIS` zde není náhodná. V prostředí #abbr("KZ", none) se tato platforma dlouhodobě používá jako integrační vrstva pro napojování okolních systémů, a proto bylo vhodnější navázat na existující provozní standard než zavádět pro jedinou vazbu samostatný integrační middleware. Tento mezistupeň pak řeší tři problémy najednou. Izoluje specifika skutečně dostupného integračního rozhraní mimo business logiku, sjednocuje chybové stavy do kontrolovaného HTTP kontraktu a zjednodušuje případnou výměnu integračního detailu bez zásahu do domény. 
 
 Výstup z registru backend převádí do jednotné doménové struktury obsahující identifikaci pracovníka a seznam odborných, specializovaných a zvláštních odborných způsobilostí. Současně vytváří auditní záznam o úspěšném i neúspěšném dotazu. Z důvodu ochrany osobních údajů se v auditu neukládá plné rodné číslo ani plné identifikátory dotazu, ale pouze jejich maskovaná podoba a hash. Implementace tak spojuje automatizaci kontroly kvalifikace s provozní kontrolou nad citlivou integrační vazbou.

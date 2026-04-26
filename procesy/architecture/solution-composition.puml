@@ -1,17 +1,16 @@
 @startuml
 left to right direction
 hide stereotype
-
 skinparam backgroundColor transparent
 skinparam shadowing false
 skinparam linetype ortho
 skinparam packageStyle rectangle
 skinparam defaultFontName Arial
-skinparam defaultFontSize 15
+skinparam defaultFontSize 20
 skinparam defaultTextAlignment center
 skinparam arrowFontSize 13
 skinparam dpi 160
-skinparam ranksep 24
+skinparam ranksep 40
 skinparam nodesep 18
 skinparam ArrowColor #475569
 skinparam ArrowThickness 1.0
