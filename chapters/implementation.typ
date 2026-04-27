@@ -223,7 +223,18 @@ Komunikaci s backendem jsem soustředil do centralizované API vrstvy místo př
 Z pohledu uživatelské zkušenosti bylo důležité zachovat kontext při pohybu mezi seznamem a detailem pozice. Pro krátkodobý kontext používá portál `sessionStorage`, například pro návrat na stejné místo v seznamu, zatímco `localStorage` slouží k uchování vybraných pozic mezi jednotlivými navigacemi. Formulář reakce současně provádí klientskou validaci a používá idempotency klíč, aby se snížilo riziko duplicitních žádostí při opakovaném kliknutí nebo nestabilním spojení.
 
 Vzhledem k tomu, že backend vrací popis pozice ve formátu HTML, řešil jsem i bezpečné vykreslení obsahu. HTML proto před zobrazením sanitizuji, aby se do stránky nedostal neověřený nebo škodlivý obsah. Jde o zdánlivý detail, ale právě na podobných místech se láme důvěryhodnost veřejného portálu.
-TODO:FOTKY
+
+Na @obr:career-portal-catalog je zachycen katalog volných pozic v desktopovém zobrazení po aplikaci fulltextového dotazu a kombinace filtrů. V levé části rozhraní jsou ovládací prvky pro zpřesnění výběru, konkrétně zařazení, lokalitu, pracovní roli a typ úvazku, zatímco pravá část je vyhrazena pro vyhledávací pole, souhrn výsledku a samotný seznam nabídek. Toto rozvržení jsem zvolil proto, aby uchazeč mohl opakovaně upravovat dotaz bez ztráty kontextu a současně průběžně sledovat, jak se změna filtru promítá do výsledné množiny pozic.
+
+#figure(
+  image(
+    "../procesy/implementation/career-portal-catalog.jpeg",
+    width: 100%,
+  ),
+  caption: [Katalog volných pozic s filtračním panelem a výsledkovou kartou]
+) <obr:career-portal-catalog>
+
+Vycházím z osvědčených standardů kariérních portálů. Uživatelé jsou zvyklí na náhledové karty s klíčovými informacemi a jasné zobrazení aktivních filtrů. Neexperimentuji s rozhraním tam, kde by to lidi jen pletlo. Sázím na rychlou orientaci, kterou uchazeči od moderního webu prostě očekávají. 
 
 ===  E2E Testování portálu
 Spolehlivost veřejného portálu je zajištěna automatizovaným ověřením celé veřejné náborové cesty. Vzhledem k tomu, že portál představuje vstupní bod pro uchazeče, nepovažoval jsem za dostačující ověřovat jen jednotlivé prvky uživatelského rozhraní. Klíčové bylo chránit tok od vyhledání pracovní pozice přes otevření jejího detailu až po odeslání reakce s životopisem a současně tak ověřit integrační kontrakt mezi frontendem v `Next.js` a odděleným transakčním API. Tento krok přímo podporuje naplnění nefunkcionálního požadavku NF04 na dostupnost systému, který požaduje dostupnost alespoň 99,5 % v pracovních dnech mezi 6:00 a 22:00, protože snižuje riziko, že se po změně frontendu nebo API naruší právě veřejně exponovaná náborová cesta. Jako alternativu jsem mohl zvolit pouze komponentové nebo integrační testy s mockovaným API, ty by však neodhalily poruchy vznikající až při běhu sestaveného portálu proti skutečně spuštěnému backendu. Reálnou alternativou byl i `Cypress`, avšak pro tento projekt jsem zvolil `Playwright`, protože umožňuje spouštět scénáře nad sestavenou verzí portálu v reálném prohlížeči, dobře pracuje s navigací, nahráváním příloh a více krokovým formulářovým tokem a současně se přirozeně integruje do `CI/CD` pipeline, včetně opakování selhaných běhů a záznamu trasování při chybě.
