@@ -90,14 +90,14 @@ Po schválení textu následuje ruční publikace na jednotlivých platformách.
     },
     align: (left, left),
 
-    [Identfikátor procesu:], [P01],
+    [Identifikátor procesu:], [P01],
     [Název procesu:], [Vytvoření inzerátu pro pracovní pozici],
     [Zákazník:], [Vedoucí daného oddělení v odštěpném závodě],
     [Vlastník procesu:], [Náborář, vedoucí daného oddělení v odštěpném závodě],
     [Účel:], [Vytvoření inzerátu na poptávanou pozici],
     [Produkt:], [Inzerát],
     [Technické prostředky:],
-    [E-mail, webové stránky KZ,webové portály třetích strán, nemocniční nástěnky, socíální sítě],
+    [E-mail, webové stránky KZ, webové portály třetích stran, nemocniční nástěnky, sociální sítě],
 
     [Metrika:], [Rychlost od žádosti po vystavení inzerátu],
     [Nedostatky:],
@@ -130,8 +130,8 @@ Kritickým nedostatkem je i absence systematické databáze uchazečů a zájemc
       if col == 0 { rgb("#cecece") } else { white }
     },
     align: (left, left),
-    [Identfikátor procesu:], [P02],
-    [Název procesu:], [Příjem přihlášek a výber kandidátů k oslovení],
+    [Identifikátor procesu:], [P02],
+    [Název procesu:], [Příjem přihlášek a výběr kandidátů k oslovení],
     [Zákazník:], [Vedoucí daného oddělení v odštěpném závodě],
     [Vlastník procesu:], [Náborář, vedoucí daného oddělení v odštěpném závodě],
     [Účel:], [Výběr kandidátů, jenž splňují požadavky obsazované pozice],
@@ -139,9 +139,9 @@ Kritickým nedostatkem je i absence systematické databáze uchazečů a zájemc
     [Technické prostředky:], [E-mail, telefon, tabulkový procesor, Webex],
     [Metrika:], [Rychlost od vystavení inzerátu po oslovení kandidáta],
     [Nedostatky:],
-    [Neexistence centrální databáze uchazečů o pozici, neexistence databáze potencionálních zájemců o zaměstnání v KZ],
+    [Neexistence centrální databáze uchazečů o pozici, neexistence databáze potenciálních zájemců o zaměstnání v KZ],
   ),
-  caption: [Proces P02 - Příjem a výber kandidátů k oslovení],
+  caption: [Proces P02 - Příjem a výběr kandidátů k oslovení],
 ) <tab:proces-p02>
 
 
@@ -411,7 +411,7 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
 ) <tab:fp-portal>
 
 
-@tab:fp-admin shrnuje funkcionální požadavky na interní část systému určenou pro nábořáře, personální a mzdové oddělení a vedoucí oddělení. Požadavky pokrývají celý průběh náboru od založení požadavku na obsazení pozice až po výběr kandidáta. 
+@tab:fp-admin shrnuje funkcionální požadavky na interní část systému určenou pro náboráře, personální a mzdové oddělení a vedoucí oddělení. Požadavky pokrývají celý průběh náboru od založení požadavku na obsazení pozice až po výběr kandidáta. 
 
 #figure(
   [

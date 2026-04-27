@@ -1,32 +1,43 @@
 #import "../template/abbreviations.typ": abbr
 
-Architektonický návrh má smysl jen tehdy, pokud se podaří převést jeho principy do konkrétní implementace bez toho, aby se po cestě rozpadly pod tlakem technologických kompromisů. V této kapitole proto nesleduji úplný výpis všech tříd, tabulek a endpointů, ale ta rozhodnutí, na nichž se láme rozdíl mezi formálně správným návrhem a skutečně provozně použitelným systémem.
+Architektonický návrh má smysl jen tehdy, pokud se podaří převést jeho principy do konkrétní implementace bez toho, aby se po cestě rozpadly pod tlakem technologických kompromisů. V této kapitole proto neuvádím úplný výpis všech tříd, tabulek a endpointů, ale ta rozhodnutí, na nichž se láme rozdíl mezi formálně správným návrhem a skutečně provozně použitelným systémem.
 
 Pozornost soustředím především na modulární backend, hexagonální rozdělení odpovědností, spolehlivou asynchronní komunikaci, datovou vrstvu, bezpečnostní model a oddělenou vrstvu inteligentního zpracování dat. Právě v těchto částech se ukazuje, zda navržená architektura dokáže unést reálné procesní a provozní požadavky #abbr("KZ", none).
 
 == Struktura řešení
-Celé řešení je implementováno jako sada spolupracujících aplikací a služeb s oddělenými odpovědnostmi. Transakční část systému je realizována v prostředí Node.js/Express, webové portály jsou postaveny na Next.js a podpůrné zpracovatelské či integrační služby běží převážně v jazyce Go. Toto rozdělení nevyplývá z technologické preference samo o sobě, ale z rozdílného charakteru jednotlivých problémů. Backend vyžaduje doménovou konzistenci, frontendy rychlý rozvoj rozhraní a procesory vrstvy inteligentního zpracování dat efektivní práci s asynchronními úlohami.
+Celé řešení je implementováno jako sada spolupracujících aplikací a služeb s oddělenými odpovědnostmi. Backend je realizován v prostředí Node.js/Express, webové portály jsou postaveny na Next.js a podpůrné zpracovatelské či integrační služby běží převážně v jazyce Go. 
+
+Pro backend jsem zvolil `Node.js/Express`, protože řešené jádro je především API s velkým podílem HTTP komunikace, middleware logiky a integračních vazeb. `Express` současně ponechává přímou kontrolu nad skladbou aplikace, což bylo důležité pro promítnutí hexagonálního uspořádání do kódu. Alternativou byl `NestJS` nebo jiný backendový stack, například `Spring Boot` či `ASP.NET Core`, ty by však v daném rozsahu přinesly více konvencí a vyšší implementační režii bez zřetelného přínosu.
+
+Webové portály jsem postavil na `Next.js`. Vedle technických vlastností zde hrála důležitou roli i vyzrálost ekosystému. Široká komunita, dobře dostupná dokumentace a průběžný vývoj frameworku snižují riziko, že se řešení dostane do technologicky okrajové větve s horší udržovatelností. Současně jde o přirozené rozšíření `React` prostředí, takže bylo možné využít známý vývojový model i rozsáhlé sdílené know-how. Alternativou byla čistě klientská aplikace v `React` bez serverového vykreslení nebo řešení v jiném ekosystému, například `Nuxt`. Zvolený přístup však lépe podporoval dlouhodobou udržitelnost i sjednocení obou portálů v jednom technologickém základu.
 
 Volba jazyka Go u procesorů přitom nebyla motivována tím, že by právě tento jazyk nabízel zásadně lepší knihovny pro práci s modely. Samotná inference je totiž delegována do `Ollama` a extrakce textu do `Apache Tika`, tedy do oddělených služeb dostupných přes HTTP. Z čistě funkčního hlediska by proto bylo možné procesory implementovat i v `Node.js`, což by sjednotilo technologický stack. Rozhodující byly spíše jejich provozní vlastnosti. `cv_processor` běží jako dlouhožijící worker s více souběžnými konzumenty fronty a `job_processor` jako samostatná `HTTP/SSE` služba. Go v tomto kontextu přináší jednoduchý model souběžnosti, malé samostatně nasaditelné binární soubory a předvídatelné chování u specializovaných služeb, které neřeší rozsáhlou doménovou logiku ani práci s uživatelským rozhraním.
 
-Vedle hlavního backendu tak řešení zahrnuje i samostatné služby pro auditní zápis, integrační adaptéry a inteligentní zpracování dokumentů či textů pracovních pozic. Tyto komponenty spolu komunikují přes HTTP rozhraní nebo přes `RabbitMQ`. Praktickým důsledkem je možnost odděleně nasazovat a škálovat části s odlišným provozním profilem, aniž by se celý systém rozpadl na síťově fragmentovaný soubor mikroslužeb.
+Vedle hlavního backendu řešení zahrnuje i samostatné služby pro auditní zápis, integrační adaptéry a inteligentní zpracování dokumentů či textů pracovních pozic. Tyto komponenty spolu komunikují přes HTTP nebo přes `RabbitMQ`. `RabbitMQ` jsem zvolil proto, že umožňuje spolehlivě oddělit transakční cestu od vedlejších efektů, aniž by bylo nutné zavádět robustnější streamovací platformu. Alternativou bylo čistě synchronní volání mezi službami nebo platforma typu `Kafka`. První varianta by zhoršovala odezvu a odolnost systému, druhá by v tomto měřítku přinesla spíše vyšší provozní režii.
 
-Z implementačního hlediska jde o převod architektonické dělby práce do konkrétních runtime prostředků. Cílem není technologická pestrost sama o sobě, ale přiřazení vhodného nástroje ke konkrétnímu typu problému. Přínosem je lepší přizpůsobení jednotlivých částí jejich provoznímu profilu, omezením naopak vyšší nárok na koordinaci buildů, nasazení a provozního dohledu mezi více technologickými celky.
+Zvolený technologický mix tedy nesměřuje k pestrosti pro ni samu, ale k přiřazení vhodného nástroje konkrétnímu typu problému. Přínosem je lepší přizpůsobení jednotlivých částí jejich provoznímu profilu, omezením naopak vyšší nárok na koordinaci buildů, nasazení a dohledu.
+
+Obrázek @obr:impl-solution-overview ukazuje nasazované komponenty řešení a jejich hlavní komunikační vazby. Je na něm vidět trojice klientských aplikací nad společným backendem, návaznost backendu na integrační a auditní služby, propojení s databází, objektovým úložištěm a vrstvou předávání zpráv i oddělení inteligentní vrstvy od hlavní aplikační cesty.
 
 #figure(
   image(
     "../procesy/architecture-implementation-16x9.svg",
     width: 100%,
   ),
-  caption: [Diagram implementace],
-) <obr:impl-outbox-ai>
+  caption: [Nasazované komponenty řešení a jejich hlavní komunikační vazby],
+) <obr:impl-solution-overview>
 
 == Implementace backendu
-Backend jsem implementoval jako modulární aplikaci s dominantním hexagonálním uspořádáním. Každý požadavek vstupuje přes route a middleware pipeline, která řeší autentizaci, autorizaci, request kontext a mapování chyb. Teprve potom přechází řízení do doménové služby, kde probíhá business logika.
 
-Z fyzického hlediska je backend rozdělen do pěti hlavních částí. `src/routes` a `src/app.js` tvoří vstupní HTTP adaptéry. `src/domain` obsahuje byznysové moduly, například `jobs`, `applicants`, `employees`, `qualification` nebo `internalUsers`. `src/shared/contracts/ports` drží explicitní kontrakty a `src/platform` soustřeďuje technologické adaptéry pro databázi, audit, messaging, storage, autentizaci, `ReBAC` i interní integrační služby. Vazby mezi těmito částmi spravuje dependency injection kontejner `Awilix`.
+Backend byl implementován jako modulární aplikace s hexagonálním architektonickým uspořádáním. Každý požadavek vstupuje do systému prostřednictvím routovací vrstvy a middleware pipeline, která zajišťuje autentizaci, autorizaci, vytvoření kontextu požadavku a jednotné mapování chyb. Po úspěšném průchodu touto infrastrukturní částí je požadavek předán vstupnímu adaptéru (např. HTTP controlleru), který jej převede na aplikační vstupní model a zavolá odpovídající případ užití (use-case) v aplikační vrstvě.
 
-Takto navržený backend plní roli autoritativní transakční hranice systému. Právě zde se rozhoduje o tom, zda je konkrétní změna v souladu s doménovými pravidly, s organizačním rozsahem uživatele i s požadavkem na auditní dohledatelnost. Akademicky řečeno jde o koncentraci invariantů do jedné aplikační vrstvy, která omezuje riziko, že se stejná pravidla budou rozcházet mezi frontendem, integračními službami a databázovými skripty.
+Samotné use-cases tvoří vstupní porty aplikace a určují, jaké operace systém poskytuje. Tyto use-cases orchestrují průběh operace, ověřují aplikační pravidla a delegují samotná doménová pravidla na doménové objekty a služby, aniž by je samy implementovaly. Pokud aplikace potřebuje komunikovat s okolním světem, činí tak prostřednictvím výstupních portů, jejichž konkrétní implementace poskytuje infrastrukturní vrstva pomocí technologických adaptérů (tj. komponent převádějících komunikaci mezi externími systémy a porty aplikace) pro zajištění perzistence dat, auditování, asynchronního předávání zpráv, autentizace a externích integrací.
+
+Skládání těchto částí řídí dependency injection (DI) kontejner Awilix. Volba tohoto nástroje byla podřízena snaze o maximální čistotu doménové vrstvy. Na rozdíl od alternativ, jako je například InversifyJS, nevyžaduje Awilix použití dekorátorů přímo v doménovém kódu. Tím je dosaženo stavu, kdy doménová logika zůstává technologicky agnostická a neobsahuje žádné závislosti na použitém DI frameworku, což odpovídá principům hexagonální architektury. Awilix byl dále zvolen pro svou podporu tzv. request scopingu, který umožňuje v rámci jednoho požadavku sdílet kontext (např. identitu uživatele či databázovou transakci) napříč vrstvami bez nutnosti jejich explicitního předávání.
+
+Takto navržený backend plní roli autoritativní transakční hranice systému. Právě zde se rozhoduje o tom, zda je konkrétní změna v souladu s doménovými pravidly, s rozsahem oprávnění uživatele i s požadavky na auditní dohledatelnost. Z formálního hlediska jde o koncentraci invariantů, tedy pravidel, která musí v systému vždy platit, do doménové a aplikační vrstvy, což minimalizuje riziko jejich nekonzistentní implementace napříč frontendem, integračními službami a databázovými skripty.
+
+Pro lepší přehlednost o rozdělení odpovědností v rámci systému je níže uvedena tabulka @tab:impl-backend-layers, která mapuje teoretické prvky hexagonální architektury na jejich konkrétní realizaci v rámci této implementace.
 
 #figure(
   [
@@ -38,24 +49,24 @@ Takto navržený backend plní roli autoritativní transakční hranice systému
       fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
       stroke: 0.5pt + gray,
       [Prvek hexagonu], [Implementační realizace],
-      [Vstupní adaptéry], [`src/routes`, kontrolery v `src/domain/*/controller`, middleware a bootstrap v `src/app.js`],
-      [Doménové moduly], [`src/domain/*/service`, `repository`, `events` a modulové registrace přes `index.js`],
-      [Porty], [`src/shared/contracts/ports`, například `cvPublishPort`, `internalUsersPort`, `rebacPort`],
-      [Výstupní adaptéry], [`src/platform/*`, například `platform/qualification`, `platform/userSearch`, `platform/audit`, `platform/outbox`, `platform/storage`],
-      [Vazba port-adaptér], [DI registr `src/container.registry.js` a Awilix tokeny],
+      [Vstupní adaptéry], [Routovací vrstva, middleware a řadiče (controllers) převádějící HTTP požadavky na případy užití],
+      [Aplikační vrstva / vstupní porty], [Případy užití (use-cases), které definují operace poskytované aplikací a orchestrují jejich průběh],
+      [Doménové moduly], [Entity, value objekty, doménové služby a doménové události ohraničených kontextů (bounded contexts)],
+      [Výstupní porty], [Explicitní rozhraní (kontrakty), kterými aplikační nebo doménová vrstva vyjadřuje požadavky na okolní systémy],
+      [Výstupní adaptéry], [Konkrétní implementace perzistence, auditu, asynchronního předávání zpráv, úložiště a externích či interních integrací],
+      [Vazba port-adaptér], [Kompoziční kořen (composition root) a DI kontejner `Awilix`, které propojují porty s jejich konkrétními adaptéry],
     )
   ],
-  caption: [Implementační realizace hexagonální architektury backendu],
+  caption: [Mapování prvků hexagonální architektury na implementační vrstvy backendu],
 ) <tab:impl-backend-layers>
-
-=== Použité návrhové a integrační vzory v hiring_backend
+=== Použité návrhové a integrační vzory v backendu
 Architektonická kapitola obhajuje principy backendu na koncepční úrovni. V implementační části proto již není účelné znovu vysvětlovat, co jednotlivé vzory obecně znamenají, ale ukázat, v jakých konkrétních místech kódu nesou odpovědnost za čitelnost, rozšiřitelnost a provozní stabilitu `hiring_backend`.
 
 Nejviditelněji se to týká hexagonálního uspořádání. V implementaci se neprojevuje jako obecná definice, ale jako konkrétní hranice mezi doménou, kontrakty a technologickými adaptéry. V `hiring_backend` je tato hranice patrná v kontraktech ve `src/shared/contracts/ports`, v adaptérech ve `src/platform/*` i v rozdělení vstupních a výstupních hranic aplikace. Praktickým přínosem je, že doména vyjadřuje pouze schopnosti, které potřebuje, zatímco konkrétní infrastruktura zůstává uzavřena v adaptační vrstvě.
 
-S hexagonálním uspořádáním úzce souvisí vzor `Repository`. Jeho smyslem je oddělit práci s perzistencí od aplikačních služeb tak, aby use-cases nemusely nést detailní znalost SQL dotazů a fyzického schématu. V backendu se tento přístup projevuje přímo v modulové struktuře `src/domain/*/repository`, kde každý kontext zapouzdřuje vlastní datový přístup. Přínosem je menší vazba mezi business logikou a databázovou vrstvou a současně čitelnější hranice odpovědnosti uvnitř jednotlivých modulů.
+S hexagonálním uspořádáním úzce souvisí vzor `Repository`. Jeho smyslem je oddělit práci s perzistencí od aplikačních služeb tak, aby případy užití nemusely nést detailní znalost SQL dotazů a fyzického schématu. Každý doménový kontext tak zapouzdřuje vlastní datový přístup a vystavuje jen operace, které dávají význam z hlediska domény. Přínosem je menší vazba mezi business logikou a databázovou vrstvou a současně čitelnější hranice odpovědnosti uvnitř jednotlivých modulů.
 
-Dalším důležitým vzorem je `Dependency Injection`. Ten řeší problém skládání závislostí v aplikaci, která už není malým monolitickým skriptem, ale systémem s porty, adaptéry, službami a moduly s odlišnými rolemi. V `hiring_backend` tuto úlohu plní kontejner `Awilix` spolu s registrací vazeb v `src/container.registry.js`. Praktickým přínosem je, že jednotlivé části backendu nejsou pevně svázány konkrétní implementací při vytváření objektů, což zjednodušuje výměnu adaptérů, testování i dlouhodobou údržbu.
+Dalším důležitým vzorem je `Dependency Injection`. Ten řeší problém skládání závislostí v aplikaci, která už není malým monolitickým skriptem, ale systémem s porty, adaptéry, službami a moduly s odlišnými rolemi. V `hiring_backend` tuto úlohu plní kontejner `Awilix` spolu s centrální registrací vazeb. Praktickým přínosem je, že jednotlivé části backendu nejsou pevně svázány konkrétní implementací při vytváření objektů, což zjednodušuje výměnu adaptérů, testování i dlouhodobou údržbu.
 
 Pro zápisové a integrační toky je klíčový vzor `Transactional Outbox`. Řeší problém, jak bezpečně navázat vedlejší efekty na doménovou transakci bez rizika, že se business data uloží, ale navazující notifikace, audit nebo publikační událost se kvůli chybě nikdy nevykoná. V backendu se tento vzor realizuje pomocí tabulky `side_effect_outbox`, samostatného workeru a outbox handlerů. Praktickým přínosem je vyšší konzistence mezi databází a integrační vrstvou a menší náchylnost systému k chybám v mezistavech.
 
@@ -66,14 +77,14 @@ Posledním důležitým vzorem je `Adapter`, přesněji integrační mezivrstva 
 `hiring_backend` tedy nestojí na jednom izolovaném vzoru, ale na jejich kombinaci. Hexagonální uspořádání omezuje vazby mezi doménou a infrastrukturou, `Repository` abstrahuje přístup k datům, `Dependency Injection` řídí skládání závislostí, `Transactional Outbox` a `Idempotency` stabilizují integrační a zápisové toky a integrační adaptéry chrání doménu před cizími rozhraními. Právě tato kombinace umožňuje, aby backend zůstal čitelný i v situaci, kdy musí současně řešit business pravidla, bezpečnost, messaging a více externích vazeb.
 
 === Implementace doménové vrstvy
-Doménové jádro je členěno do modulů odpovídajících hlavním kontextům systému. Prakticky jde například o správu uchazečů (`applicants`), pracovních pozic (`jobs`), pohovorů (`interviews`), zaměstnanců (`employees`), organizací (`organizations`), číselníků (`catalog`) nebo interních uživatelů (`internal_users`). Každý modul má vlastní use-cases, repozitáře a události, takže změna v jedné oblasti nemusí automaticky rozbít zbytek systému.
+Doménové jádro je členěno do modulů odpovídajících hlavním kontextům systému, tedy zejména náboru, pracovním pozicím, pohovorům, zaměstnancům, organizacím, číselníkům a interním identitám. Každý modul má vlastní případy užití, repozitáře a události, takže změna v jedné oblasti nemusí automaticky rozbít zbytek systému.
 
 Toto členění řeší dva problémy současně. Zaprvé omezuje přímé závislosti mezi nesouvisejícími částmi backendu. Zadruhé umožňuje číst a rozvíjet konkrétní oblast bez nutnosti držet v hlavě celou aplikaci. Právě tato vlastnost je důležitá pro dlouhodobou udržitelnost projektu.
 
-=== Implementace hexagonální architektury
-Architektonické principy rozebrané v předchozí kapitole se v implementaci promítají do konkrétní struktury kódu. `src/domain` nese doménové jádro, `src/shared/contracts/ports` explicitní port kontrakty a `src/platform` sekundární adaptéry; vazbu mezi nimi skládá `Awilix` v composition rootu a registru závislostí.
+=== Projevy hexagonálního uspořádání v kódu
+Architektonické principy rozebrané v předchozí kapitole se v implementaci promítají do konkrétní dělby práce mezi doménovým jádrem, port kontrakty a sekundárními adaptéry. Vazbu mezi nimi skládá `Awilix` v centrálním composition rootu, takže závislosti nevznikají nahodile uvnitř jednotlivých služeb, ale jako řízená součást architektury.
 
-Vůči svému okolí doména komunikuje výhradně prostřednictvím explicitních kontraktů vytvářených pomocí helperu `createServicePort`, který zpřístupní jen povolené metody a uzamkne jejich rozhraní. Implementaci těchto odchozích závislostí následně realizují adaptéry jako `platform/qualification`, `platform/userSearch`, `platform/audit` a `platform/outbox`. Právě zde se doménové požadavky převádějí na interní HTTP volání, auditní transport nebo spolehlivé doručování vedlejších efektů, zatímco samotná doména zůstává odstíněna od toho, zda je fyzická vrstva realizována prostřednictvím SQL, HTTP, AMQP nebo objektového úložiště.
+Vůči svému okolí doména komunikuje výhradně prostřednictvím explicitních kontraktů vytvářených pomocí helperu `createServicePort`, který zpřístupní jen povolené metody a uzamkne jejich rozhraní. Implementaci těchto odchozích závislostí následně realizují sekundární adaptéry pro kvalifikace, vyhledávání uživatelů, audit nebo outbox. Právě zde se doménové požadavky převádějí na interní HTTP volání, auditní transport nebo spolehlivé doručování vedlejších efektů, zatímco samotná doména zůstává odstíněna od toho, zda je fyzická vrstva realizována prostřednictvím SQL, HTTP, AMQP nebo objektového úložiště.
 
 === Vynucení architektonických pravidel
 Architektonická pravidla nestačí pouze deklarovat. Proto jsem je v implementaci částečně vynutil testy architektury. Ty ověřují, že doménové moduly neimportují repozitáře jiných modulů napřímo, že služby nepoužívají infrastrukturu mimo definované porty a že business vedlejší efekty nejsou volány mimo outbox handlery.
@@ -137,7 +148,7 @@ Technické oddělení této vrstvy má přímý provozní důvod. Inference, pr�
 
 Současně jde o ukázku řízené distribuce pouze tam, kde přináší prokazatelný přínos. Oddělené procesory snižují tlak na backend a umožňují volit jiný runtime i škálování, ale zároveň zvyšují integrační složitost, potřebu observability a počet míst, kde může vzniknout prodleva nebo chyba přenosu. V implementaci proto tuto vrstvu odděluji jen pro úlohy s odlišným výpočetním profilem, nikoli jako obecné pravidlo pro celý systém.
 
-TODO: Tohle dát do příloh a tady v textu se jen odkázat
+Návaznost mezi transakční operací, vrstvou odloženého odeslání a zpracovatelskými službami shrnuje @obr:impl-outbox-ai. Smyslem schématu není znovu popsat architekturu jako celek, ale ukázat, jak se v implementaci propojuje commit business dat, vznik outbox události, její předání do `RabbitMQ` a následné zpracování v oddělené AI vrstvě.
 #figure(
   image(
     "../procesy/architecture/seq-outbox-rabbitmq-ai.svg",
@@ -158,7 +169,7 @@ V implementaci důsledně nesu organizační izolaci přes `organization_id` v k
 Volba jedné primární databázové platformy podporuje nejen provozní jednoduchost, ale i datovou konzistenci. Multi-tenantní filtr, auditní události, outbox i běžná transakční agenda jsou tak uloženy v jednom prostředí a lze je spravovat společně v rámci stejných zálohovacích a migračních postupů. Alternativou by bylo vyčlenit embeddingy do specializované vektorové databáze, například typu `Qdrant` nebo `Pinecone`, která by přinesla vyšší specializaci a potenciálně lepší škálování podobnostního vyhledávání. V daném měřítku řešení by to však znamenalo další datový subsystém, synchronizaci mezi transakční a vektorovou vrstvou, samostatné zálohování a větší integrační plochu v on-premise provozu. Volba `pgvector` byla proto jednoduchá.
 
 === Fyzický datový model
-Na úrovni fyzického modelu pracuji s tabulkami odpovídajícími doménovým skupinám popsaným v architektuře. V náborové části jsou klíčové zejména `job_postings`, `job_roles`, `applicants`, `interview_events` a návazné pomocné tabulky pro obsah inzerátu, účastníky pohovorů a přílohy. Onboardingová část je realizována nad tabulkami `onboarding_workflows`, `onboarding_steps`, `user_onboarding_steps`, `onboarding_documents` a `user_documents`.
+Na úrovni fyzického modelu zachovávám stejnou logiku, která byla popsána v architektonické kapitole. Náborová část je vystavěna kolem vazby pracovní role -> pracovní pozice -> uchazeč -> pohovor a navázané přílohy či změny stavů. Onboardingová část na ni navazuje oddělením šablony adaptačního postupu od jeho konkrétní instance nad zaměstnancem, takže databáze rozlišuje mezi definicí kroků a jejich skutečným plněním. Smyslem tohoto rozdělení není „mít více tabulek“, ale zabránit tomu, aby se jeden zápis současně tvářil jako definice procesu i jeho vykonaná instance.
 
 Přístupový model je fyzicky opřen o `users`, `user_roles`, `organization_memberships` a `resource_permissions`. Datová vrstva tak přímo nese organizační kontext i pravidla `ReBAC`, místo aby byla autorizace řešena jen dodatečně nad již načtenými daty.
 
@@ -175,6 +186,8 @@ Z teoretického pohledu představují migrace mechanismus řízené evoluce sch�
 Dokumenty uchazečů a zaměstnanců neukládám přímo do relační databáze. Tabulky jako `application_attachments`, `user_documents` nebo `onboarding_documents` obsahují metadata a reference na objektové klíče, zatímco fyzický obsah souborů je uložen v `SeaweedFS` přes S3 kompatibilní rozhraní. Tím řeším problém, jak zachovat výkonnou databázi pro transakční agendu a současně pracovat s většími soubory a jejich verzemi.
 
 Vedle doménových tabulek používám i několik infrastrukturních tabulek. `side_effect_outbox` zajišťuje spolehlivé doručení vedlejších efektů po commit fázi, `command_idempotency` omezuje riziko duplicitního provedení zápisových operací a `audit_events` uchovává auditní stopu citlivých akcí. Tyto struktury nejsou byznysovou doménou samy o sobě, ale bez nich by nebylo možné naplnit požadavky na spolehlivost a auditovatelnost.
+
+Stejná infrastruktura je důležitá i pro řízené nakládání s osobními údaji po uplynutí retenční lhůty. Výmaz nebo anonymizace neúspěšného uchazeče se v takovém systému nesmí omezit na prosté smazání jednoho řádku, protože osobní obsah bývá rozprostřen mezi databází, přílohami v objektovém úložišti a případnými odvozenými výstupy. Outbox proto poskytuje mechanismus, jak po rozhodnutí transakční vrstvy spustit navazující kroky konzistentně i mimo hlavní databázi, zatímco auditní tabulka uchovává důkaz o provedení zásahu bez dalšího držení odstraněných osobních údajů.
 
 === Implementace bezpečnosti a identity
 Bezpečnost je řešena ve více vrstvách. První vrstvou je autentizace uživatele přes session token, který middleware převádí na jednotný request kontext obsahující identitu, role a seznam organizací. Druhou vrstvou jsou endpoint guardy, které rozhodují, zda uživatel smí vstoupit do dané části API. Třetí vrstvou je datová autorizace v `hiring_backend`, realizovaná nad `resource_permissions` a návaznými vazbami na `organization_memberships`.
@@ -206,15 +219,12 @@ Toto rozdělení řeší časté napětí mezi centralizovanou identitou a loká
 Role check v middleware tedy není poslední autorizační krok, ale jen vstupní filtr. Samotné čtení, změny a mazání zdrojů vyhodnocuji až na úrovni práce s daty nad `resource_permissions`. Dědičnost oprávnění neřeším kopírováním záznamů do každé dceřiné tabulky, ale relačním odvozením z nadřazeného zdroje. `resource_permissions` drží především oprávnění k organizaci a pracovní pozici, zatímco přístup k poznámkám uchazeče, jeho přílohám, pohovorům nebo přílohám pohovoru se vyhodnocuje přes vazbu na uchazeče a jeho `job_posting_id`. Pokud se tedy změní oprávnění k pracovní pozici, změní se automaticky i přístup ke všem navázaným dceřiným entitám bez nutnosti hromadně přepisovat jejich vlastní ACL záznamy. Přínosem je menší redundance a menší riziko zastaralých oprávnění. Omezením naopak složitější SQL dotazy a vyšší závislost na konzistenci relačních vazeb. Změny rolí a membershipů se navíc synchronizují asynchronně přes outbox události, aby model zůstal konzistentní i mimo kritickou request cestu.
 
 == Implementace onboardingového portálu
-Onboardingový portál jsem implementoval jako Next.js aplikaci oddělenou od veřejného kariérního portálu. Toto rozdělení řeší problém, že HR pracovníci a nastupující zaměstnanci potřebují pracovat s odlišnými typy úloh i s jiným bezpečnostním režimem. Na úrovni implementace jsem proto oddělil layouty, cesty i stavovou logiku podle role uživatele.
-todo: rozšířit asi třeba o obrázek a nějaké kecy okolo
+Onboardingový portál jsem implementoval jako samostatnou aplikaci oddělenou od veřejného kariérního portálu. Toto rozdělení řeší problém, že HR pracovníci a nastupující zaměstnanci potřebují pracovat s odlišnými typy úloh i s jiným bezpečnostním režimem. Na úrovni implementace jsem proto oddělil layouty, cesty i stavovou logiku podle role uživatele.
 
 Na implementační úrovni portál skládá pohled zaměstnance a interních pracovníků nad stejným backendem, ale s odlišnými layouty, trasami a stavovou logikou. Tím se zachovává jednotný zdroj pravdy v API a zároveň se respektuje, že HR role pracuje s přehledem procesu, zatímco nastupující zaměstnanec s konkrétní sadou kroků, termínů a dokumentů. Přínosem je vyšší srozumitelnost práce s onboardingem, omezením naopak nutnost udržovat další frontendovou aplikaci a synchronizovat její vývoj s backendem.
 
-TODO:FOTKY
-
 == Implementace kariérního portálu
-Kariérní portál `kariera.kzcr.eu` jsem implementoval jako veřejný vstup do náborového procesu nad technologiemi `Next.js`, `React` a `TypeScript`. Frontend je oddělen od backendu záměrně. Veřejný portál řeší prezentaci obsahu, navigaci a interakci s uchazečem, zatímco business pravidla pro práci s pozicemi, uchazeči a formulářovými daty zůstávají v jednom autoritativním API.
+Kariérní portál `kariera.kzcr.eu` jsem implementoval jako veřejný vstup do náborového procesu. Frontend je oddělen od backendu záměrně. Veřejný portál řeší prezentaci obsahu, navigaci a interakci s uchazečem, zatímco business pravidla pro práci s pozicemi, uchazeči a formulářovými daty zůstávají v jednom autoritativním API.
 
 Domovská stránka propojuje obsahové a transakční scénáře. Uchazeč zde najde benefity, tematické kategorie pracovních rolí, mapový přehled nemocnic a vstup do katalogu volných míst. Samotný náborový tok tvoří seznam pozic, detail konkrétní nabídky a formulář reakce na vybranou pozici. Vedle toho portál obsahuje i samostatný kontakt pro zájemce bez vazby na konkrétní inzerát.
 
@@ -234,12 +244,12 @@ Na @obr:career-portal-catalog je zachycen katalog volných pozic v desktopovém 
   caption: [Katalog volných pozic s filtračním panelem a výsledkovou kartou]
 ) <obr:career-portal-catalog>
 
-Vycházím z osvědčených standardů kariérních portálů. Uživatelé jsou zvyklí na náhledové karty s klíčovými informacemi a jasné zobrazení aktivních filtrů. Neexperimentuji s rozhraním tam, kde by to lidi jen pletlo. Sázím na rychlou orientaci, kterou uchazeči od moderního webu prostě očekávají. 
+Rozhraní záměrně vychází z ustálených vzorců kariérních portálů. Náhledová karta shrnuje klíčové atributy nabídky a filtrační panel zůstává při práci s katalogem stabilní, aby uchazeč mohl porovnávat více výsledků bez opakované orientace v rozhraní. Nejde tedy o grafické rozhodnutí samo o sobě, ale o snahu snížit kognitivní zátěž v situaci, kdy uživatel rychle prochází větší množství podobných nabídek a rozhoduje se, zda pokračovat do detailu a formuláře reakce.
 
-===  E2E Testování portálu
-Spolehlivost veřejného portálu je zajištěna automatizovaným ověřením celé veřejné náborové cesty. Vzhledem k tomu, že portál představuje vstupní bod pro uchazeče, nepovažoval jsem za dostačující ověřovat jen jednotlivé prvky uživatelského rozhraní. Klíčové bylo chránit tok od vyhledání pracovní pozice přes otevření jejího detailu až po odeslání reakce s životopisem a současně tak ověřit integrační kontrakt mezi frontendem v `Next.js` a odděleným transakčním API. Tento krok přímo podporuje naplnění nefunkcionálního požadavku NF04 na dostupnost systému, který požaduje dostupnost alespoň 99,5 % v pracovních dnech mezi 6:00 a 22:00, protože snižuje riziko, že se po změně frontendu nebo API naruší právě veřejně exponovaná náborová cesta. Jako alternativu jsem mohl zvolit pouze komponentové nebo integrační testy s mockovaným API, ty by však neodhalily poruchy vznikající až při běhu sestaveného portálu proti skutečně spuštěnému backendu. Reálnou alternativou byl i `Cypress`, avšak pro tento projekt jsem zvolil `Playwright`, protože umožňuje spouštět scénáře nad sestavenou verzí portálu v reálném prohlížeči, dobře pracuje s navigací, nahráváním příloh a více krokovým formulářovým tokem a současně se přirozeně integruje do `CI/CD` pipeline, včetně opakování selhaných běhů a záznamu trasování při chybě.
+=== E2E testování portálu
+Spolehlivost veřejného portálu je zajištěna automatizovaným ověřením celé veřejné náborové cesty. Vzhledem k tomu, že portál představuje vstupní bod pro uchazeče, nepovažoval jsem za dostačující ověřovat jen jednotlivé prvky uživatelského rozhraní. Klíčové bylo chránit tok od vyhledání pracovní pozice přes otevření jejího detailu až po odeslání reakce s životopisem a současně tak ověřit integrační kontrakt mezi frontendem a odděleným transakčním API. Tento krok přímo podporuje naplnění nefunkcionálního požadavku NF04 na dostupnost systému, který požaduje dostupnost alespoň 99,5 % v pracovních dnech mezi 6:00 a 22:00, protože snižuje riziko, že se po změně frontendu nebo API naruší právě veřejně exponovaná náborová cesta. Jako alternativu jsem mohl zvolit pouze komponentové nebo integrační testy s mockovaným API, ty by však neodhalily poruchy vznikající až při běhu sestaveného portálu proti skutečně spuštěnému backendu. Reálnou alternativou byl i `Cypress`, avšak pro tento projekt jsem zvolil `Playwright`, protože umožňuje spouštět scénáře nad sestavenou verzí portálu v reálném prohlížeči, dobře pracuje s navigací, nahráváním příloh a více krokovým formulářovým tokem a současně se přirozeně integruje do `CI/CD` pipeline, včetně opakování selhaných běhů a záznamu trasování při chybě.
 
-Testovací scénaře obsahují zobrazení veřejného seznamu pozic, vyloučení neveřejných nabídek, filtrování a vyhledávání nad skutečným API, přechod ze seznamu do detailu a dále na formulář reakce, odeslání přihlášky v režimu s povinným i nepovinným životopisem, klientskou validaci formulářů, samostatný kontaktní formulář i formulář pro zájemce bez vazby na konkrétní pozici. U klíčových scénářů nekončím na úrovni obrazovky, ale kontroluji i perzistenci výsledku v databázi, například vznik záznamu uchazeče, uložení přílohy nebo zápis kontaktního dotazu. Tímto postupem snižuji riziko, že po změně frontendu, API nebo validační logiky zůstane portál vizuálně dostupný, ale fakticky přestane spolehlivě přijímat použitelné reakce.
+Testovací scénáře obsahují zobrazení veřejného seznamu pozic, vyloučení neveřejných nabídek, filtrování a vyhledávání nad skutečným API, přechod ze seznamu do detailu a dále na formulář reakce, odeslání přihlášky v režimu s povinným i nepovinným životopisem, klientskou validaci formulářů, samostatný kontaktní formulář i formulář pro zájemce bez vazby na konkrétní pozici. U klíčových scénářů nekončím na úrovni obrazovky, ale kontroluji i perzistenci výsledku v databázi, například vznik záznamu uchazeče, uložení přílohy nebo zápis kontaktního dotazu. Tímto postupem snižuji riziko, že po změně frontendu, API nebo validační logiky zůstane portál vizuálně dostupný, ale fakticky přestane spolehlivě přijímat použitelné reakce.
 
 === Integrace analytického nástroje Umami
 Pro analytické účely jsem do portálu integroval nástroj `Umami`. Jeho smyslem není zasahovat do rozhodování systému, ale měřit průchod uživatelů portálem a identifikovat místa, kde uchazeči proces opouštějí. Inicializace analytiky je provedena centrálně v kořenové komponentě aplikace, aby bylo zajištěno jednotné měření napříč stránkami.

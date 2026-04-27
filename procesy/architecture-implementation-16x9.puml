@@ -7,10 +7,12 @@ skinparam shadowing false
 skinparam linetype ortho
 skinparam packageStyle rectangle
 skinparam defaultFontName Arial
+skinparam defaultFontSize 20
 skinparam defaultTextAlignment center
+skinparam arrowFontSize 13
 skinparam dpi 160
-skinparam ranksep 26
-skinparam nodesep 28
+skinparam ranksep 32
+skinparam nodesep 22
 skinparam ArrowColor #475569
 skinparam ArrowThickness 1.0
 skinparam RoundCorner 14
@@ -59,118 +61,63 @@ skinparam queue {
   FontColor #7C2D12
 }
 
-skinparam actor {
-  BorderColor #64748B
-  FontColor #0F172A
-}
-
-actor "Uchazeč" as Candidate
-actor "HR / vedoucí" as Hr
-actor "Nový zaměstnanec" as Employee
-
 rectangle "Implementační pohled platformy náboru a adaptace KZ" {
-  package "Prezentační vrstva" {
+  package "Klientské aplikace" {
     together {
-      rectangle "Kariérní frontend" <<frontend>> as CareerFe
-      rectangle "Administrační frontend" <<frontend>> as AdminFe
-      rectangle "Onboarding frontend" <<frontend>> as OnboardFe
-      rectangle "Umami" <<frontend>> as Umami
+      rectangle "Kariérní portál" <<frontend>> as CareerFe
+      rectangle "Administrační portál" <<frontend>> as AdminFe
+      rectangle "Onboardingový portál" <<frontend>> as OnboardFe
     }
   }
 
-  package "Aplikační a integrační služby" {
+  package "Transakční a integrační služby" {
     together {
-      rectangle "migration" <<service>> as Migration
+      rectangle "Migrace schématu" <<service>> as Migration
       rectangle "hiring_backend" <<service>> as Backend
-      rectangle "qualification-adapter" <<service>> as Qualification
-      rectangle "user-search-adapter" <<service>> as UserSearch
-      rectangle "audit_writer_processor" <<service>> as AuditWriter
+      rectangle "Interní integrační adaptéry" <<service>> as IntegrationAdapters
+      rectangle "Auditní zapisovač" <<service>> as AuditWriter
     }
   }
 
-  package "Datová a messaging vrstva" {
+  package "Datová a podpůrná vrstva" {
     together {
       database "PostgreSQL\n+ pgvector" as DB
-      folder "SeaweedFS" as S3
       queue "RabbitMQ" as MQ
+      folder "SeaweedFS" as S3
     }
-  }
 
-  package "Vrstva inteligentního pracování" {
     together {
-      rectangle "cv_processor" <<service>> as CvProcessor
-      rectangle "job_processor" <<service>> as JobProcessor
-      rectangle "Apache Tika" <<service>> as Tika
-      rectangle "Ollama" <<service>> as Ollama
+      rectangle "AI procesory\n(cv_processor, job_processor)" <<service>> as AIProcessors
+      rectangle "Ollama + Apache Tika" <<service>> as AICore
     }
-  }
-
-  package "Dohledová vrstva" {
-    rectangle "Promtail • Loki • Prometheus • Grafana" <<obs>> as Observability
   }
 }
 
-rectangle "SSO / OIDC" <<external>> as SSO
-rectangle "SMTP" <<external>> as SMTP
-rectangle "IRIS / interní integrační vrstva" <<external>> as Iris
-rectangle "NRZP / ÚZIS" <<external>> as Nrzp
+CareerFe --> Backend : HTTP
+AdminFe --> Backend : HTTP
+OnboardFe --> Backend : HTTP
 
-Candidate --> CareerFe
-Hr --> AdminFe
-Employee --> OnboardFe
+Migration --> DB : SQL
+Backend --> DB : SQL
+Backend --> MQ : AMQP
+Backend --> S3 : S3
+Backend --> IntegrationAdapters : HTTP
+Backend --> AIProcessors : HTTP / SSE
 
-CareerFe --> Backend
-AdminFe --> Backend
-OnboardFe --> Backend
+MQ --> AuditWriter : AMQP
+AuditWriter --> DB : SQL
 
-CareerFe ..> Umami : analytika
-AdminFe ..> Umami : analytika
-OnboardFe ..> Umami : analytika
-
-Migration --> DB
-Backend --> DB
-Backend --> S3
-Backend <--> MQ
-Backend --> Qualification
-Backend --> UserSearch
-Backend --> JobProcessor : HTTP / SSE
-Backend --> SSO
-Backend --> SMTP
-
-Qualification --> Iris
-Qualification --> Nrzp
-UserSearch --> Iris
-
-MQ --> AuditWriter
-AuditWriter --> DB
-
-MQ --> CvProcessor
-CvProcessor --> S3
-CvProcessor --> Tika
-CvProcessor --> Ollama
-CvProcessor --> MQ
-
-JobProcessor --> Ollama
-
-Backend ..> Observability
-CvProcessor ..> Observability
-JobProcessor ..> Observability
-MQ ..> Observability
-DB ..> Observability
+MQ --> AIProcessors : AMQP
+AIProcessors --> S3 : S3
+AIProcessors --> AICore : HTTP
+AIProcessors --> MQ : AMQP
 
 CareerFe -[hidden]right-> AdminFe
 AdminFe -[hidden]right-> OnboardFe
-OnboardFe -[hidden]right-> Umami
 Migration -[hidden]right-> Backend
-Backend -[hidden]right-> Qualification
-Qualification -[hidden]right-> UserSearch
-UserSearch -[hidden]right-> AuditWriter
-DB -[hidden]right-> S3
-S3 -[hidden]right-> MQ
-CvProcessor -[hidden]right-> JobProcessor
-JobProcessor -[hidden]right-> Tika
-Tika -[hidden]right-> Ollama
-SSO -[hidden]right-> SMTP
-SMTP -[hidden]right-> Iris
-Iris -[hidden]right-> Nrzp
+Backend -[hidden]right-> IntegrationAdapters
+IntegrationAdapters -[hidden]right-> AuditWriter
+DB -[hidden]right-> MQ
+MQ -[hidden]right-> S3
+AIProcessors -[hidden]right-> AICore
 @enduml
