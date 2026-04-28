@@ -1,0 +1,35 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 18
+skinparam rectangle {
+  RoundCorner 8
+  FontSize 18
+}
+skinparam database {
+  FontSize 18
+}
+
+rectangle "Vedoucí se přihlásí\npřes SSO/OIDC" as sso #E0F2FE
+rectangle "Vznikne aplikační\nrelace v backendu" as token #F8FAFC
+rectangle "Požadavek na zobrazení\nCV uchazeče" as request #F8FAFC
+rectangle "Backend ověří relaci\na sestaví uživatele" as auth #E0F2FE
+
+rectangle "Uživatel je\nVedoucí" as role #FEF3C7
+rectangle "Je přiřazen\nke konkrétnímu inzerátu?" as rebac #DCFCE7
+database "Evidence oprávnění\nk inzerátu" as acl #ECFDF5
+rectangle "CV se zobrazí\nnebo je přístup zamítnut" as result #F8FAFC
+
+sso -right-> token
+token -right-> request
+request -right-> auth
+
+sso -[hidden]down-> role
+auth -down-> role
+
+role -right-> rebac
+rebac -right-> acl
+acl -right-> result
+
+@enduml

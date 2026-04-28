@@ -32,7 +32,7 @@ Respondenty jsem vybíral účelově podle rolí, které reprezentují tři rozd
       [Role], [Účel zapojení], [Hlavní testovaná agenda],
       [HR specialista], [Operativní ověření náborového workflow], [Správa uchazečů, změny stavů, plánování pohovorů, komunikace s kandidáty],
       [Vedoucí pracovník], [Ověření rozhodovacích a dohledových kroků], [Hodnocení kandidátů, přehled stavu náboru, vstupní agenda nového zaměstnance],
-      [Nový zaměstnanec], [Ověření srozumitelnosti onboardingového rozhraní], [Plnění onboardingových kroků, práce s dokumenty, notifikace a orientace v úkolech],
+      [Nový zaměstnanec], [Ověření srozumitelnosti rozhraní vstupní agendy], [Plnění kroků vstupní agendy, práce s dokumenty, notifikace a orientace v úkolech],
     )
   ],
   caption: [Zastoupení rolí v pilotním uživatelském ověření]
@@ -40,7 +40,7 @@ Respondenty jsem vybíral účelově podle rolí, které reprezentují tři rozd
 
 
 == Testovací scénáře a hodnoticí kritéria
-Testovací scénáře jsem navrhl tak, aby pokryly kritické průchody systémem od založení pracovní pozice až po onboarding nového zaměstnance. Každý scénář měl jasně definovaný cílový stav, protože právě ten rozhoduje o tom, zda uživatel úlohu skutečně dokončil, nebo pouze rozhraním prošel bez jistoty, co provedl. 
+Testovací scénáře jsem navrhl tak, aby pokryly kritické průchody systémem od založení pracovní pozice až po vstupní agendu nového zaměstnance. Každý scénář měl jasně definovaný cílový stav, protože právě ten rozhoduje o tom, zda uživatel úlohu skutečně dokončil, nebo pouze rozhraním prošel bez jistoty, co provedl. 
 
 #figure(
   [
@@ -55,8 +55,8 @@ Testovací scénáře jsem navrhl tak, aby pokryly kritické průchody systémem
       [S1], [Založení a publikace nové pracovní pozice], [HR], [R2, R3],
       [S2], [Zpracování přihlášky a změna stavu uchazeče], [HR], [R3, R6],
       [S3], [Naplánování pohovoru a odeslání pozvánek], [HR], [R3],
-      [S4], [Převod uchazeče na zaměstnance a spuštění onboardingu], [HR], [R4],
-      [S5], [Vyplnění onboardingového kroku a nahrání požadovaných dokumentů], [Zaměstnanec], [R4],
+      [S4], [Převod uchazeče na zaměstnance a spuštění vstupní agendy], [HR], [R4],
+      [S5], [Vyplnění kroku vstupní agendy a nahrání požadovaných dokumentů], [Zaměstnanec], [R4],
       [S6], [Kontrola reportu náborové průchodnosti], [Vedoucí], [R6],
       [S7], [Ověření notifikace a reakce na přidělený úkol], [HR / Zaměstnanec], [R4, R6],
     )
@@ -64,7 +64,7 @@ Testovací scénáře jsem navrhl tak, aby pokryly kritické průchody systémem
   caption: [Sada testovacích scénářů]
 ) <tab:user-test-scenarios>
 
-Scénáře v @tab:user-test-scenarios záměrně nesledují jen izolované klikací úlohy, ale uzly, ve kterých se rozhoduje o průchodnosti celého procesu. Pokud se uživatel ztratí při změně stavu uchazeče, při převodu na zaměstnance nebo při práci s onboardingovým úkolem, nevzniká pouze lokální nepohodlí v rozhraní, ale přímé zpomalení navazujících kroků.
+Scénáře v @tab:user-test-scenarios záměrně nesledují jen izolované klikací úlohy, ale uzly, ve kterých se rozhoduje o průchodnosti celého procesu. Pokud se uživatel ztratí při změně stavu uchazeče, při převodu na zaměstnance nebo při práci s úkolem vstupní agendy, nevzniká pouze lokální nepohodlí v rozhraní, ale přímé zpomalení navazujících kroků.
 
 Protože šlo o pilotní uživatelské ověření kvalitativního charakteru, nesoustředil jsem se na jedinou agregovanou metriku. Vhodnější bylo sledovat kombinaci ukazatelů, které společně vystihují, zda je proces pro uživatele čitelný, dokončitelný a provozně použitelný. Zajímalo mě zejména to, zda uživatel dosáhl cílového stavu, zda potřeboval zásah moderátora, kolik chybných kroků udělal a jak svůj postup následně slovně hodnotil.
 
@@ -91,9 +91,9 @@ Protože šlo o pilotní uživatelské ověření kvalitativního charakteru, ne
 
 
 == Hlavní zjištění a implikace pro další rozvoj
-Získaná pozorování ukázala, že největší hodnotu uživatelé vnímali v centralizaci informací, ve sjednocení stavu kandidátů a v lepší dohledatelnosti odpovědností napříč náborovým a onboardingovým procesem.
+Získaná pozorování ukázala, že největší hodnotu uživatelé vnímali v centralizaci informací, ve sjednocení stavu kandidátů a v lepší dohledatelnosti odpovědností napříč náborovým procesem a procesem vstupní agendy.
 
-Jako problematická se naopak ukázala místa, kde systém předpokládá vyšší procesní znalost uživatele, než jakou lze očekávat při prvním použití. Typicky šlo o potřebu jasněji vysvětlit význam stavů, lépe zvýraznit další očekávaný krok a oddělit informace, které jsou pouze informativní, od těch, které vyžadují akci. U onboardingových scénářů byla důležitá také viditelná vazba mezi úkolem, termínem a odpovědnou rolí. Bez ní se uživatel sice v systému orientuje, ale hůře chápe prioritu jednotlivých kroků.
+Jako problematická se naopak ukázala místa, kde systém předpokládá vyšší procesní znalost uživatele, než jakou lze očekávat při prvním použití. Typicky šlo o potřebu jasněji vysvětlit význam stavů, lépe zvýraznit další očekávaný krok a oddělit informace, které jsou pouze informativní, od těch, které vyžadují akci. U scénářů vstupní agendy byla důležitá také viditelná vazba mezi úkolem, termínem a odpovědnou rolí. Bez ní se uživatel sice v systému orientuje, ale hůře chápe prioritu jednotlivých kroků.
 
 #figure(
   [

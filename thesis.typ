@@ -66,3 +66,20 @@ Analýza současného stavu procesů náboru a adaptace pracovníků v Krajské 
 = Závěr
 
 #include "chapters/conclusion.typ"
+
+
+#attachments(
+  attach_content("Realizační tok Outbox-RabbitMQ a vrstvy inteligentního zpracování dat v implementaci", [
+    #rotate(-90deg, reflow: true)[
+      #figure(
+        image(
+          "procesy/architecture/seq-outbox-rabbitmq-ai.svg",
+          width: 90%,
+          height: 100%
+        ),
+        caption: [Realizační tok Outbox-RabbitMQ a vrstvy inteligentního zpracování dat v implementaci],
+      ) <obr:impl-outbox-ai>
+
+    ]
+  ]),
+)

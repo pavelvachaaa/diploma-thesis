@@ -6,7 +6,7 @@ Rozhodnutí o vlastním vývoji je obhajitelné pouze tehdy, pokud je zřejmé, 
 
 
 == Metodika rešerše
-Rešerše byla provedena jako komparativní posouzení řešení ze tří kategorií. #abbr("ATS", "Applicant Tracking System"), onboardingové platformy (vstupní agenda a adaptace) a  #abbr("HCM", "Human Capital Management") systémy. Na základě analyzovaných požadavků vznikla kritéria pro hodnocení uvedené níže v @tab:research-kriteria.
+Rešerše byla provedena jako komparativní posouzení řešení ze tří kategorií. #abbr("ATS", "Applicant Tracking System"), platformy pro vstupní agendu (adaptaci) a  #abbr("HCM", "Human Capital Management") systémy. Na základě analyzovaných požadavků vznikla kritéria pro hodnocení uvedené níže v @tab:research-kriteria.
 
 
 #figure(
@@ -48,7 +48,7 @@ Z hlediska funkčního pokrytí Teamio naplňuje klíčové ATS scénáře a v k
 Z analytického hlediska je proto Teamio vhodné vnímat spíše jako specializovanou integrační komponentu pro inzerci a sběr kandidátských reakcí než jako plnohodnotný cílový systém pro end-to-end řízení náboru, vstupní agendy a adaptace.
 
 === Recruitis
-Recruitis je ATS platforma orientovaná na digitalizaci náborového workflow, práci s talent poolem a reportingovou podporu náborových aktivit. Veřejné materiály zároveň uvádějí vazbu na onboardingové řešení Onbee, což potvrzuje interoperabilitu systému, ale zároveň ukazuje, že náborová a adaptační vrstva jsou řešeny odděleně. @recruitisWeb2026
+Recruitis je ATS platforma orientovaná na digitalizaci náborového workflow, práci s talent poolem a reportingovou podporu náborových aktivit. Veřejné materiály zároveň uvádějí vazbu na řešení pro vstupní agendu Onbee, což potvrzuje interoperabilitu systému, ale zároveň ukazuje, že náborová a adaptační vrstva jsou řešeny odděleně. @recruitisWeb2026
 
 Ve vztahu k enterprise požadavkům je důležitá deklarovaná podpora REST API integrace, #abbr("SSO", "Single Sign-On") a více právních subjektů. @recruitisWeb2026 Tyto parametry zvyšují použitelnost v heterogenním organizačním prostředí. Přesto i zde platí, že řešení komplexního adaptačního procesu by muselo být zajištěno navazujícím externím modulem, což zvyšuje závislost na mezisystémové koordinaci.
 
@@ -62,14 +62,14 @@ Sloneek nabízí ATS modul jako součást širší HR platformy. @sloneekAts2026
 
 V prostředí #abbr("KZ", none) tak Sloneek představuje využitelnou variantu pro obecnou digitalizaci HR činností, nikoli však jednoznačně vhodného kandidáta pro cílové řešení s požadovanou mírou specializace na zdravotnické procesy, multi-tenantní řízení a on-premise provoz.
 
-== Onboardingové platformy
+== Platformy pro vstupní agendu a adaptaci
 === Onbee
-Onbee představuje specializovanou onboarding/offboarding platformu zaměřenou na procesní koordinaci nástupu zaměstnance, práci s checklisty a správu související dokumentace. Ve veřejné produktové dokumentaci jsou deklarovány integrační možnosti na ATS/HRIS, podpora #abbr("SSO", none) i možnost on-premise instalace. @onbeeWeb2026
+Onbee představuje specializovanou platformu pro vstupní agendu a adaptaci zaměřenou na procesní koordinaci nástupu zaměstnance, práci s checklisty a správu související dokumentace. Ve veřejné produktové dokumentaci jsou deklarovány integrační možnosti na ATS/HRIS, podpora #abbr("SSO", none) i možnost on-premise instalace. @onbeeWeb2026
 
 Z hlediska hodnoticího rámce tak Onbee velmi dobře pokrývá část požadavků spojených s adaptací (R4) a částečně i provozní požadavky NF07. Jeho limit spočívá v tom, že nejde o plnohodnotné ATS řešení, takže by organizace musela paralelně provozovat a integračně udržovat další náborový systém. Vznikla by tak vícevrstvá architektura s vyšší závislostí na kvalitě integračních vazeb.
 
 == Integrované HCM suite (enterprise)
-Integrované #abbr("HCM", none) platformy sledují jiný strategický cíl než specializované ATS nebo onboardingové nástroje. Snaží se pokrýt co největší část zaměstnaneckého cyklu v jednom datovém a procesním modelu. Z pohledu enterprise architektury jde o logický přístup, protože snižuje fragmentaci dat. V praxi však bývá vykoupen vyšší implementační náročností, větším rozsahem změnového řízení a velmi často i cloudovým provozním modelem.
+Integrované #abbr("HCM", none) platformy sledují jiný strategický cíl než specializované ATS nebo nástroje pro vstupní agendu. Snaží se pokrýt co největší část zaměstnaneckého cyklu v jednom datovém a procesním modelu. Z pohledu enterprise architektury jde o logický přístup, protože snižuje fragmentaci dat. V praxi však bývá vykoupen vyšší implementační náročností, větším rozsahem změnového řízení a velmi často i cloudovým provozním modelem @mauro2024digital.
 
 === SAP SuccessFactors
 SAP SuccessFactors je výrobcem prezentován jako cloud-based HCM suite s moduly pro recruiting i onboarding. @sapSuccessfactorsWhatIs2026 @sapSuccessfactorsOnboarding2026 Z hlediska funkční šíře jde o robustní platformu schopnou pokrýt velkou část HR procesů, včetně centralizovaného reportingu a governance.

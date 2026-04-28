@@ -27,7 +27,7 @@ Přehled  služeb v @tab:deployment-services zachycuje provozní členění nasa
 
       [`kariera.kzcr.eu`], [Kariérní portál pro publikaci inzerátů a podání přihlášek], [Bezstavová], [Veřejná],
 
-      [`onboarding.kzcr.eu`], [Onboardingový portál pro HR a zaměstnance], [Bezstavová], [Veřejná],
+      [`onboarding.kzcr.eu`], [Portál vstupní agendy pro HR a zaměstnance], [Bezstavová], [Veřejná],
 
       [`hr-backend`], [Transakční API a integrační logika], [Bezstavová], [Interní],
 
@@ -88,7 +88,7 @@ Konfigurace systému je v navrženém řešení pojata jednotně jako vrstva odd
 
 V praktické rovině se tento princip projevuje prostřednictvím konfiguračních souborů a proměnných prostředí předávaných mimo verzovaný repozitář. U části řešení jsou vybrané netajné proměnné vloženy už ve fázi sestavení, kdy je automatizace v `Gitea Actions` předá procesu tvorby obrazu a jejich hodnoty se promítnou do výsledného obrazu. Typicky jde o parametry, které musí být známy již při sestavení klientské aplikace. Naproti tomu provozní a citlivé údaje nejsou do obrazu zapisovány, ale jsou připojeny až při nasazení, a to buď prostřednictvím hostitelské konfigurace, nebo pomocí minimálního nasazovacího balíčku obsahujícího soubor `compose.yaml` a odpovídající konfigurační proměnné pro konkrétní verzi.
 
-U služeb typu `hiring_backend`, `cv_processor` i `onboarding.kzcr.eu` tak zůstávají citlivé hodnoty, jako jsou přístupové údaje k databázi, integrační klíče nebo certifikáty, odděleny od obrazu aplikace. Přínosem tohoto modelu je omezení rizika nechtěného zveřejnění citlivých údajů při distribuci systému. Nevýhodou naopak zůstává závislost na disciplinovaném provozním postupu a na správném předání konfigurace do cílového prostředí.
+U služeb typu `hiring_backend`, `cv_processor` i portálu vstupní agendy tak zůstávají citlivé hodnoty, jako jsou přístupové údaje k databázi, integrační klíče nebo certifikáty, odděleny od obrazu aplikace. Přínosem tohoto modelu je omezení rizika nechtěného zveřejnění citlivých údajů při distribuci systému. Nevýhodou naopak zůstává závislost na disciplinovaném provozním postupu a na správném předání konfigurace do cílového prostředí.
 
 Z hlediska dalšího rozvoje by bylo vhodné tento princip posílit zavedením centralizované samostatně provozované správy citlivých údajů, která by odpovídala požadavkům on-premise prostředí #abbr("KZ", none). Takové řešení by omezilo závislost na lokálních souborech a dílčích předávacích mechanismech, zlepšilo dohledatelnost přístupů k tajným hodnotám a podpořilo jednotnější správu konfigurace v rámci celého ekosystému služeb.
 
