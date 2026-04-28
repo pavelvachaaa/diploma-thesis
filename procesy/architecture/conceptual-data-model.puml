@@ -1,95 +1,86 @@
 @startuml
-!pragma layout smetana
-top to bottom direction
-hide stereotype
+!theme plain
+hide empty members
+hide stereotypes
 
-skinparam backgroundColor transparent
-skinparam shadowing false
-skinparam linetype ortho
-skinparam packageStyle rectangle
-skinparam defaultFontName Arial
-skinparam defaultFontSize 15
+
+skinparam nodesep 60
+skinparam ranksep 100
 skinparam defaultTextAlignment center
-skinparam arrowFontSize 13
-skinparam dpi 160
-skinparam ranksep 24
-skinparam nodesep 18
-skinparam ArrowColor #475569
-skinparam ArrowThickness 1.0
-skinparam RoundCorner 14
+skinparam linetype ortho
 
+' Barevná paleta
 skinparam rectangle {
   BackgroundColor #F8FAFC
   BorderColor #334155
   FontColor #0F172A
+  RoundCorner 8
 }
 
-skinparam rectangle<<frontend>> {
+skinparam rectangle<<primary>> {
   BackgroundColor #EAF2FF
   BorderColor #2B5AA6
 }
 
-skinparam rectangle<<service>> {
+skinparam rectangle<<core>> {
   BackgroundColor #E8FFF8
   BorderColor #0F766E
 }
 
-skinparam rectangle<<external>> {
-  BackgroundColor #F1F5F9
-  BorderColor #64748B
-}
-
-skinparam rectangle<<obs>> {
-  BackgroundColor #EEF2FF
-  BorderColor #4F46E5
-}
-
-skinparam rectangle<<data>> {
+skinparam rectangle<<secondary>> {
   BackgroundColor #FFF3E0
   BorderColor #C97A10
   FontColor #7C2D12
 }
 
-title Zjednodušený model hlavních datových entit
 
-package "Organizační rámec" {
-  rectangle "Organizace" <<data>> as ORG
-  rectangle "Interní uživatel / zaměstnanec,\nčlenství a oprávnění" <<data>> as USR
+package "(Jádro)" {
+  rectangle "Organizace" as org <<core>>
+  rectangle "Uživatel" as user <<core>>
 }
 
 package "Nábor" {
-  rectangle "Pracovní role" <<data>> as ROLE
-  rectangle "Pracovní pozice" <<data>> as JOB
-  rectangle "Uchazeč" <<data>> as APP
-  rectangle "Pohovor" <<data>> as INT
+  rectangle "Katalogová role" as jrole <<primary>>
+  rectangle "Pracovní inzerát" as jpost <<primary>>
+  rectangle "Uchazeč" as app <<primary>>
+  rectangle "Pohovor" as interview <<primary>>
+  rectangle "Analýza CV" as ai_cv <<primary>>
 }
 
-package "Adaptace" {
-  rectangle "Adaptační postup" <<data>> as WF
-  rectangle "Průběh adaptace\nzaměstnance" <<data>> as PROG
-  rectangle "Dokument zaměstnance" <<data>> as DOC
+package "Nástup" {
+  rectangle "Šablona" as owf <<secondary>>
+  rectangle "Průchod adaptací" as oprog <<secondary>>
 }
 
-ORG --> JOB : vypisuje
-ORG --> WF : spravuje
-ORG --> USR : vymezuje členství
-USR --> JOB : má oprávnění k
-ROLE --> JOB : typizuje
-JOB --> APP : přijímá reakce
-APP --> INT : vede k
-APP --> USR : po přijetí se převádí
+package " Data" {
+  rectangle "Soubor" as doc
+  rectangle "Notifikace" as comms
+}
 
-JOB --> WF : používá
-USR --> PROG : plní
-WF --> PROG : podle postupu
-USR --> DOC : předkládá
-WF ..> DOC : může vyžadovat
+' --- STRUKTURÁLNÍ VAZBY ---
 
-ORG -[hidden]-> USR
-ROLE -[hidden]-> JOB
-JOB -[hidden]-> APP
-APP -[hidden]-> INT
-WF -[hidden]-> PROG
-PROG -[hidden]-> DOC
+' Jádro
+org ||-d-o{ user : "sdružuje"
+
+
+' Nábor
+org ||--o{ jrole : "obsahuje"
+org ||--o{ jpost : "eviduje"
+jpost }o-u-|| jrole : "je přiřazen k"
+
+jpost ||-r-o{ app : "má"
+app ||-d-o| ai_cv : "má přiřazenu"
+app ||-r-o{ interview : "jde na"
+interview }o-u-|| user : "vede"
+
+' Onboarding
+org ||--o{ owf : "obsahuje"
+oprog }o-l-|| owf : "vzniká z"
+user ||-d-o{ oprog : "má evidován"
+
+' Data a Komunikace
+app ||-d-o{ doc : "má doložen"
+org ||-d-o{ doc 
+user ||--o{ comms : "přijímá"
 
 @enduml

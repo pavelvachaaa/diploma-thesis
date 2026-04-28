@@ -58,6 +58,8 @@ Z @obr:arch-context je patrné, že systém obsluhuje několik odlišných skupi
 
 Na kontextový pohled navazuje logická kompozice řešení. Jejím smyslem není popsat konkrétní nasazovací topologii ani technologickou skladbu, ale ukázat, z jakých stavebních bloků se systém skládá a proč jsou hranice mezi nimi vedeny právě tímto způsobem.
 
+Systém musí současně zvládat transakční agendu náboru a adaptace, komunikaci s okolními službami, výpočetně náročné zpracování i průběžné vyhodnocování procesu. Pokud by se tyto odpovědnosti soustředily do jedné vrstvy, docházelo by ke prolínání stabilní domény s proměnlivými integračními a analytickými požadavky, což by vedlo ke ztrátě přehlednosti i rozšiřitelnosti.
+
 #figure(
   image(
     "../procesy/architecture/solution-composition.svg",
@@ -66,9 +68,9 @@ Na kontextový pohled navazuje logická kompozice řešení. Jejím smyslem nen�
   caption: [Logická kompozice řešení]
 ) <obr:arch-composition>
 
-Systém musí současně zvládat transakční agendu náboru a adaptace, komunikaci s okolními službami, výpočetně náročné zpracování i průběžné vyhodnocování procesu. Pokud by se tyto odpovědnosti soustředily do jedné vrstvy, docházelo by ke směšování stabilní domény s proměnlivými integračními a analytickými požadavky, což by vedlo ke ztrátě přehlednosti i rozšiřitelnosti.
 
-Na tuto situaci odpovídá @obr:arch-composition. V centru návrhu stojí transakční jádro náboru a adaptace, které nese doménová pravidla a hlavní procesní tok. K němu se připojuje prezentační vrstva obsluhující veřejný kariérní portál i interní rozhraní, datová vrstva uchovávající stav procesu, samostatná vrstva předávání zpráv pro asynchronní přeposílání úloh a událostí, integrační vrstva zajišťující řízený kontakt s okolím, auditní stopa pro dohledatelnost změn a oddělená vrstva s inteligentím zpracováním dat. Diagram záměrně abstrahuje od konkrétních technologií, protože jejich realizační rozpad patří až do implementační kapitoly. Na architektonické úrovni je důležité obhájit logiku hranic, nikoli vyjmenovat každou nasazenou službu.
+
+Tuto situaci odpovídá řešení zobrazené na @obr:arch-composition. V centru návrhu stojí transakční jádro náboru a adaptace, které nese doménová pravidla a hlavní procesní tok. K němu se připojuje prezentační vrstva obsluhující veřejný kariérní portál i interní rozhraní, datová vrstva uchovávající stav procesu, samostatná vrstva předávání zpráv pro asynchronní přeposílání úloh a událostí, integrační vrstva zajišťující řízený kontakt s okolím, auditní stopa pro dohledatelnost změn a oddělená vrstva s inteligentím zpracováním dat. Diagram záměrně abstrahuje od konkrétních technologií, protože jejich realizační rozpad patří až do implementační kapitoly. 
 
 Návrh vychází přímo z požadavků R1–R6. Požadavky R2–R4 definují tři navazující situace (veřejný vstup, interní řízení, adaptace), což vede k oddělení prezentační vrstvy od jednotného transakčního jádra. Požadavek R1 pak promítá holdingovou strukturu KZ do datové vrstvy, která tak nese nejen stav systému, ale i organizační kontext.
 
@@ -80,16 +82,18 @@ Stejně podstatná je integrační vrstva. Její role nespočívá jen v napojen
 
 Vedle ní stojí vrstva předávání zpráv, která neřeší, na jaký vnější systém se systém napojuje, ale jak jsou úlohy a události předávány mimo hlavní transakční tok.
 
-== Struktura backendu
+== Struktura backendu <sec:arch-backend-structure>
 V předchozí části byl systém popsán na úrovni logické kompozice, tedy jako soubor hlavních částí řešení a jejich odpovědností. Tento pohled ukazuje, jak do sebe zapadají veřejné portály, transakční jádro, integrační vrstva, vrstva předávání zpráv, analytická část, auditní stopa a provozní dohled.
 
-Nejcitlivější částí celého řešení je backend, protože právě v něm se setkávají doménová pravidla, datové hranice, bezpečnost i integrace. Jádro backendu proto stavím na hexagonální architektuře, kterou Cockburn popsal jako vzor portů a adaptérů (Ports and Adapters) @cockburnHexagonalArchitecture2005. Motivací tohoto vzoru je oddělit aplikační logiku od uživatelského rozhraní, databáze a dalších zařízení tak, aby systém bylo možné testovat, provozovat i rozvíjet bez přímé závislosti na konkrétní technologii. V praktickém smyslu to znamená, že doménová pravidla nesmějí být uzamčena v řadiči požadavků (controller), v rámci pro zpracování HTTP požadavků ani v databázovém ovladači.
+Nejcitlivější částí celého řešení je ono transakční jádro, protože právě v něm se setkávají doménová pravidla, datové hranice, bezpečnost i integrace. Hlavním rizikem zde bylo postupné prolínání business logiky s technologickými detaily, například s obsluhou HTTP požadavků, databázovým schématem nebo integračními klienty. Jednodušší alternativou by byla klasická vrstvená architektura, v níž se řadiče, služby a repozitáře skládají podle technických vrstev. Ta je srozumitelná a rychlá na počáteční implementaci, ale v systému s dlouhou životností často vede k nepřímé závislosti domény na databázi a k rozptýlení pravidel mezi aplikační kód, SQL dotazy a integrační obsluhu.
+
+Jádro jsem proto navrhl na hexagonální architektuře, kterou Cockburn popsal jako vzor portů a adaptérů (Ports and Adapters) @cockburnHexagonalArchitecture2005. Motivací tohoto vzoru je oddělit aplikační logiku od uživatelského rozhraní, databáze a dalších zařízení tak, aby systém bylo možné testovat, provozovat i rozvíjet bez přímé závislosti na konkrétní technologii. V praktickém smyslu to znamená, že doménová pravidla nesmějí být uzamčena v řadiči požadavků (controller), v rámci pro zpracování HTTP požadavků ani v databázovém ovladači. Přínosem pro #abbr("KZ", none) je udržitelnější transakční jádro, které lze rozvíjet i při změnách datové vrstvy, integračních služeb nebo uživatelských portálů. Kompromisem je větší počet explicitních kontraktů a nutnost důsledně mapovat data na hranicích jádra.
 
 Klíčová asymetrie této architektury neleží mezi „horní" prezentační a „spodní" datovou vrstvou, ale mezi vnitřkem a vnějškem aplikace @cockburnHexagonalArchitecture2005. Port v tomto pojetí nepředstavuje síťový port, nýbrž účelově definovaný kontrakt komunikace mezi jádrem a jeho okolím. K jednomu portu přitom může existovat více adaptérů, například produkční HTTP vstup, konzolový přístup nebo náhradní implementace trvalého uložení dat pro integrační testy @cockburnHexagonalArchitecture2005. Tento přístup je důležitý ze tří důvodů. Zaprvé udržuje víceorganizační kontext pod kontrolou od vstupu do systému až po datovou vrstvu. Zadruhé chrání doménu před přímou závislostí na integračních detailech, které se mohou v čase měnit. Zatřetí vytváří čitelnou strukturu, kterou lze dlouhodobě rozvíjet i bez velkého specializovaného architektonického týmu.
 
 V terminologii této práce proto označuji adaptéry, které aplikaci řídí zvenku dovnitř, jako primární adaptéry, zatímco adaptéry vykonávající požadavky jádra směrem do infrastruktury označuji jako sekundární adaptéry. Primární adaptér převádí vnější signál na volání případu užití, kdežto sekundární adaptér implementuje port definovaný jádrem a překládá jeho požadavek do konkrétního protokolu, rozhraní nebo technologie trvalého uložení. Současně je důležité odlišit architektonickou hranici od hranice nasazovací. Hexagonální architektura sama o sobě neznamená, že každý adaptér musí být samostatná služba. Naopak většina adaptérů běží uvnitř jednoho backendového procesu a samostatně odděluji jen ty části, jejichž běhový profil, provozní charakteristiky nebo integrační režim se od jádra skutečně liší.
 
-Hexagonální uspořádání v mém návrhu současně doplňují principy doménově řízeného návrhu (DDD). Doménové moduly jsou vedeny jako ohraničené kontexty s vlastním modelem a slovníkem, protože význam pojmů je v doménovém návrhu vždy platný jen uvnitř explicitně vymezené hranice @evansDomaindrivenDesignTackling2003 @evansDDDReference2015. Na styku s vnějšími službami proto integrační vrstva plní roli překladové mezivrstvy. Doména pracuje se svým modelem, zatímco adaptér přebírá odpovědnost za převod z cizího rozhraní a zpět @evansDDDReference2015.
+Hexagonální uspořádání v mém návrhu současně využívá vybrané principy doménově řízeného návrhu (DDD). Jde zejména o členění podle významových oblastí systému, práci s doménovými pravidly uvnitř modulů a oddělení vnitřní části backendu od infrastrukturních detailů. Na hranici s okolím proto jádro komunikuje přes porty a adaptéry. Port vyjadřuje, co jádro potřebuje, zatímco adaptér přebírá odpovědnost za převod na konkrétní rozhraní nebo technologii @evansDDDReference2015.
 
 #figure(
   image(
@@ -99,54 +103,26 @@ Hexagonální uspořádání v mém návrhu současně doplňují principy domé
   caption: [Obecný princip hexagonální architektury]
 ) <obr:arch-hexagon-principle>
 
-Obecný princip zachycený na @obr:arch-hexagon-principle se v backendu promítá do konkrétní struktury. Primární adaptéry na vstupu aplikace převádějí HTTP požadavky a integrační události na případy užití domény. Uvnitř aplikace zůstává doménová vrstva členěná do ohraničených kontextů a komunikuje s okolím pouze prostřednictvím explicitních kontraktů portů. Sekundární adaptéry pak zajišťují napojení na databázi, vrstvu předávání zpráv, audit, autorizaci a vnější registry.
+Obecný princip zachycený na @obr:arch-hexagon-principle se v implementovaném backendu promítá do oddělení vstupních adaptérů, aplikační logiky, portů a výstupních adaptérů. Vstupní adaptéry přijímají HTTP požadavky, integrační události a další vnější signály a převádějí je na volání aplikačních služeb nebo případů užití. Porty představují kontrakty, kterými aplikační logika vyjadřuje požadavky na okolí. Výstupní adaptéry tyto porty naplňují konkrétním napojením na databázi, outbox a vrstvu zpráv, audit, autorizaci, objektové úložiště, e-mail a vnější registry. Detailnější rozpad těchto hranic je kvůli čitelnosti přesunut do přílohy @obr:arch-backend-detail.
 
-#figure(
-  image(
-    "../procesy/architecture/backend-structure.svg",
-    width: 100%,
-  ),
-  caption: [Návrh hranic backendu v hexagonálním uspořádání]
-) <obr:arch-backend>
+Vnitřní část backendu je členěna podle významových oblastí personálního systému, například náboru, pracovních pozic, pohovorů, zaměstnanců, dokumentů, onboardingu, organizací, číselníků, oprávnění, kvalifikací, provozních pohledů a kontaktních dotazů. Toto členění není pouhým seskupením souborů, ale praktickým rozdělením odpovědností. Pravidla zůstávají v modulech, porty popisují potřebné okolní schopnosti a adaptéry zajišťují napojení na konkrétní technologii.
 
-@obr:arch-backend neslouží jako inventář implementačních složek, ale jako návrh hlavních hranic backendu. Ukazuje, že vstupní adaptéry řídí vstup do systému, doménové jádro nese případy užití a ohraničené kontexty, porty vymezují povolené závislosti a sekundární adaptéry připojují databázi, vrstvu předávání zpráv, audit, bezpečnost a okolní služby. Smyslem tohoto rozdělení je udržet stabilnější doménovou logiku uvnitř a proměnlivější integrační infrastrukturu na hraně systému.
+== Datový model 
+Datový model v návrhu nese hlavní architektonické hranice systému. Finální fyzický model databáze je výrazně podrobnější a čítá 62 tabulek, protože kromě doménových entit obsahuje také číselníky, spojovací tabulky, auditní stopu, outbox, evidenci souborů, notifikace, idempotenci a další podpůrné struktury. Převzetí úplného fyzického schématu do hlavního textu by proto zhoršilo čitelnost návrhu a zakrylo vazby, které jsou pro architekturu podstatné.
 
-== Datový model a integrační toky
-Architektonická rozhodnutí by zůstala neúplná, pokud by se nepropsala i do datového modelu. Reálné schéma obsahuje přibližně šedesát tabulek a řadu vazeb, pro hlavní výklad je však důležitější jeho konceptuální kostra než úplný inventář všech struktur. V této části proto nepopisuji všechny tabulky, ale vysvětluji, jakými objekty systém zachycuje organizační rámec, nábor, přijetí a adaptaci pracovníka.
+Z tohoto důvodu používám zjednodušený konceptuální model, který abstrahuje od implementačních detailů a ukazuje pouze rozhodující vazby. Organizace tvoří rámec víceorganizační izolace, interní uživatelé nesou identitu a pracovní inzerát představuje hlavní procesní uzel náboru. Na ni se vážou uchazeči, pohovory, stavové změny (posuzováno, dokončil pohovor a další) a následně i přechod do evidence zaměstnance. Díky tomu model zachycuje celý životní cyklus od reakce na inzerát až po adaptaci, aniž by se při přijetí uchazeče ztratil organizační kontext nebo návaznost oprávnění.
 
-Nejvyšším rámcem modelu je organizace. Každý klíčový záznam je k některé organizaci vztažen přímo nebo nepřímo, takže víceorganizační členění není jen pravidlo v aplikaci, ale vlastnost samotných dat. Vedle organizace stojí interní uživatel jako nositel identity. Jeho globální role říká, jaký typ uživatele v systému vystupuje, ale sama o sobě neurčuje, ke kterým datům smí přistoupit. To zajišťuje až členství v organizaci, které vyjadřuje vztah ke konkrétnímu závodu, a evidence oprávnění ke zdrojům, která jemněji vymezuje přístup k pracovním pozicím a k navázaným záznamům. Právě tato kombinace identity, členství a oprávnění umožňuje oddělit data jednotlivých závodů a současně zachovat centrální dohled.
+Adaptace je v modelu oddělena jako vztah mezi obecnou šablonou postupu a konkrétní instancí nad zaměstnancem. Tím lze měnit pravidla adaptačního procesu bez narušení historického průběhu již zahájených nástupů. Podpůrné evidence, například soubory, auditní záznamy, outbox nebo analytické výstupy nad životopisy a pozicemi, nejsou v konceptuálním modelu hlavní doménou. Přesto jsou důležité, protože zajišťují dohledatelnost, zpracování vedlejších efektů a práci s dokumenty mimo samotné transakční jádro.
 
-V náborové oblasti je nutné odlišit pracovní roli a pracovní pozici. Pracovní role představuje obecný typ místa, například druh profese nebo zařazení. Pracovní pozice naproti tomu představuje konkrétní otevřené místo vypsané jednou organizací v určitém čase. Právě pracovní pozice je hlavním procesním objektem náboru. Nese vazbu na organizaci, odkazuje na pracovní roli, může využívat předem definovaný adaptační postup a stává se bodem, k němuž se vztahují další data. Na pracovní pozici se vážou uchazeči a k jednotlivým uchazečům se dále vážou pohovory, změny stavů a další rozhodnutí v průběhu výběrového řízení. Jinými slovy: organizace vypisuje pracovní pozici, pracovní role ji typizuje, na pozici reaguje uchazeč a nad uchazečem se evidují pohovory a další náborové kroky.
-
-Zlom mezi náborem a následnou adaptací nenastává vznikem zcela nové evidence, ale přechodem v rámci téhož životního cyklu. Pokud je uchazeč přijat, systém jej nepovažuje za izolovaný historický záznam, ale převádí jej do evidence interního uživatele, respektive zaměstnance. Tím vzniká výslovná vazba mezi přihláškou, výběrovým řízením a následným nástupem do zaměstnání. Pro data je to důležité ze dvou důvodů. Jednak lze zpětně dohledat celý průběh od první reakce na inzerát až po adaptaci, jednak se při přechodu nepřerušuje organizační kontext ani návaznost oprávnění.
-
-Samostatný doménový blok tvoří adaptace. Zde je nutné odlišit definici adaptačního postupu od jeho konkrétního průběhu. První rovina popisuje šablonu. Jaké kroky má nový pracovník splnit, v jakém pořadí, za jakých podmínek a jaké dokumenty mohou být požadovány. Druhá rovina zachycuje skutečný průběh adaptace konkrétního zaměstnance, tedy co už bylo splněno, co čeká na doplnění a kdo za daný krok odpovídá. Adaptační proces má tedy podobu obecného postupu na jedné straně a jeho konkrétní instance na straně druhé. Dokumenty zaměstnance jsou v této oblasti vedeny jako samostatná, ale úzce navázaná skupina dat. Nejsou to jen přílohy, ale důkazy splnění konkrétních povinností v průběhu nástupu.
-
-Vedle hlavního rámce systém obsahuje i doplňkovou větev zájemců o práci bez vazby na konkrétní pracovní pozici. Tato evidence má vlastní údaje, preference a přílohy, ale z hlediska modelu představuje vedlejší vstup do náboru, nikoli jeho hlavní větev. Podobně technické evidence, jako jsou soubory, auditní záznamy, asynchronní vedlejší účinky nebo analytické výsledky nad životopisy a pozicemi, nejsou jádrem konceptuálního modelu. Jsou pro provoz systému nezbytné, ale slouží především jako podpůrná vrstva nad hlavní doménou, a proto je zjednodušený diagram záměrně neukazuje.
-TODO: Tohle šoupnu spíše asi do implementace? nebo já nevím TODOTDO
-Součástí datového návrhu však není jen to, co se ukládá, ale i jak dlouho má být která informace uchována. U neúspěšných uchazečů proto architektura nepočítá s neomezenou retencí osobních údajů. Po uplynutí zákonné nebo souhlasem vymezené lhůty se jejich data nestávají běžnou historickou evidencí, ale kandidátem na řízenou anonymizaci nebo výmaz. To je důležité i modelově. Identifikační a kontaktní údaje, přílohy a volné texty musí být oddělitelné od metadat o průběhu procesu tak, aby bylo možné odstranit osobní obsah a současně nezničit nutný provozní nebo statistický kontext.
-
-Takový zásah nelze provádět ručně a izolovaně jen v jedné tabulce, protože údaje uchazeče zasahují do příloh, poznámek, auditní stopy i navazujících úloh. Návrh proto využívá asynchronní předávání událostí. Transakční vrstva označí záznam k anonymizaci, zatímco navazující procesy zajistí úklid v souborovém úložišti a dalších službách. Auditní vrstva následně uloží důkaz o provedení skartace, aniž by sama uchovávala původní osobní obsah.
- V auditní stopě tak zůstává informace o typu operace, čase a technickém identifikátoru zásahu, nikoli plná data, která měla být odstraněna.
-
-Obrázek @obr:er-diagram schematicky shrnuje výše popsané bloky a jejich nejdůležitější vazby. Jednotlivé obdélníky proto nepředstavují vždy jedinou fyzickou tabulku, ale spíše jednu část domény nebo skupinu úzce souvisejících entit.
+@obr:er-diagram shrnuje tyto bloky na konceptuální úrovni. Nejde o úplný ER diagram databáze, ale o záměrně redukovaný pohled na model, který ukazuje, jak na sebe navazují hlavní oblasti systému.
 
 #figure(
   image(
     "../procesy/architecture/conceptual-data-model.svg",
     width: 100%,
   ),
-  caption: [Zjednodušený diagram hlavních entit a vztahů]
+  caption: [Zjednodušený konceptuální model hlavních entit a vztahů]
 ) <obr:er-diagram>
-
-
-Pružnou část modelu představují adaptační formuláře a odpovědi zaměstnanců, které ukládám jako `jsonb`. Důvodem je, že obsah těchto kroků se může měnit podle role, pracoviště i interních pravidel a čistě relační model by zde vedl k častým změnám schématu kvůli drobným úpravám formulářů. Výhodou je větší pružnost, omezením přesun části validačních pravidel do aplikační logiky.
-
-Zvláštní roli mají také vektorové reprezentace životopisů a pracovních pozic, které ukládám pomocí `pgvector` přímo v `PostgreSQL`. Sémantické vyhledávání tak zůstává součástí stejného datového prostředí jako transakční agenda, což zjednodušuje správu a udržuje vazbu mezi běžnými daty a analytickými výstupy.
-
-Na takto vymezený datový model přímo navazuje způsob, jakým systém komunikuje s okolními službami a jak provádí vedlejší události. Integrační vrstvu proto navrhuji jako kombinaci synchronní a asynchronní komunikace. Synchronní volání používám tam, kde uživatel očekává okamžitou odezvu, například při práci s administračním rozhraním nebo při generování konkrétního výstupu. Asynchronní komunikaci naopak využívám pro vedlejší události a časově náročnější operace, u nichž by blokování požadavku zhoršovalo použitelnost systému. Podrobný průběh této kombinace, včetně vzoru odloženého odeslání (transactional outbox) a návaznosti na vrstvu inteligentního zpracování dat, rozvádím až v implementační kapitole. Cenou za tento model je složitější dohled nad tím, zda byly navazující události opravdu provedeny a v jakém pořadí. Právě proto je asynchronní komunikace v návrhu úzce svázána s auditní a dohledovou vrstvou.
-
-Pro komunikaci směrem ke klientské aplikaci architektura počítá s mechanismem serverem zasílaných událostí (Server-Sent Events, `SSE`) pro průběžné informování o stavu operací. Ten umožňuje zobrazovat změny nebo postup zpracování bez nutnosti opakovaného dotazování ze strany klienta a zároveň nezatěžuje systém plně obousměrnou komunikací.
 
 == Rámec bezpečnosti a spolehlivosti
 Tato část neurčuje konkrétní implementaci bezpečnostních kontrol, ale vymezuje architektonický rámec, který musí implementace respektovat. Systém pracuje s citlivými personálními údaji, více organizačními jednotkami a uživateli s rozdílným rozsahem odpovědnosti. Rizikem proto není pouze neoprávněné přihlášení, ale také příliš široké zpřístupnění dat, neprokazatelnost změn a tiché selhání navazujících integračních nebo asynchronních procesů.

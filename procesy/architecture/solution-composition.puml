@@ -6,7 +6,7 @@ skinparam shadowing false
 skinparam linetype ortho
 skinparam packageStyle rectangle
 skinparam defaultFontName Arial
-skinparam defaultFontSize 20
+skinparam defaultFontSize 32
 skinparam defaultTextAlignment center
 skinparam arrowFontSize 13
 skinparam dpi 160

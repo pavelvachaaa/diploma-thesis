@@ -67,7 +67,7 @@ together {
   rectangle "SSO / OIDC" <<external>> as SSO
   rectangle "NRZP\n(ověření kvalifikace)" <<external>> as NRZP
   rectangle "SMTP server\n(transakční e-maily)" <<external>> as SMTP
-  rectangle "Vema\n(personální data)\n[R5 - plánováno]" <<external>> as Vema
+  rectangle "Vema\n(personální data)\n[plánováno]" <<external>> as Vema
 }
 
 Candidate ..> CareerPortal

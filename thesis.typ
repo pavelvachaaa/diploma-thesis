@@ -82,4 +82,16 @@ Analýza současného stavu procesů náboru a adaptace pracovníků v Krajské 
 
     ]
   ]),
+  attach_content("Detailní návrh hranic backendu v hexagonálním uspořádání", [
+    #rotate(-90deg, reflow: true)[
+      #figure(
+        image(
+          "procesy/architecture/backend-structure.svg",
+          width: 94%,
+        ),
+        caption: [Detailní návrh hranic backendu v hexagonálním uspořádání],
+      ) <obr:arch-backend-detail>
+
+    ]
+  ]),
 )
