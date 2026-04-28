@@ -63,6 +63,8 @@ Sloneek nabízí ATS modul jako součást širší HR platformy. @sloneekAts2026
 V prostředí #abbr("KZ", none) tak Sloneek představuje využitelnou variantu pro obecnou digitalizaci HR činností, nikoli však jednoznačně vhodného kandidáta pro cílové řešení s požadovanou mírou specializace na zdravotnické procesy, multi-tenantní řízení a on-premise provoz.
 
 == Platformy pro vstupní agendu a adaptaci
+Samostatnou skupinu tvoří řešení zaměřená na fázi po výběru kandidáta, tedy na vstupní agendu, předávání dokumentů, plnění úkolů a řízení adaptačního procesu. Oproti ATS platformám se méně soustředí na získání uchazeče a více na koordinaci nástupu zaměstnance. Pro #abbr("KZ", none) je tato oblast důležitá zejména proto, že právě po rozhodnutí o přijetí vzniká velké množství administrativních kroků mezi HR, zaměstnancem a organizační jednotkou.
+
 === Onbee
 Onbee představuje specializovanou platformu pro vstupní agendu a adaptaci zaměřenou na procesní koordinaci nástupu zaměstnance, práci s checklisty a správu související dokumentace. Ve veřejné produktové dokumentaci jsou deklarovány integrační možnosti na ATS/HRIS, podpora #abbr("SSO", none) i možnost on-premise instalace. @onbeeWeb2026
 
