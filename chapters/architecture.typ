@@ -131,7 +131,7 @@ Jednodušší alternativa by spočívala v lokálních účtech, globálních ro
 
 Součástí rámce je také auditovatelnost operací nad citlivými daty (NF11). Audit zde nechápu pouze jako technický log, ale jako schopnost zpětně vysvětlit, kdo provedl podstatnou změnu v náborovém nebo adaptačním procesu a v jakém kontextu k ní došlo.
 
-Bezpečnostní rámec doplňuje rámec provozní spolehlivosti. Dostupnost a odezva nejsou vlastnosti, které by bylo možné prokázat pouze návrhem modulů nebo testy; vyžadují průběžné měření běžícího systému. Proto architektura počítá se samostatnou dohledovou vrstvou, která sbírá logy, metriky a stavy integračních komponent mimo doménovou logiku. Tato vrstva vytváří základ pro pozdější ověřování dostupnosti podle NF04 a výkonnostního profilu podle NF05.
+Bezpečnostní rámec doplňuje rámec provozní spolehlivosti. Dostupnost a odezva nejsou vlastnosti, které by bylo možné prokázat pouze návrhem modulů nebo testy. Vyžadují průběžné měření běžícího systému. Proto architektura počítá se samostatnou dohledovou vrstvou, která sbírá logy, metriky a stavy integračních komponent mimo doménovou logiku. Tato vrstva vytváří základ pro pozdější ověřování dostupnosti podle NF04 a výkonnostního profilu podle NF05.
 
 #figure(
   image(
