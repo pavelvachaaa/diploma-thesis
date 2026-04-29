@@ -94,4 +94,16 @@ Analýza současného stavu procesů náboru a adaptace pracovníků v Krajské 
 
     ]
   ]),
+  attach_content("Tok vydání založený na verzovaných obrazech", [
+    #rotate(-90deg, reflow: true)[
+      #figure(
+        image(
+          "procesy/deployment/deployment-flow.svg",
+          width: 94%,
+        ),
+        caption: [Obecný tok vydání založený na obrazech s distribucí do registru a nasazením na cílový host],
+      ) <obr:deployment-flow>
+
+    ]
+  ]),
 )
