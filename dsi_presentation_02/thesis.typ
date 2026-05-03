@@ -32,7 +32,7 @@
 
 == Analýza procesů a definování požadoavků
 
-- Strukturované rozhovory s náboráři, pracovníky z personalního a mzdového oddělení.
+- Strukturované rozhovory s náboráři, pracovníky z personálního a mzdového oddělení.
 
 - Mapování procesů pomocí notace BPMN. Zmapáváno *pět* klíčových procesů pro digitalizaci \ od inzerce až po adaptaci.
 
@@ -173,7 +173,7 @@ table(
     "/assets/ai_analysis.png",
     width: 100%,
   ),
-  caption: [Detail uchazeče v záložce AI analýza]
+  caption: [Detail uchazeče v záložce inteligentní analýza]
 ) <obr:process-p02>
 #figure(
   image(
@@ -219,10 +219,10 @@ table(
   - Image-based deployment model, mění se až runtime konfigurace prostředí.
   - Testovací a produkční prostředí. 
   - Aplikační host nese `hr-backend`, `migration`, interní adaptéry. Další host nese `PostgreSQL`, `RabbitMQ` a oddělený host je i pro `SeaweedFS` a `Umami`.
-  - Vrstva inteligentního zpracování běží taky odděleně na samostatném hostu. (4 kontejnery).
+  - Vrstva inteligentního zpracování běží také odděleně na samostatném hostu (4 kontejnery).
   - Rozdíl mezi prostředími konfigurace, integrační endpointy, dimenzování a tajné údaje.
   - Dohledová vrstvá je též na separátním hostu.
-  - Riziko nefunkčního nasazení snižují `healthcheck` popřípadě centralizované logy a metriky.
+  - Riziko nefunkčního nasazení snižují `healthchecky`, popřípadě centralizované logy a metriky.
 ]
 
 == Obecný proces nasazení služby
@@ -261,7 +261,7 @@ table(
 
 - Důraz na izolovanost dat, auditní stopu a granulární řízení přístupu k datům. 
 
-- Integrace *lokálního generativního systému* do tohoto projektu (AI pre-screening, tvorba nabídky práce, dotazovaní přirozeným jazykem pro manažery). 
+- Integrace *lokálního generativního systému* do tohoto projektu (inteligentní předvýběr, tvorba nabídky práce, dotazování přirozeným jazykem pro manažery).
 
 - Uživatelské testování.
 

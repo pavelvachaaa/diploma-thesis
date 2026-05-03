@@ -88,10 +88,10 @@ rectangle "Cílová architektura platformy náboru a adaptace KZ" {
     }
   }
 
-  package "Vrstva inteligentního pracování" {
+  package "Inteligentní služby" {
     together {
       rectangle "Analýza CV" <<ai>> as AiCv
-      rectangle "AI asistence pro inzerci" <<ai>> as AiJob
+      rectangle "Inteligentní asistence\npro inzerci" <<ai>> as AiJob
     }
   }
 }

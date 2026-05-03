@@ -87,7 +87,7 @@ rectangle "Implementační pohled platformy náboru a adaptace KZ" {
     }
 
     together {
-      rectangle "AI procesory\n(cv_processor, job_processor)" <<service>> as AIProcessors
+      rectangle "Inteligentní služby\n(cv_processor, job_processor)" <<service>> as AIProcessors
       rectangle "Ollama + Apache Tika" <<service>> as AICore
     }
   }

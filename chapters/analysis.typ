@@ -8,7 +8,7 @@ V roce 2021 se struktura #abbr("KZ", none) dále rozšířila. Do společnosti b
 S více než jedenácti tisíci zaměstnanci patří #abbr("KZ", none) mezi největší zaměstnavatele v Ústeckém kraji. Pro tuto práci je podstatné zejména to, že značnou část personálu tvoří zdravotničtí pracovníci s regulovanou odbornou způsobilostí. Nábor a adaptace zde proto nejsou jen administrativní agendou, ale procesem, který musí současně splnit provozní, legislativní i odborné požadavky.
 
 === Organizační struktura z pohledu řízení lidských zdrojů
- #abbr("KZ", none) je řízená centrálně, avšak jednotlivé nemocnice mají zároveň prostor samostatně řešit běžné provozní a personální záležitosti. Každý odštěpný závod má vlastní personální zázemí #abbr("HR", "Human Resources") pro operativní agendu, správu smluv, docházku i řízení adaptace, ale současně se řídí jednotnou metodikou a strategickými cíli holdingu.
+#abbr("KZ", none) je řízená centrálně, avšak jednotlivé nemocnice mají zároveň prostor samostatně řešit běžné provozní a personální záležitosti. Každý odštěpný závod má vlastní personální zázemí #abbr("HR", "Human Resources") pro operativní agendu, správu smluv, docházku i řízení adaptace, ale současně se řídí jednotnou metodikou a strategickými cíli společnosti.
 
 Z pohledu digitalizace je důležité, že systém nesmí uvažovat organizaci jako jeden homogenní celek. Musí respektovat samostatnost jednotlivých závodů a zároveň umožnit centrální dohled, reporting a správu pravidel. V architektonické terminologii jde o požadavek na _multi-tenantní_ řešení, ve kterém každý odštěpný závod vystupuje jako samostatný tenant sdílející společnou infrastrukturu i metodické řízení.
 
@@ -53,14 +53,14 @@ Hlavním specifikem je právě práce v rámci *regulované odborné způsobilos
 
 Informační systém proto musí umět validovat doklady o dosaženém vzdělání, zaznamenat výsledek jejich kontroly a následně pracovat i s informacemi o registracích v profesních komorách nebo o odborné způsobilosti pod dohledem. Bez této vrstvy by digitalizace sice urychlila administrativu, ale neřešila by to, co je v prostředí zdravotnické organizace skutečně kritické.
 
-Dalším specifikem je *kontinuální nábor*. Na rozdíl od prostředí, kde se nábor spouští jen při výjimečné potřebě, musí zdravotnická organizace dlouhodobě reagovat na fluktuaci, demografický vývoj i celorepublikový nedostatek pracovníků, zejména mimo hlavní centra. @mzd2025TiskovkaNedostatek Systém proto musí být připraven na opakované a souběžné zpracování velkého množství pozic i uchazečů.
+Dalším specifikem je *kontinuální nábor*. Na rozdíl od prostředí, kde se nábor spouští jen při výjimečné potřebě, musí zdravotnická organizace dlouhodobě reagovat na fluktuaci, demografický vývoj i celorepublikový nedostatek pracovníků, zejména mimo hlavní centra @mzd2025TiskovkaNedostatek. Systém proto musí být připraven na opakované a souběžné zpracování velkého množství pozic i uchazečů.
 
-Podpisem pracovní smlouvy končí práce náboráře a personalního oddělení. Následuje *vícestupňový adaptační proces*, který zahrnuje nejen standardní nástupní agendu a školení #abbr("BOZP", "Bezpečnost a ochrana zdraví při práci"), ale i odborné zapracování, práci s interní dokumentací, seznámení s nemocničními systémy a ověření připravenosti na konkrétním pracovišti. Právě vazba mezi náborem, vstupní agendou a adaptací je proto v této práci klíčová.
+Podpisem pracovní smlouvy končí práce náboráře a personálního oddělení. Následuje *vícestupňový adaptační proces*, který zahrnuje nejen standardní nástupní agendu a školení #abbr("BOZP", "Bezpečnost a ochrana zdraví při práci"), ale i odborné zapracování, práci s interní dokumentací, seznámení s nemocničními systémy a ověření připravenosti na konkrétním pracovišti. Právě vazba mezi náborem, vstupní agendou a adaptací je proto v této práci klíčová.
 
 == Současný stav procesů náboru pracovníků<kapitola-soucasny-stav>
-Před zahájením digitalizace stojí správa uchazečů v #abbr("KZ", none) převážně na „svaté dvojici“ sdílených tabulek a e-mailové komunikace, kterou doplňují lokální zvyklosti jednotlivých závodů. Takové řešení může fungovat v menší organizaci, ale v podmínkách zdravotnického holdingu začíná postupně brzdit celý proces. Nábor zde pak nepůsobí jako jeden plynulý celek, ale jako řada navazujících administrativních kroků, mezi nimiž se informace ztrácejí nebo zbytečně přepisují.
+Před zahájením digitalizace stojí správa uchazečů v #abbr("KZ", none) převážně na „svaté dvojici“ sdílených tabulek a e-mailové komunikace, kterou doplňují lokální zvyklosti jednotlivých závodů. Takové řešení může fungovat efektivně v menší organizaci, ale v podmínkách #abbr("KZ",none) začíná postupně brzdit celý proces. Nábor zde pak nepůsobí jako jeden plynulý celek, ale jako řada navazujících administrativních kroků, mezi nimiž se informace ztrácejí nebo zbytečně přepisují.
 
-Pro účely analýzy jsem proto mapoval skutečný průběh procesů pomocí strukturovaných rozhovorů s vedoucím personálního oddělení a s náboráři jednotlivých odštěpných závodů. Vycházel jsem nejen z formální dokumentace, ale i z popisu reálné praxe, tedy z toho, jak proces skutečně probíhá při běžném provozu, včetně neformálních dohod a obcházení chybějících nástrojů.
+Pro účely analýzy jsem proto mapoval skutečný průběh procesů pomocí strukturovaných rozhovorů s vedoucím personálního oddělení a s náboráři jednotlivých odštěpných závodů. Vycházel jsem nejen z formálních metodických pokynů, ale i z popisu reálné praxe, tedy z toho, jak proces skutečně probíhá při běžném provozu, včetně neformálních dohod a obcházení chybějících nástrojů.
 
 Pro zajištění terminologické konzistence jsou v této kapitole používány následující pojmy:
 
@@ -74,13 +74,15 @@ Inzerce volných pracovních pozic je v současném stavu rozložena mezi někol
 - *Webové portály třetích stran* - Jobs.cz, Práce.cz (provozovatel LMC), portál MPSV
 - *Nemocniční nástěnky* - fyzické nástěnky v areálech nemocnic
 - *Webové stránky nemocnic* - statické stránky s omezenou aktualizací
-- *Sociální sítě* — Linkedin
+- *Sociální sítě* - LinkedIn
 
 Absence vlastního kariérního portálu znamená, že uchazeč nemá jednotný vstupní bod, ve kterém by našel aktuální nabídky všech závodů, základní informace o zaměstnavateli i možnost okamžitě reagovat na pozici. Už na této úrovni tedy vzniká roztříštěnost, kterou organizace dále přenáší i do interní práce s inzeráty.
 
 Proces začíná tím, že vedoucí oddělení identifikuje potřebu obsadit pozici a předává ji personálnímu oddělení. Vstupní informace však nejsou standardizované. Rozsah i kvalita zadání se liší podle konkrétního vedoucího, takže HR často nejprve doplňuje chybějící údaje a až poté připravuje text inzerátu. Samotné schvalování proto probíhá v několika e-mailových iteracích a místo plynulého procesu vzniká komunikační smyčka.
 
-Po schválení textu následuje ruční publikace na jednotlivých platformách. Každý portál má vlastní formulář, vlastní strukturu dat i vlastní způsob následné aktualizace. Změna termínu nebo úprava požadavků proto neznamená jednu opravu v centrálním systému, ale opakování stejné práce na více místech. Důsledkem je nízká transparentnost, vyšší časová náročnost a slabý přehled vedoucích pracovníků o tom, kde se jejich pozice právě nachází a jaké reakce na ni přišly.
+Po schválení textu následuje ruční publikace na jednotlivých platformách. Každý portál má vlastní formulář, vlastní strukturu dat i vlastní způsob následné aktualizace. Změna termínu nebo úprava požadavků proto neznamená jednu opravu v centrálním systému, ale opakování stejné práce na více místech. Důsledkem je nízká transparentnost, vyšší časová náročnost a slabý přehled vedoucích pracovníků o tom, kde se jejich pozice právě nachází a jaké reakce na ni přišly. Navíc se ukázalo, že publikace na webových stránkách organizace je závislá pouze na jedné osobě, což představuje významné provozní riziko a může vést ke zpožděním nebo omezení dostupnosti informací.
+
+Celý proces v notaci #abbr("BPMN", none) přehledně shrnuje @obr:proces-p01 a doplňuje o identifikatory a metriky pro lepší orientaci @tab:proces-p01.
 #figure(
   table(
     columns: 2,
@@ -101,7 +103,7 @@ Po schválení textu následuje ruční publikace na jednotlivých platformách.
 
     [Metrika:], [Rychlost od žádosti po vystavení inzerátu],
     [Nedostatky:],
-    [Manuální publikace inzerátu, již neaktuální inzeráty na portálech, nejednotý přehled o vydaných financích, dlouhé administrativní kolečko mezi vedoucím a náborářem],
+    [Manuální publikace inzerátu, již neaktuální inzeráty na portálech, nejednotný přehled o vydaných financích, dlouhé administrativní kolečko mezi vedoucím a náborářem],
   ),
   caption: [Proces P01 - Vystavení inzerátu],
 ) <tab:proces-p01>
@@ -150,7 +152,7 @@ Kritickým nedostatkem je i absence systematické databáze uchazečů a zájemc
     "../procesy/p02_prijem_prihlasek.svg",
     width: 100%,
   ),
-  caption: [Diagram BPMN znázorňující proces od příjmutí přihlášky po pozvánku na pohovor],
+  caption: [Diagram BPMN znázorňující proces od přijetí přihlášky po pozvánku na pohovor],
 ) <obr:proces-p02>
 
 === Proces náboru kandidáta
@@ -236,7 +238,7 @@ Adaptační proces tvoří most mezi formálním nástupem a plnohodnotným výk
 
 Obecná část adaptace se vztahuje na všechny zaměstnance a probíhá zejména ve zkušební době. Vedoucí zaměstnanec určuje školitele, nastavuje adaptační plán a průběžně hodnotí jeho plnění. Odborná část je pak výraznější u zdravotnických profesí, kde se sleduje nejen zvládnutí organizačních pravidel, ale i osvojení pracovních postupů, standardů a očekávané míry samostatnosti.
 
-V současném stavu je však adaptace z velké části vedena papírově. To komplikuje průběžný monitoring, znesnadňuje auditní dohled a prakticky znemožňuje centrálně vyhodnocovat, jak adaptace probíhá napříč odštěpnými závody. Organizace tak sice adaptaci vykonává, ale nemá k dispozici jednotný digitální obraz o jejím stavu a výsledcích.
+V současném stavu je však adaptace z velké části vedena papírově. To komplikuje průběžné sledování, znesnadňuje auditní dohled a prakticky znemožňuje centrálně vyhodnocovat, jak adaptace probíhá napříč odštěpnými závody. Organizace tak sice adaptaci vykonává, ale nemá k dispozici jednotný digitální obraz o jejím stavu a výsledcích.
 
 #figure(
   table(
@@ -274,7 +276,7 @@ Na základě analýzy současného stavu procesů náboru a adaptace v KZ, konzu
 
 Identifikované problémy mají kumulativní charakter a v provozní praxi se vzájemně zesilují. Významným akceleračním faktorem je vysoká personální dynamika organizace, která dosahuje průměrně 110 nástupů měsíčně (v sezónních špičkách až 180). Typická měsíční struktura nástupů přitom zahrnuje přibližně 10 pracovníků kategorie #abbr("LZ", none), 50 #abbr("NLZP", none) a 50 #abbr("THP", "technickohospodářských pracovníků")/dělnických profesí. V takovém objemu se manuální administrativa stává kritickým omezením propustnosti celého procesu.
 
-Z analytického pohledu lze problémy rozdělit do tří tematických oblastí. První oblast představuje *datová fragmentace* (P1-P3), kdy jsou informace rozptýleny mezi e-mailovou komunikaci, lokální soubory a tabulkové přehledy jednotlivých závodů. Druhou oblast tvoří *procesní a řídicí nedostatky* (P4-P9), zejména chybějící auditní stopa, nízká standardizace rozhodování a slabá transparentnost stavu náboru i vstupní agendy. Třetí oblast je *digitálně nepodpořená adaptace* (P10), která omezuje možnost systematicky řídit zapracování nových zaměstnanců a vyhodnocovat jeho úspěšnost.
+Z analytického pohledu lze problémy rozdělit do tří tematických oblastí. První oblast představuje *datová fragmentace* (P1–P3), kdy jsou informace rozptýleny mezi e-mailovou komunikaci, lokální soubory a tabulkové přehledy jednotlivých závodů. Druhou oblast tvoří *procesní a řídicí nedostatky* (P4–P9), zejména chybějící auditní stopa, nízká standardizace rozhodování a slabá transparentnost stavu náboru i vstupní agendy. Třetí oblast je *digitálně nepodpořená adaptace* (P10), která omezuje možnost systematicky řídit zapracování nových zaměstnanců a vyhodnocovat jeho úspěšnost.
 
 #figure(
   [
@@ -301,12 +303,14 @@ Z analytického pohledu lze problémy rozdělit do tří tematických oblastí. 
   caption: [Kvalitativní hodnocení závažnosti identifikovaných problémů],
 ) <tab:zavaznost-problemu>
 
-Souhrnně lze konstatovat, že stávající procesní model již neodpovídá rozsahu organizace ani požadavkům na datově řízené rozhodování. Zjištění této kapitoly proto představují přímý vstup pro definici požadavků na cílové řešení.
+Na základě dat, které poskytuje @tab:zavaznost-problemu, lze souhrnně konstatovat, že stávající procesní model již neodpovídá rozsahu organizace ani požadavkům na datově řízené rozhodování. Zjištění této kapitoly proto představují přímý vstup pro definici požadavků na cílové řešení.
 
 == Požadavky na digitalizaci procesů
 Na základě provedené analýzy procesů a identifikovaných problémů (@kapitola-identifikcea-problemu) lze formulovat klíčové požadavky na digitalizaci procesů náboru a adaptace. Každý požadavek je odůvodněn vazbou na identifikované problémy.
 
-Požadavky R1-R6 představují minimální funkční rámec cílového systému. Každý požadavek je formulován tak, aby byl implementovatelný, ověřitelný při testování a současně jednoznačně navázaný na problémy identifikované v předchozí sekci.
+Požadavky R1–R6 představují minimální funkční rámec cílového systému. Každý požadavek je formulován tak, aby byl implementovatelný, ověřitelný při testování a současně jednoznačně navázaný na problémy identifikované v předchozí sekci.
+
+@tab:pozadavky-digitalizace níže ukazuje, že jednotlivé požadavky nepokrývají izolované části procesu, ale řeší problémy napříč celým životním cyklem kandidáta. Současně je patrná snaha o propojení náboru a adaptace do jednoho integrovaného systému, který umožní lepší přehled, efektivnější koordinaci a kvalitnější rozhodování na úrovni jednotlivých závodů i centrály. 
 
 #figure(
   [
@@ -346,7 +350,7 @@ Požadavky R1-R6 představují minimální funkční rámec cílového systému.
 
       [R6],
       [Reporting a analytika],
-      [Zajistit dashboardy a export metrik náboru a adaptace pro závody i centrální úroveň.],
+      [Zajistit přehledy a export metrik náboru a adaptace pro závody i centrální úroveň.],
       [P5],
     )
   ],
@@ -354,10 +358,10 @@ Požadavky R1-R6 představují minimální funkční rámec cílového systému.
 ) <tab:pozadavky-digitalizace>
 
 
-Tabulka výše ukazuje, že jednotlivé požadavky nepokrývají izolované části procesu, ale řeší problémy napříč celým životním cyklem kandidáta. Současně je patrná snaha o propojení náboru a adaptace do jednoho integrovaného systému, který umožní lepší přehled, efektivnější koordinaci a kvalitnější rozhodování na úrovni jednotlivých závodů i centrály.
+
 
 == Specifikace funkcionálních a nefunkcionálních požadavků
-Na základě formulovaných požadavků na digitalizaci (R1-R6) jsem v této sekci provedl jejich dekompozici na konkrétní funkcionální a nefunkcionální požadavky, které slouží jako vstup pro návrh softwarové architektury a implementaci systému.
+Na základě formulovaných požadavků na digitalizaci (R1–R6) jsem v této sekci provedl jejich dekompozici na konkrétní funkcionální a nefunkcionální požadavky, které slouží jako vstup pro návrh softwarové architektury a implementaci systému.
 
 === Funkcionální požadavky
 Funkcionální požadavky definují konkrétní chování systému, tedy co systém musí umožňovat svým uživatelům nebo jakých výstupů musí být schopen. Požadavky jsou kategorizovány podle oblastí systému a prioritizovány metodou MoSCoW (Must have, Should have, Could have, Won't have).
@@ -487,7 +491,7 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
 ) <tab:fp-integrace>
 
 
-@tab:fp-adaptace shrnuje funkcionální požadavky na digitalizaci vstupní agendy a adaptačního procesu. Požadavky reagují na  manuální řízení těchto činností zavedením strukturovaných seznamů, evidence plnění a upozornění.
+@tab:fp-adaptace shrnuje funkcionální požadavky na digitalizaci vstupní agendy a adaptačního procesu. Požadavky reagují na manuální řízení těchto činností zavedením strukturovaných seznamů, evidence plnění a upozornění.
 
 #figure(
   [
@@ -567,7 +571,7 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
 
 === Nefunkcionální požadavky
 
-Nefunkcionální požadavky definují kvalitativní vlastnosti systému, které nejsou přímo pozorovatelné jako konkrétní funkce, ale podstatně ovlivňují použitelnost, spolehlivost a udržitelnost systému.
+Nefunkcionální požadavky definují kvalitativní vlastnosti systému, které nejsou přímo pozorovatelné jako konkrétní funkce, ale podstatně ovlivňují použitelnost, spolehlivost a udržitelnost systému. Požadavky vychazí z veřejných zakázek #abbr("KZ",none).
 
 #figure(
   [
@@ -586,13 +590,13 @@ Nefunkcionální požadavky definují kvalitativní vlastnosti systému, které 
 
       [NF02],
       [Bezpečnost],
-      [Autentizace uživatelů musí být zajištěna prostřednictvím protokolu OAuth 2.0 s integrací do existujícího SSO poskytovatele organizace],
+      [Autentizace uživatelů musí být zajištěna prostřednictvím OIDC nad OAuth 2.0 s integrací do existujícího SSO poskytovatele organizace],
 
       [NF03],
       [Bezpečnost],
-      [Systém musí podporovat řízení přístupů podle rolí alespoň ve stupních:  administrátor, HR pracovník a vedoucí oddělení],
+      [Systém musí podporovat řízení přístupů podle rolí alespoň ve stupních: administrátor, HR pracovník a vedoucí oddělení],
 
-      [NF04], [Dostupnost], [Systém musí dosahovat dostupnosti alespoň 99,5 % v pracovních dnech v čase 6:00-22:00],
+      [NF04], [Dostupnost], [Systém musí dosahovat dostupnosti alespoň 99,5 % v pracovních dnech v čase 6:00–22:00],
 
       [NF05],
       [Výkon],

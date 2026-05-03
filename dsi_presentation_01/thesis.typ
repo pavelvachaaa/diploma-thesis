@@ -52,7 +52,6 @@
 
 - Důraz na izolovanost dat, auditní stopu a granulární řízení přístupu k datům. 
 
-- Integrace *lokálního generativního systému* do tohoto projektu (AI pre-screening, tvorba nabídky práce, dotazovaní přirozeným jazykem pro manažery). 
+- Integrace *lokálního generativního systému* do tohoto projektu (inteligentní předvýběr, tvorba nabídky práce, dotazování přirozeným jazykem pro manažery).
 
 - Nasazení do testovacího/produkčního prostředí.
-

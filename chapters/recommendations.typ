@@ -5,21 +5,21 @@ Tato kapitola navazuje na výsledky analýzy, architektonického návrhu, implem
 Navrhovaný rozvoj stavím na třech principech. Prvním je preference změn s přímým dopadem na každodenní práci HR pracovníků, vedoucích a nových zaměstnanců. Druhým je zachování architektonické kázně, aby rychlé provozní úpravy neoslabily modularitu systému. Třetím principem je měřitelnost. Každá další iterace má být vyhodnocena nejen podle toho, že byla nasazena, ale i podle toho, zda zlepšila průchodnost procesu, srozumitelnost rozhraní a provozní stabilitu.
 
 == Prioritizační rámec rozvoje
-Pro potřeby plánování jsem další vývoj rozdělil do tří horizontů. Do krátkodobého, střednědobého a dlouhodobého. Toto členění mi umožňuje oddělit kroky, které je vhodné provést ihned po stabilizaci pilotního provozu, od změn, jež vyžadují širší integrační nebo organizační připravenost.
+Pro potřeby plánování jsem další vývoj rozdělil do tří horizontů: krátkodobého, střednědobého a dlouhodobého. Toto členění mi umožňuje oddělit kroky, které je vhodné provést ihned po stabilizaci pilotního provozu, od změn, jež vyžadují širší integrační nebo organizační připravenost.
 
-Prioritizace vychází z vazby na požadavky R1-R6 a NF01-NF12. Nejvyšší prioritu mají oblasti, které současně zvyšují provozní spolehlivost, bezpečnost a srozumitelnost práce se systémem. Pilotní uživatelské ověření navíc ukázalo, že další vývoj nemá směřovat pouze k novým funkcím, ale i k lepšímu vysvětlení stavů, odpovědností a návazností mezi kroky procesu.
+Prioritizace vychází z vazby na požadavky R1–R6 a NF01–NF11. Nejvyšší prioritu mají oblasti, které současně zvyšují provozní spolehlivost, bezpečnost a srozumitelnost práce se systémem. Pilotní uživatelské ověření navíc ukázalo, že další vývoj nemá směřovat pouze k novým funkcím, ale i k lepšímu vysvětlení stavů, odpovědností a návazností mezi kroky procesu.
 
-== Krátkodobá fáze (0 - 6 měsíců)
+== Krátkodobá fáze (0–6 měsíců)
 Krátkodobý horizont by měl být zaměřen především na stabilizaci provozu a na odstranění nejednoznačností, které se ukázaly při pilotním ověření. První prioritou je proto sjednocení monitorování a provozního vyhodnocování napříč aplikační vrstvou a vrstvou inteligentního zpracování dat. Cílem není sbírat více technických dat samoúčelně, ale získat spolehlivý obraz o tom, kde vznikají latence, selhání nebo nedoručené asynchronní operace.
 
 Druhou prioritou je zpřesnění uživatelského rozhraní v bodech, kde testování ukázalo zvýšenou míru nejistoty. Prakticky to znamená lépe vysvětlit význam stavů kandidáta, viditelněji zobrazit odpovědnost za další krok vstupní agendy a seskupit úkoly vstupní agendy podle procesu, nikoli pouze podle technického typu záznamu. Tyto úpravy nejsou architektonicky rozsáhlé, ale mají okamžitý dopad na reálné používání systému.
 
 Třetí oblastí krátkodobého rozvoje je bezpečnostní a provozní hygiena prostředí. Patří sem pravidelná rotace přístupových údajů, zpřesnění práce s tajnými hodnotami, kontrola obnovitelnosti záloh a formalizace postupů při nedostupnosti vrstvy inteligentního zpracování dat. Jde o změny, které nejsou z pohledu uživatele nejviditelnější, ale mají zásadní význam pro důvěryhodnost a dlouhodobou provozuschopnost systému.
 
-== Střednědobá fáze (6 - 18 měsíců)
+== Střednědobá fáze (6–18 měsíců)
 Ve střednědobém horizontu má smysl soustředit se na rozšíření funkcí, které zvyšují řídicí hodnotu systému. První oblastí je rozvoj reportingu a procesní analytiky. Vedení organizace potřebuje sledovat nejen počet otevřených pozic, ale i průchodnost náboru, dobu reakce mezi kroky, úspěšnost adaptačních plánů a rozdíly mezi odštěpnými závody.
 
-Druhou oblast představuje další rozvoj integračních vazeb systému, zejména ve vztahu k externím registrům a navazujícím interním agendám (Vema, Plánování služeb, atd.). Rozvoj by měl zůstat řízený přes explicitní integrační kontrakty, aby nedocházelo k tomu, že externí systémy začnou určovat podobu doménového modelu.
+Druhou oblast představuje další rozvoj integračních vazeb systému, zejména ve vztahu k externím registrům a navazujícím interním agendám (Vema, plánování služeb apod.). Rozvoj by měl zůstat řízený přes explicitní integrační kontrakty, aby nedocházelo k tomu, že externí systémy začnou určovat podobu doménového modelu.
 
 Třetím směrem střednědobého rozvoje je vyšší automatizace vstupní agendy a adaptace. Přínos zde nepřinese jen více notifikací, ale hlavně lepší práce s pravidly, eskalacemi a přehledem nesplněných kroků. Cílem je omezit situace, kdy je úkol sice v systému založen, ale z pohledu uživatele není zřejmé, kdo jej má převzít a co blokuje další postup.
 

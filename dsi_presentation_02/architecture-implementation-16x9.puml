@@ -96,7 +96,7 @@ rectangle "Implementační pohled platformy náboru a adaptace KZ" {
     }
   }
 
-  package "Vrstva inteligentního pracování" {
+  package "Inteligentní služby" {
     together {
       rectangle "cv_processor" <<service>> as CvProcessor
       rectangle "job_processor" <<service>> as JobProcessor

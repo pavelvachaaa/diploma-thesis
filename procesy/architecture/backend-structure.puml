@@ -64,13 +64,13 @@ title Návrh hranic backendu v hexagonálním uspořádání
 package "Vstupní adaptéry" {
   rectangle "HTTP vstupy a controllery" <<frontend>> as ROUTES
   rectangle "Vstupní middleware\nkontext, validace, autentizace" <<frontend>> as MW
-  rectangle "Konzumenti událostí\n a SSE vstupy" <<frontend>> as CONSUMERS
+  rectangle "Konzumenti událostí\na SSE vstupy" <<frontend>> as CONSUMERS
 }
 
 package "Doménové jádro a use-cases" {
   package "Ohraničené kontexty" {
     rectangle "Uchazeči" <<service>> as M_APP
-    rectangle "Pracovni pozice" <<service>> as M_JOBS
+    rectangle "Pracovní pozice" <<service>> as M_JOBS
     rectangle "Pohovory" <<service>> as M_INT
     rectangle "Zaměstnanci a adaptace" <<service>> as M_EMP
     rectangle "Notifikace a provozní logika" <<service>> as M_OTHER

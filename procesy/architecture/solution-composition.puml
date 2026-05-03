@@ -60,7 +60,7 @@ rectangle "Platforma náboru\na adaptace KZ" as SystemBoundary {
     rectangle "Datová vrstva" <<data>> as Data
     rectangle "Auditní\nstopa" <<service>> as AuditTrail
     rectangle "Řídicí a\nanalytická vrstva" <<service>> as Analytics
-    rectangle "AI vrstva" <<service>> as AiLayer
+    rectangle "Inteligentní\nslužby" <<service>> as AiLayer
   }
 }
 
