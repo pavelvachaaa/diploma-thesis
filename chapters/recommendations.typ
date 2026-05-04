@@ -39,3 +39,5 @@ Stejně důležitá je průběžná práce se zpětnou vazbou. Pilotní uživate
 Pro další směřování vývoje považuji za nejvhodnější evoluční postup. Nejprve je potřeba stabilizovat provoz a odstranit bariéry zjištěné při uživatelském ověření, poté rozšiřovat analytiku, integrace a automatizaci a teprve nakonec otevírat otázku hlubších strukturálních změn. Takto zvolený postup dává nejvyšší šanci, že systém bude dlouhodobě podporovat cíle digitalizace náboru a adaptace bez zbytečného provozního rizika.
 
 Navržený plán současně zachovává prostor pro budoucí organizační i technické změny v #abbr("KZ", none), aniž by narušil základní architektonické principy stanovené v této práci.
+
+Zároveň tím vzniká předpoklad, že systém nebude pouze technologickým nástrojem, ale stabilní součástí personálních procesů organizace. Jeho hodnota se neprojeví počtem implementovaných funkcí, ale tím, že zrychlí rozhodování, sníží nejistotu mezi jednotlivými kroky a umožní lépe řídit nábor i adaptaci na základě dat. Právě tato schopnost dlouhodobě vyvažovat technickou kvalitu a reálný procesní přínos je klíčová pro udržitelnost celého řešení.
