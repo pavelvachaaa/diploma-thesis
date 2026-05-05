@@ -18,6 +18,8 @@ Pilotní uživatelské ověření jsem vedl jako moderované scénářové ově�
 
 Z metodického hlediska jsem kombinoval tři vzájemně se doplňující techniky. Základem bylo scénářové ověření s jednoznačně definovaným cílovým stavem a měřením doby dokončení. Druhou vrstvu tvořilo průběžné komentování postupu uživatelem, které pomohlo odlišit pouhou chybu od hlubší nejasnosti v terminologii nebo navigaci. Třetí vrstvou byl krátký rozhovor po dokončení scénáře, ve kterém jsem ověřoval, co bylo pro uživatele přínosné, co považoval za problematické a jaké změny by očekával před širším provozním rozšířením.
 
+Z důvodu ochrany soukromí účastníků jsou data v této kapitole i v příloze anonymizována. Jednotliví účastníci nejsou uváděni jménem, ale pod interními identifikátory N01–N07 pro náboráře, P01–P02 pro personalistky, U01–U02 pro interní zaměstnance v roli uchazeče a V01 pro vedoucího zaměstnance.
+
 Praktického školení se účastnilo sedm náborářů (jeden náborář na závod) a dvě personalistky. Tato skupina ověřovala zejména náborové a personální scénáře. Samostatně byli do ověření zapojeni dva interní zaměstnanci v roli uchazečů, aby bylo možné ověřit srozumitelnost části procesu z pohledu osoby, která reaguje na nabídku nebo plní navazující vstupní úkoly. Manažerský pohled reprezentoval jeden vedoucí zaměstnanec. 
 
 #figure(
@@ -118,7 +120,7 @@ Jako problematická se naopak ukázala místa, kde systém předpokládá vyšš
   caption: [Souhrn výsledků pilotního uživatelského ověření]
 ) <tab:user-test-results>
 
-Souhrn v @tab:user-test-results vychází z reálného měření průchodů pilotními scénáři během praktického školení a navazujícího ověření vybraných rolí. U každého scénáře jsem sledoval dosažení cílového stavu, potřebu asistence, orientační dobu dokončení, počet chybných kroků a následný komentář účastníka. Čas dokončení je proto uváděn jako medián naměřených průchodů scénářem a doplněn o rozsah nejkratšího a nejdelšího dokončeného průchodu. U scénáře S6 je rozsah tvořen jediným měřením, protože manažerský pohled reprezentoval jeden vedoucí zaměstnanec.
+Souhrn v @tab:user-test-results vychází z reálného měření průchodů pilotními scénáři během praktického školení a navazujícího ověření vybraných rolí. U každého scénáře jsem sledoval dosažení cílového stavu, potřebu asistence, orientační dobu dokončení, počet chybných kroků a následný komentář účastníka. Čas dokončení je proto uváděn jako medián naměřených průchodů scénářem a doplněn o rozsah nejkratšího a nejdelšího dokončeného průchodu. U scénáře S6 je rozsah tvořen jediným měřením, protože manažerský pohled reprezentoval jeden vedoucí zaměstnanec. Detailní anonymizovaný záznam jednotlivých průchodů je uveden v @tab:user-test-raw-data.
 
 Výsledky zároveň ukazují, že digitalizace procesů již v pilotním provozu zrychlila průchod náborem. Operace, které byly v původním stavu závislé na kombinaci e-mailové komunikace, lokálních souborů a ručního předávání informací mezi rolemi, bylo možné ve sledovaných scénářích dokončit v řádu jednotek minut. Zvlášť patrné to bylo u založení a úpravy pracovní nabídky, změny stavu uchazeče, naplánování pohovoru a automatického vyvolání navazujících notifikací. Přínos tedy nespočívá pouze v nahrazení papírových nebo e-mailových kroků digitálním formulářem, ale především ve zkrácení prodlev mezi navazujícími činnostmi a ve vzniku jednoznačně dohledatelné historie procesu.
 

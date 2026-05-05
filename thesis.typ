@@ -75,7 +75,7 @@ Analýza současného stavu procesů náboru a adaptace pracovníků v Krajské 
         image(
           "procesy/architecture/seq-outbox-rabbitmq-ai.svg",
           width: 90%,
-          height: 100%
+          height: 100%,
         ),
         caption: [Realizační tok Outbox-RabbitMQ a vrstvy inteligentního zpracování dat v implementaci],
       ) <obr:impl-outbox-ai>
@@ -105,5 +105,8 @@ Analýza současného stavu procesů náboru a adaptace pracovníků v Krajské 
       ) <obr:deployment-flow>
 
     ]
+  ]),
+  attach_content("Detailní anonymizovaný záznam pilotního uživatelského ověření", [
+    #include "chapters/sections/user_testing_raw_data.typ"
   ]),
 )
