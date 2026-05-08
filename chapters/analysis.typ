@@ -364,7 +364,7 @@ Požadavky R1–R6 představují minimální funkční rámec cílového systém
 Na základě formulovaných požadavků na digitalizaci (R1–R6) jsem v této sekci provedl jejich dekompozici na konkrétní funkční a nefunkční požadavky, které slouží jako vstup pro návrh softwarové architektury a implementaci systému.
 
 === Funkční požadavky
-Funkční požadavky definují konkrétní chování systému, tedy co systém musí umožňovat svým uživatelům nebo jakých výstupů musí být schopen. Požadavky jsou kategorizovány podle oblastí systému a prioritizovány metodou MoSCoW (Must have, Should have, Could have, Won't have).
+Funkční požadavky definují konkrétní chování systému, tedy co systém musí umožňovat svým uživatelům nebo jakých výstupů musí být schopen. Požadavky jsou kategorizovány podle oblastí systému a prioritizovány metodou MoSCoW (Must have, Should have, Could have, Won't have). @miranda2022moscow
 
 @tab:fp-portal shrnuje funkční požadavky na veřejnou část systému, tedy kariérní portál určený pro uchazeče. Požadavky se zaměřují na vytvoření jednoho a plně digitálního vstupního bodu pro uchazeče. Cílem je eliminace ostatních komunikačních kanálů, zejména e-mailu, telefonické a papírové komunikace, které v současném stavu vedou k roztříštěnosti dat a zvýšené administrativní zátěži.
 
