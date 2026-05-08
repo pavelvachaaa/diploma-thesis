@@ -58,7 +58,7 @@ Dalším specifikem je *kontinuální nábor*. Na rozdíl od prostředí, kde se
 Podpisem pracovní smlouvy končí práce náboráře a personálního oddělení. Následuje *vícestupňový adaptační proces*, který zahrnuje nejen standardní nástupní agendu a školení #abbr("BOZP", "Bezpečnost a ochrana zdraví při práci"), ale i odborné zapracování, práci s interní dokumentací, seznámení s nemocničními systémy a ověření připravenosti na konkrétním pracovišti. Právě vazba mezi náborem, vstupní agendou a adaptací je proto v této práci klíčová.
 
 == Současný stav procesů náboru pracovníků<kapitola-soucasny-stav>
-Před zahájením digitalizace stojí správa uchazečů v #abbr("KZ", none) převážně na „svaté dvojici“ sdílených tabulek a e-mailové komunikace, kterou doplňují lokální zvyklosti jednotlivých závodů. Takové řešení může fungovat efektivně v menší organizaci, ale v podmínkách #abbr("KZ",none) začíná postupně brzdit celý proces. Nábor zde pak nepůsobí jako jeden plynulý celek, ale jako řada navazujících administrativních kroků, mezi nimiž se informace ztrácejí nebo zbytečně přepisují.
+Před zahájením digitalizace stála správa uchazečů v #abbr("KZ", none) převážně na „svaté dvojici“ sdílených tabulek a e-mailové komunikace, kterou doplňují lokální zvyklosti jednotlivých závodů. Takové řešení může fungovat efektivně v menší organizaci, ale v podmínkách #abbr("KZ",none) začíná postupně brzdit celý proces. Nábor zde pak nepůsobí jako jeden plynulý celek, ale jako řada navazujících administrativních kroků, mezi nimiž se informace ztrácejí nebo zbytečně přepisují.
 
 Pro účely analýzy jsem proto mapoval skutečný průběh procesů pomocí strukturovaných rozhovorů s vedoucím personálního oddělení a s náboráři jednotlivých odštěpných závodů. Vycházel jsem nejen z formálních metodických pokynů, ale i z popisu reálné praxe, tedy z toho, jak proces skutečně probíhá při běžném provozu, včetně neformálních dohod a obcházení chybějících nástrojů.
 
@@ -71,7 +71,7 @@ Pro zajištění terminologické konzistence jsou v této kapitole používány 
 === Proces inzerce volných pozic
 Inzerce volných pracovních pozic je v současném stavu rozložena mezi několik nezávislých kanálů:
 
-- *Webové portály třetích stran* - Jobs.cz, Práce.cz (provozovatel LMC), portál MPSV
+- *Webové portály třetích stran* - jobs.cz, prace.cz (provozovatel LMC), portál provozující #abbr("MPSV", "Ministerstvo práce a sociálních věcí České republiky")
 - *Nemocniční nástěnky* - fyzické nástěnky v areálech nemocnic
 - *Webové stránky nemocnic* - statické stránky s omezenou aktualizací
 - *Sociální sítě* - LinkedIn
@@ -274,7 +274,7 @@ V současném stavu je však adaptace z velké části vedena papírově. To kom
 == Identifikace problémů a úzkých míst<kapitola-identifikcea-problemu>
 Na základě analýzy současného stavu procesů náboru a adaptace v KZ, konzultací s HR pracovníky jednotlivých nemocnic a pozorování reálného průběhu procesů jsem identifikoval následující klíčové problémy. Problémy jsou kategorizovány podle oblastí dopadu a doplněny o kvalitativní hodnocení závažnosti.
 
-Identifikované problémy mají kumulativní charakter a v provozní praxi se vzájemně zesilují. Významným akceleračním faktorem je vysoká personální dynamika organizace, která dosahuje průměrně 110 nástupů měsíčně (v sezónních špičkách až 180). Typická měsíční struktura nástupů přitom zahrnuje přibližně 10 pracovníků kategorie #abbr("LZ", none), 50 #abbr("NLZP", none) a 50 #abbr("THP", "technickohospodářských pracovníků")/dělnických profesí. V takovém objemu se manuální administrativa stává kritickým omezením propustnosti celého procesu.
+Identifikované problémy mají kumulativní charakter a v provozní praxi se vzájemně zesilují. Situaci ovlivňuje také častá obměna zaměstnanců. Do organizace nastupuje v průměru 110 nových pracovníků měsíčně, přičemž v sezónních špičkách může jít až o 180 osob. Typická měsíční struktura nástupů přitom zahrnuje přibližně 10 pracovníků kategorie #abbr("LZ", none), 50 #abbr("NLZP", none) a 50 #abbr("THP", "technickohospodářských pracovníků")/dělnických profesí. V takovém objemu se manuální administrativa stává kritickým omezením propustnosti celého procesu.
 
 Z analytického pohledu lze problémy rozdělit do tří tematických oblastí. První oblast představuje *datová fragmentace* (P1–P3), kdy jsou informace rozptýleny mezi e-mailovou komunikaci, lokální soubory a tabulkové přehledy jednotlivých závodů. Druhou oblast tvoří *procesní a řídicí nedostatky* (P4–P9), zejména chybějící auditní stopa, nízká standardizace rozhodování a slabá transparentnost stavu náboru i vstupní agendy. Třetí oblast je *digitálně nepodpořená adaptace* (P10), která omezuje možnost systematicky řídit zapracování nových zaměstnanců a vyhodnocovat jeho úspěšnost.
 
@@ -360,13 +360,13 @@ Požadavky R1–R6 představují minimální funkční rámec cílového systém
 
 
 
-== Specifikace funkcionálních a nefunkcionálních požadavků
-Na základě formulovaných požadavků na digitalizaci (R1–R6) jsem v této sekci provedl jejich dekompozici na konkrétní funkcionální a nefunkcionální požadavky, které slouží jako vstup pro návrh softwarové architektury a implementaci systému.
+== Specifikace požadavků
+Na základě formulovaných požadavků na digitalizaci (R1–R6) jsem v této sekci provedl jejich dekompozici na konkrétní funkční a nefunkční požadavky, které slouží jako vstup pro návrh softwarové architektury a implementaci systému.
 
-=== Funkcionální požadavky
-Funkcionální požadavky definují konkrétní chování systému, tedy co systém musí umožňovat svým uživatelům nebo jakých výstupů musí být schopen. Požadavky jsou kategorizovány podle oblastí systému a prioritizovány metodou MoSCoW (Must have, Should have, Could have, Won't have).
+=== Funkční požadavky
+Funkční požadavky definují konkrétní chování systému, tedy co systém musí umožňovat svým uživatelům nebo jakých výstupů musí být schopen. Požadavky jsou kategorizovány podle oblastí systému a prioritizovány metodou MoSCoW (Must have, Should have, Could have, Won't have).
 
-@tab:fp-portal shrnuje funkcionální požadavky na veřejnou část systému, tedy kariérní portál určený pro uchazeče. Požadavky se zaměřují na vytvoření jednoho a plně digitálního vstupního bodu pro uchazeče. Cílem je eliminace ostatních komunikačních kanálů, zejména e-mailu, telefonické a papírové komunikace, které v současném stavu vedou k roztříštěnosti dat a zvýšené administrativní zátěži.
+@tab:fp-portal shrnuje funkční požadavky na veřejnou část systému, tedy kariérní portál určený pro uchazeče. Požadavky se zaměřují na vytvoření jednoho a plně digitálního vstupního bodu pro uchazeče. Cílem je eliminace ostatních komunikačních kanálů, zejména e-mailu, telefonické a papírové komunikace, které v současném stavu vedou k roztříštěnosti dat a zvýšené administrativní zátěži.
 
 #figure(
   [
@@ -411,11 +411,11 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
 
     )
   ],
-  caption: [Funkcionální požadavky — Kariérní portál],
+  caption: [Funkční požadavky — Kariérní portál],
 ) <tab:fp-portal>
 
 
-@tab:fp-admin shrnuje funkcionální požadavky na interní část systému určenou pro náboráře, personální a mzdové oddělení a vedoucí oddělení. Požadavky pokrývají celý průběh náboru od založení požadavku na obsazení pozice až po výběr kandidáta. 
+@tab:fp-admin shrnuje funkční požadavky na interní část systému určenou pro náboráře, personální a mzdové oddělení a vedoucí oddělení. Požadavky pokrývají celý průběh náboru od založení požadavku na obsazení pozice až po výběr kandidáta. 
 
 #figure(
   [
@@ -456,10 +456,10 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
       [R3, R6],
     )
   ],
-  caption: [Funkcionální požadavky — Interní řízení náboru],
+  caption: [Funkční požadavky — Interní řízení náboru],
 ) <tab:fp-admin>
 
-@tab:fp-integrace shrnuje funkcionální požadavky na integraci systému s externími zdroji. Součástí je také auditní stopa v souladu s principy řízené správy dat.
+@tab:fp-integrace shrnuje funkční požadavky na integraci systému s interními službami a systémy třetích stran. Součástí je také auditní stopa v souladu s principy řízené správy dat.
 #figure(
   [
     #set par(justify: false)
@@ -487,11 +487,11 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
       [R3, R5],
     )
   ],
-  caption: [Funkcionální požadavky — Integrace a ověřování kvalifikací],
+  caption: [funkční požadavky — Integrace a ověřování kvalifikací],
 ) <tab:fp-integrace>
 
 
-@tab:fp-adaptace shrnuje funkcionální požadavky na digitalizaci vstupní agendy a adaptačního procesu. Požadavky reagují na manuální řízení těchto činností zavedením strukturovaných seznamů, evidence plnění a upozornění.
+@tab:fp-adaptace shrnuje funkční požadavky na digitalizaci vstupní agendy a adaptačního procesu. Požadavky reagují na manuální řízení těchto činností zavedením strukturovaných seznamů, evidence plnění a upozornění.
 
 #figure(
   [
@@ -529,7 +529,7 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
       [F21], [Systém poskytne přehled stavu adaptací podle závodu, oddělení a typu pracovní pozice], [Should], [R4, R6],
     )
   ],
-  caption: [Funkcionální požadavky — Vstupní agenda a adaptace],
+  caption: [Funkční požadavky — Vstupní agenda a adaptace],
 ) <tab:fp-adaptace>
 
 
@@ -564,14 +564,14 @@ Funkcionální požadavky definují konkrétní chování systému, tedy co syst
       [F25], [Systém umožní export reportů do formátu PDF a CSV], [Could], [R6],
     )
   ],
-  caption: [Funkcionální požadavky — Reporting a multi-tenantní správa],
+  caption: [Funkční požadavky — Reporting a multi-tenantní správa],
 ) <tab:fp-reporting>
 
 
 
-=== Nefunkcionální požadavky
+=== Nefunkční požadavky
 
-Nefunkcionální požadavky definují kvalitativní vlastnosti systému, které nejsou přímo pozorovatelné jako konkrétní funkce, ale podstatně ovlivňují použitelnost, spolehlivost a udržitelnost systému. Požadavky vychazí z veřejných zakázek #abbr("KZ",none).
+Nefunkční požadavky definují kvalitativní vlastnosti systému, které nejsou přímo pozorovatelné jako konkrétní funkce, ale podstatně ovlivňují použitelnost, spolehlivost a udržitelnost systému. Požadavky vychazí z veřejných zakázek #abbr("KZ",none).
 
 #figure(
   [
@@ -628,5 +628,5 @@ Nefunkcionální požadavky definují kvalitativní vlastnosti systému, které 
 
     )
   ],
-  caption: [Nefunkcionální požadavky na systém],
+  caption: [Nefunkční požadavky na systém],
 ) <tab:nfp>

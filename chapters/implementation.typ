@@ -340,7 +340,7 @@ V případě úplné nedostupnosti registru nebo integrační platformy IRIS ned
 
 
 == Ověření architektonických cílů
-Prokázání, že implementace naplňuje dříve definované cíle, je nezbytnou součástí inženýrského přístupu. Tato sekce proto mapuje nefunkcionální požadavky NF01–NF11 a hlavní funkční požadavky F01–F25 na konkrétní části řešení a jejich vazbu na rámcové cíle R1–R6.
+Prokázání, že implementace naplňuje dříve definované cíle, je nezbytnou součástí inženýrského přístupu. Tato sekce proto mapuje nefunkční požadavky NF01–NF11 a hlavní funkční požadavky F01–F25 na konkrétní části řešení a jejich vazbu na rámcové cíle R1–R6.
 
 Funkční požadavky jsou pokryty rozdělením systému na veřejný kariérní portál, interní administrační rozhraní, portál vstupní agendy, integrační služby a datovou a reportingovou vrstvu. Kariérní portál naplňuje požadavky F01–F06 prostřednictvím katalogu pozic, detailu nabídky, online reakce uchazeče, registrace zájemce a kontaktního vstupu do organizace. Interní náborová agenda pokrývá F07–F12 správou pracovních pozic, evidencí kandidátů, pohovorů, stavových změn, komunikačních šablon a přehledů pro vedoucí pracovníky.
 

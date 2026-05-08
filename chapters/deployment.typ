@@ -4,7 +4,7 @@ Navržený systém má skutečnou hodnotu pouze tehdy, pokud je dlouhodobě prov
 
 Neméně podstatná je schopnost systému včas signalizovat provozní odchylky, tedy situace, kdy se jeho chování odchyluje od očekávaného stavu. V praxi se může jednat například o prodlouženou dobu odezvy, zvýšenou chybovost, nedostupnost služby, neobvyklé zatížení infrastruktury nebo narušení komunikace mezi jednotlivými komponentami. Včasná identifikace těchto stavů je předpokladem pro jejich rychlou diagnostiku a minimalizaci dopadů na uživatele i navazující procesy.
 
-Tato kapitola navazuje přímo na nefunkcionální požadavky formulované v analytické části. Dostupnost podle NF04, výkon podle NF05 a nasaditelnost na vlastní infrastruktuře podle NF07 nelze doložit pouze návrhem tříd nebo funkčními testy. Musí být podpořeny provozním modelem, který umožňuje systém opakovaně nasadit, bezpečně měnit a současně měřit, zda se běžící instance chová v mezích očekávaných hodnot.
+Tato kapitola navazuje přímo na nefunkční požadavky formulované v analytické části. Dostupnost podle NF04, výkon podle NF05 a nasaditelnost na vlastní infrastruktuře podle NF07 nelze doložit pouze návrhem tříd nebo funkčními testy. Musí být podpořeny provozním modelem, který umožňuje systém opakovaně nasadit, bezpečně měnit a současně měřit, zda se běžící instance chová v mezích očekávaných hodnot.
 
 Z provozního hlediska proto stojí návrh před volbou, jak orchestrovat více kontejnerizovaných částí systému v on-premise prostředí. Řešení musí oddělit veřejné portály, transakční backend, integrační adaptéry, asynchronní zpracování, stavové služby a dohled, ale současně nesmí zavést takovou provozní složitost, která by byla pro počáteční pilotní rozsah nepřiměřená.
 
@@ -145,7 +145,7 @@ Prosazení pravidel na úrovni firewallu, reverzní proxy, VLAN a směrování s
 Stejně tak lokálně spravované konfigurační soubory a tajné hodnoty vyžadují důsledné nastavení oprávnění, rotaci a audit přístupů. Síťová segmentace je proto pouze jednou vrstvou obrany v hloubce, nikoli samostatnou garancí bezpečnosti.
 
 == Dohledová vrstva a provozní měření
-Dohledová vrstva je navržena tak, aby převáděla nefunkcionální požadavky do měřitelných provozních signálů. Pro NF04 sleduje dostupnost a degradaci hlavních služeb, pro NF05 odezvu rozhraní a pro NF07 stav nasazených komponent. Nejde tedy pouze o přehled, zda kontejnery běží, ale o mechanismus, kterým lze provozně doložit, zda systém skutečně plní požadované kvalitativní vlastnosti.
+Dohledová vrstva je navržena tak, aby převáděla nefunkční požadavky do měřitelných provozních signálů. Pro NF04 sleduje dostupnost a degradaci hlavních služeb, pro NF05 odezvu rozhraní a pro NF07 stav nasazených komponent. Nejde tedy pouze o přehled, zda kontejnery běží, ale o mechanismus, kterým lze provozně doložit, zda systém skutečně plní požadované kvalitativní vlastnosti.
 
 
 #figure(
@@ -184,5 +184,5 @@ Požadavek NF05 je pokryt zejména měřením p95 odezvy HTTP rozhraní a satura
 
 Dohledová vrstva současně slouží i k detekci odchylek, které mohou signalizovat bezpečnostní nebo integrační problém, například neobvyklý nárůst chybovosti, latence nebo zpoždění ve zpracování front.
 
-Tím kapitola uzavírá vazbu mezi nefunkcionálními požadavky a provozní realitou systému. Nasazovací model zajišťuje reprodukovatelné vydávání a oddělení provozních vrstev, zatímco dohledová vrstva poskytuje měřitelnou zpětnou vazbu o dostupnosti, odezvě a degradaci služeb. Díky tomu lze další rozvoj infrastruktury opírat o naměřená provozní data, nikoli pouze o předpoklady z návrhu.
+Tím kapitola uzavírá vazbu mezi nefunkčními požadavky a provozní realitou systému. Nasazovací model zajišťuje reprodukovatelné vydávání a oddělení provozních vrstev, zatímco dohledová vrstva poskytuje měřitelnou zpětnou vazbu o dostupnosti, odezvě a degradaci služeb. Díky tomu lze další rozvoj infrastruktury opírat o naměřená provozní data, nikoli pouze o předpoklady z návrhu.
 //TODO: Zde buď budou pilotní naměřená data nebo screenshot z grafany.

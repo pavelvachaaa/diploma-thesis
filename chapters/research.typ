@@ -37,7 +37,7 @@ Hodnocení vychází z veřejně dostupné dokumentace výrobců, produktových 
 
 Pro účely rozhodnutí byla kritéria typu *Must* chápána jako diskvalifikační. Pokud řešení nesplní kterékoli kritérium K1–K5, není vhodné jako cílová platforma pro digitalizaci procesů #abbr("KZ", none), i když může být přínosné jako dílčí integrační komponenta.
 
-== Specializované ATS platformy
+== Specializované náborové platformy
 Specializované ATS nástroje jsou zaměřeny především na počáteční fázi náboru. Silné jsou zejména v oblasti správy pracovních pozic, evidence uchazečů, komunikace s nimi a zveřejňování pracovních nabídek. Pro účely této práce však není klíčové pouze to, jak efektivně dokážou nábor zahájit, ale zda na něj dokážou plynule navázat i v oblasti vstupní agendy a adaptačního procesu. Právě tyto fáze jsou v prostředí zdravotnické organizace výrazně složitější než v běžném komerčním náboru.
 
 === Teamio (Alma Career)
@@ -57,7 +57,7 @@ Datacruit deklaruje ATS funkcionalitu doplněnou o automatizační prvky a integ
 
 Tento parametr činí Datacruit z porovnávaných ATS systémů nejbližším kandidátem ve vztahu k požadavku NF07 (on-premise nasaditelnost). Funkční těžiště produktu je však nadále v oblasti náboru. Plnohodnotná podpora adaptačního procesu zdravotnických pracovníků by tedy vyžadovala další produktovou vrstvu nebo zakázkové rozšíření, což zvyšuje architektonickou i provozní složitost cílového řešení.
 
-=== Sloneek (ATS modul)
+=== Sloneek
 Sloneek nabízí ATS modul jako součást širší HR platformy. Tento přístup je výhodný z pohledu sjednocení základních personálních agend, avšak dostupná dokumentace současně uvádí omezení v oblasti přímé integrace ATS modulu na externí platformy. @sloneekAts2026
 
 V prostředí #abbr("KZ", none) tak Sloneek představuje využitelnou variantu pro obecnou digitalizaci HR činností, nikoli však jednoznačně vhodného kandidáta pro cílové řešení s požadovanou mírou specializace na zdravotnické procesy, multi-tenantní řízení a on-premise provoz.
@@ -70,7 +70,7 @@ Onbee představuje specializovanou platformu pro vstupní agendu a adaptaci zam�
 
 Z hlediska hodnoticího rámce tak Onbee velmi dobře pokrývá část požadavků spojených s adaptací (R4) a částečně i provozní požadavky NF07. Jeho limit spočívá v tom, že nejde o plnohodnotné ATS řešení, takže by organizace musela paralelně provozovat a integračně udržovat další náborový systém. Vznikla by tak vícevrstvá architektura s vyšší závislostí na kvalitě integračních vazeb.
 
-== Integrované HCM enterprise suite 
+== Platformy pro řízení lidských zdrojů
 Integrované #abbr("HCM", none) platformy sledují jiný strategický cíl než specializované ATS nebo nástroje pro vstupní agendu. Snaží se pokrýt co největší část zaměstnaneckého cyklu v jednom datovém a procesním modelu. Z pohledu enterprise architektury jde o logický přístup, protože snižuje fragmentaci dat. V praxi však bývá vykoupen vyšší implementační náročností, větším rozsahem změnového řízení a velmi často i cloudovým provozním modelem @mauro2024digital.
 
 === SAP SuccessFactors
@@ -88,7 +88,7 @@ Oracle Fusion Cloud HCM je výrobcem prezentován jako kompletní cloudové ře�
 
 V případě #abbr("KZ", none) však i zde převažuje stejná bariéra: nesoulad s požadavkem na on-premise provoz a vysoká míra přizpůsobení nutná pro české zdravotnické procesy, zejména ve vazbě na národní registry a interní organizační členění holdingu.
 
-== Porovnání řešení vůči požadavkům KZ
+== Porovnání řešení vůči požadavkům organizace
 Následující tabulky shrnují vybraná řešení podle diskvalifikačních kritérií K1–K5 a doplňkových kritérií K6–K8 uvedených v @tab:research-kriteria. Hodnocení je provedeno kvalitativně ve škále *Ano / Částečně / Ne* na základě veřejně doložitelných informací.
 
 Pro @tab:porovnani-diskvalifikace platí: K1 = nábor, K2 = adaptace, K3 = multi-tenantní podpora, K4 = integrace/API, K5 = on-premise provoz.
