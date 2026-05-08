@@ -163,4 +163,15 @@ Na základě uvedených zjištění jsem zvolil jako nejvhodnější přístup z
 
 Vlastní řešení zároveň snižuje riziko, že kritické doménové požadavky budou odloženy kvůli externímu produktovému plánu. Integrace, které jsou pro #abbr("KZ", none) skutečně přínosné, lze realizovat selektivně a v řízeném rozsahu, například pro distribuci inzerce nebo výměnu dat s externími registry. Tím se kombinuje výhoda procesní suverenity s pragmatickým využitím existujícího softwarového ekosystému.
 
+Orientační dohledání konkrétních produktů používaných českými zdravotnickými zařízeními ukazuje, že nemocnice veřejně nakupují především placenou inzerci a nástroje pro první fázi náboru. Ve smlouvách se opakovaně objevují služby Alma Career, například Jobs.cz, Prace.cz, Atmoskop.cz, Práce za rohem nebo náborový #abbr("ATS", none) Teamio. Tyto služby lze dohledat například u FN Ostrava @registrFnoAlma2024, FNUSA @registrFnusaAlmaNabor2025, Masarykova onkologického ústavu @registrMouTeamioProfessional2025, FN Brno @registrFnBrnoJobs2026 nebo FN Bulovka @registrBulovkaAlmaInzeraty2025.
+
+K navrhovanému řešení mají částečně blízko širší #abbr("HRIS", "Human Resources Information System") systémy, například Vema, která uvádí moduly pro nástup a adaptaci zaměstnance @vemaZamestnaneckyPortal2026. V oblasti adaptace jsou pak veřejně dohledatelné hlavně systémy pro vzdělávání zaměstnanců, tedy #abbr("LMS", "Learning Management System"). Ty slouží pro kurzy, školení, testy a evidenci splněného vzdělávání. Příkladem může být Moodle od PragoData Consulting ve FN Hradec Králové @registrFnhkLms2021 nebo e-learningová platforma Educasoft Solutions ve FNUSA @registrFnusaEducasoftElearning2021.
+
+Z veřejných zdrojů se však nepodařilo potvrdit, že by české nemocnice běžně používaly jeden systém, který by pokrýval celý proces od uchazeče až po vyhodnocenou odbornou adaptaci. Pravděpodobnější je, že navazující kroky často probíhají kombinací HR systému, e-mailové komunikace, tabulek, interních metodik a papírových podkladů, podobně jako tomu bylo v #abbr("KZ", none) před zahájením digitalizace.
+
+Při cíleném dohledání se mi nepodařilo najít český produkt, který by současně pokrýval nábor, vstupní agendu, adaptační proces a zdravotnické integrace na NRZP nebo datové zdroje akreditací #abbr("MZČR", "Ministerstvo zdravotnictví České republiky"). Tyto vazby jsou přitom pro uchazeče ve zdravotnictví významné.
+
+NRZP poskytuje rozhraní pro práci s údaji zdravotnických pracovníků @ncezKrzpApi2026. Portál akreditace.mzcr.cz zase zveřejňuje akreditační data, která jsou pro uchazeče důležitá, protože ukazují, která zdravotnická zařízení mají akreditaci pro konkrétní obory specializačního vzdělávání. Ve veřejných zdrojích se tedy nepodařilo potvrdit existenci hotového produktu, který by pokrýval stejný rozsah jako navrhované řešení.
+
+
 Z metodického hlediska tedy tato kapitola nevede k závěru, že komerční produkty jsou obecně nevhodné. Vede k závěru, že pro konkrétní kombinaci požadavků R1–R6 a NF01–NF11 je v podmínkách #abbr("KZ", none) vlastní řešení variantou s nejvyšší mírou strategické a provozní shody.

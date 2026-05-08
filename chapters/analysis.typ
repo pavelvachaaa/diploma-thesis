@@ -448,7 +448,7 @@ Funkční požadavky definují konkrétní chování systému, tedy co systém m
       [Should],
       [R3],
 
-      [F11], [Systém umožní strukturované hodnocení kandidátů dle předem definovaných kritérií], [Should], [R3, R6],
+      [F11], [Systém umožní strukturované hodnocení kandidátů dle předem definovaných kritérií (v práci dále označeno jako inteligentní vrstva)], [Should], [R3, R6],
 
       [F12],
       [Vedoucí oddělení bude mít online přehled o stavu svých náborových požadavků bez nutnosti ad-hoc e-mailových dotazů],
