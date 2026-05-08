@@ -144,7 +144,7 @@ Prosazení pravidel na úrovni firewallu, reverzní proxy, VLAN a směrování s
 
 Stejně tak lokálně spravované konfigurační soubory a tajné hodnoty vyžadují důsledné nastavení oprávnění, rotaci a audit přístupů. Síťová segmentace je proto pouze jednou vrstvou obrany v hloubce, nikoli samostatnou garancí bezpečnosti.
 
-== Dohledová vrstva a provozní měření
+== Dohledová vrstva a provozní měření <dohledovakap>
 Dohledová vrstva je navržena tak, aby převáděla nefunkční požadavky do měřitelných provozních signálů. Pro NF04 sleduje dostupnost a degradaci hlavních služeb, pro NF05 odezvu rozhraní a pro NF07 stav nasazených komponent. Nejde tedy pouze o přehled, zda kontejnery běží, ale o mechanismus, kterým lze provozně doložit, zda systém skutečně plní požadované kvalitativní vlastnosti.
 
 

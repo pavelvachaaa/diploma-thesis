@@ -4,7 +4,7 @@ Na základě zjištěného stavu jsem formuloval požadavky na cílové řešen�
 
 V návrhové části byla představena hybridní architektura kombinující modulární monolit pro transakční jádro a oddělenou vrstvu pro inteligentní zpracování dat. Tento přístup umožňuje zachovat provozní jednoduchost systému a zároveň podporuje jeho rozšiřitelnost, auditovatelnost a integrační schopnosti. Součástí práce je také implementace backendu, kariérního portálu, onboardingového rozhraní, integračních adaptérů a nasazení v on-premise prostředí.
 
-Uživatelské ověření potvrdilo, že hlavním přínosem řešení je sjednocení informací, zvýšení transparentnosti procesu a omezení ruční komunikace mezi rolemi. Zároveň se ukázalo, že pro úspěch systému je klíčová nejen technická kvalita, ale i srozumitelnost procesů, jasné rozdělení odpovědností a průběžná práce se zpětnou vazbou uživatelů.
+Uživatelské testování potvrdilo, že hlavním přínosem řešení je sjednocení informací, zvýšení transparentnosti procesu a omezení ruční komunikace mezi rolemi. Zároveň se ukázalo, že pro úspěch systému je klíčová nejen technická kvalita, ale i srozumitelnost procesů, jasné rozdělení odpovědností a průběžná práce se zpětnou vazbou uživatelů.
 
 Hlavním přínosem práce je propojení analytického, architektonického a implementačního pohledu na konkrétní problém organizace. Výsledkem není pouze návrh, ale funkční základ platformy respektující specifika zdravotnického prostředí. Limitem práce zůstává nutnost dalšího rozvoje systému v návaznosti na provozní zkušenosti a dostupné kapacity.
 

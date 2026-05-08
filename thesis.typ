@@ -112,4 +112,7 @@ Analýza současného stavu procesů náboru a adaptace pracovníků v Krajské 
   attach_content("Detailní anonymizovaný záznam pilotního uživatelského ověření", [
     #include "chapters/sections/user_testing_raw_data.typ"
   ]),
+  attach_content("Využití umělé inteligence při zpracování práce", [
+    Pro jazykové a formulační účely byly při zpracování vybraných částí diplomové práce využity nástroje #abbr("AI", "Artificial Intelligence"), konkrétně model _GPT-5_. Odpovědnost za obsah, odbornou správnost, interpretaci výsledků a finální podobu práce zůstává na autorovi.
+  ]),
 )

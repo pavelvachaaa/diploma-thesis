@@ -158,7 +158,7 @@ Verzování událostí pomocí suffixu v1 (a dalších verzí) umožňuje bezpe�
 Cena za tento přístup spočívá ve vyšší implementační i provozní komplexitě. Systém musí evidovat stav zpráv, řešit opakované zpracování, sledovat stáří front a rozlišovat dočasná a neobnovitelná selhání. Přínosem je však výrazně vyšší konzistence dat a nižší riziko tichého výpadku vedlejších efektů, což je v auditovatelném informačním systému zásadní.
 
 === Implementace auditní vrstvy
-Auditní vrstva odpovídá na otázku, jak u citlivých operací nad pozicemi, kandidáty a adaptací uchovat průkaznou stopu vyžadovanou v NF11, tedy auditní záznamy o změnách klíčových entit po dobu nejméně 5 let, aniž by každý zápis neúměrně prodlužoval odezvu běžných operací, pro kterou NF05 stanovuje limit 2 sekund v 95. percentilu. V prostředí #abbr("KZ", none) nejde jen o technický log, ale o možnost zpětně vysvětlit, kdo provedl konkrétní změnu, kdy k ní došlo a jaký měla vztah k průběhu náboru nebo adaptace.
+Auditní vrstva řeší problém, jak u citlivých operací nad pozicemi, kandidáty a adaptací uchovat průkaznou stopu vyžadovanou v NF11, tedy auditní záznamy o změnách klíčových entit po dobu nejméně 5 let, aniž by každý zápis neúměrně prodlužoval odezvu běžných operací, pro kterou NF05 stanovuje limit 2 sekund v 95. percentilu. V prostředí #abbr("KZ", none) nejde jen o technický log, ale o možnost zpětně vysvětlit, kdo provedl konkrétní změnu, kdy k ní došlo a jaký měla vztah k průběhu náboru nebo adaptace.
 
 V nejjednodušším provedení by bylo nutné zapisovat audit synchronně přímo v hlavní cestě požadavku, ideálně ve stejné transakci jako doménovou změnu. Tento přístup je na první pohled přehledný, protože výsledek operace a auditní záznam vznikají současně. Jeho nevýhodou je však těsné svázání uživatelské operace s auditním úložištěm. Každý pomalejší zápis do auditní tabulky by zvyšoval latenci API a dočasná chyba auditní infrastruktury by mohla zablokovat i běžnou práci HR uživatele.
 
@@ -166,7 +166,7 @@ Zvolené řešení proto auditní stopu nezapisuje synchronně v hlavní cestě 
 
 Z implementačního hlediska je důležité odlišovat vykonávací komponentu od datové struktury. `audit_writer_processor` představuje samostatnou zpracovatelskou službu navázanou na vrstvu předávání zpráv, zatímco `audit_events` je perzistentní tabulka, do níž se auditní stopa ukládá. Tato dvojice společně zajišťuje, že audit zůstává mimo kritickou cestu požadavku , ale neztrácí vazbu na transakční dění systému.
 
-Přínosem pro #abbr("KZ", none) je splnění požadavku na dlouhodobou dohledatelnost změn klíčových entit bez negativního dopadu na odezvu zapisovacích operací. Audit lze navíc provozně sledovat jako samostatný datový tok a využít jej pro interní kontrolu, bezpečnostní přezkum nebo dokazování průběhu personálního procesu.
+Přínosem pro #abbr("KZ", none) je splnění požadavku na dlouhodobou dohledatelnost změn klíčových entit bez negativního dopadu na odezvu zapisovacích operací. Audit lze navíc provozně sledovat jako samostatný datový tok a využít jej pro interní kontrolu, bezpečnostní kontrolu nebo dokazování průběhu personálního procesu.
 
 Kompromisem tohoto řešení je krátké časové okno mezi vznikem události a jejím perzistentním zápisem. Auditní vrstva proto vyžaduje dohled nad stavem fronty, stářím nejstarší nezpracované zprávy, počtem opakovaných pokusů a zprávami v chybovém stavu. Řešení tak přesouvá část složitosti z uživatelské cesty požadavku do provozního sledování systému. Tento kompromis je však v daném kontextu vhodný, protože chrání odezvu systému a zároveň zachovává požadovanou auditovatelnost.
 
@@ -310,7 +310,7 @@ Testovací scénáře obsahují zobrazení veřejného seznamu pozic, vyloučen�
  U klíčových scénářů nekončím na úrovni obrazovky, ale kontroluji i perzistenci výsledku v databázi, například vznik záznamu uchazeče, uložení přílohy nebo zápis kontaktního dotazu. Tímto postupem snižuji riziko, že po změně frontendu, API nebo validační logiky zůstane portál vizuálně dostupný, ale fakticky přestane spolehlivě přijímat použitelné reakce.
 
 === Integrace analytického nástroje Umami
-Pro analytické účely jsem do portálu integroval nástroj `Umami`. Jeho smyslem není zasahovat do rozhodování systému, ale měřit průchod uživatelů portálem a identifikovat místa, kde uchazeči proces opouštějí. Inicializace analytiky je provedena centrálně v kořenové komponentě aplikace, aby bylo zajištěno jednotné měření napříč stránkami.
+Pro analytické účely jsem do portálu integroval open-source nástroj `Umami`, tedy webovou analytiku s možností vlastního provozu @umamiDocs2026. Jeho smyslem není zasahovat do rozhodování systému, ale měřit průchod uživatelů portálem a identifikovat místa, kde uchazeči proces opouštějí. Inicializace analytiky je provedena centrálně v kořenové komponentě aplikace, aby bylo zajištěno jednotné měření napříč stránkami.
 
 Sleduji zejména interakce s katalogem pozic, otevření detailu nabídky, zahájení reakce na pozici, práci s formulářem a výsledek jeho odeslání. Tato data slouží jako podpůrný vstup pro další iterace portálu a doplňují kvalitativní poznatky z pilotního uživatelského ověření.
 
