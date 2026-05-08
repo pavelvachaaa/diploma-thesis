@@ -1,5 +1,19 @@
 #import "../template/abbreviations.typ": abbr
 
+#import "@preview/vlna:0.1.1": *
+#show: apply-vlna
+
+#set text(
+  lang: "cs",
+  hyphenate: true,
+  costs: (
+    widow: 100%,
+    orphan: 100%,
+    runt: 100%,
+  ),
+)
+
+
 Architektonický návrh má smysl jen tehdy, pokud se podaří převést jeho principy do konkrétní implementace, aniž by došlo k jeho narušení vlivem technologických kompromisů @mauro2024digital. V této kapitole proto neuvádím úplný výpis všech tříd, tabulek a endpointů, ale zaměřuji se na rozhodnutí, která určují rozdíl mezi formálně správným návrhem a skutečně provozně použitelným systémem.
 
 Kapitola se zaměřuje především na modulární backend, hexagonální uspořádání, spolehlivou asynchronní komunikaci, datovou vrstvu, bezpečnostní model a oddělenou vrstvu inteligentního zpracování dat. Právě v těchto částech se ukazuje, zda navržená architektura dokáže unést reálné procesní a provozní požadavky #abbr("KZ", none).
@@ -170,7 +184,7 @@ Přínosem pro #abbr("KZ", none) je splnění požadavku na dlouhodobou dohledat
 
 Kompromisem tohoto řešení je krátké časové okno mezi vznikem události a jejím perzistentním zápisem. Auditní vrstva proto vyžaduje dohled nad stavem fronty, stářím nejstarší nezpracované zprávy, počtem opakovaných pokusů a zprávami v chybovém stavu. Řešení tak přesouvá část složitosti z uživatelské cesty požadavku do provozního sledování systému. Tento kompromis je však v daném kontextu vhodný, protože chrání odezvu systému a zároveň zachovává požadovanou auditovatelnost.
 
-== Implementace vrstvy inteligentního zpracování dat
+== Implementace vrstvy\ inteligentního zpracování dat
 
 Vrstva inteligentního zpracování dat byla navržena jako podpůrná část systému, která reaguje na provozní problém identifikovaný v analytické části práce. V prostředí #abbr("KZ", none) probíhá nábor kontinuálně a personální pracovníci musí souběžně pracovat s větším množstvím životopisů, pracovních pozic a průběžně aktualizovaných požadavků jednotlivých pracovišť. Ruční vyhodnocování životopisů je v takovém prostředí časově náročné a zároveň zvyšuje riziko, že důležité informace o vzdělání, odborné způsobilosti nebo praxi nebudou včas zachyceny.
 
@@ -276,7 +290,7 @@ Na @obr:onboarding-workflow-builder je zachycena správa adaptačního procesu p
 Přínosem pro #abbr("KZ", none) je možnost řídit vstupní agendu jako opakovatelný proces, nikoli jako sadu ručně předávaných pokynů. HR pracovník získává místo pro správu pravidel a dokumentů, zatímco nastupující zaměstnanec v portálu pracuje pouze se svou konkrétní sadou úkolů.
 
 
-== Implementace kariérního portálu
+== Implementace kariérního\ portálu
 Kariérní portál `kariera.kzcr.eu` jsem implementoval jako veřejný vstup do náborového procesu. Frontend je oddělen od backendu záměrně. Veřejný portál řeší prezentaci obsahu, navigaci a interakci s uchazečem, zatímco byznysová pravidla pro práci s pozicemi, uchazeči a formulářovými daty zůstávají v jednom autoritativním #abbr("API", none).
 
 Domovská stránka propojuje obsahové a transakční scénáře. Uchazeč zde najde přehled benefitů, tematické kategorie pracovních rolí, mapu nemocnic a vstup do katalogu volných míst. Náborový tok tvoří seznam pozic, detail nabídky a formulář reakce. Součástí portálu je i kontakt pro zájemce bez vazby na konkrétní inzerát.
@@ -322,7 +336,7 @@ Alternativou byly robustnější platformy, například Google Analytics 4, kter
 
 Umami se proto ukázalo jako přiměřený kompromis mezi kontrolou nad daty, jednoduchostí provozu a dostatečnou analytickou vypovídací hodnotou.
 
-== Komunikace s národními registry
+== Komunikace s národními\ registry
 Napojení na národní registry jsem řešil primárně pro #abbr("NRZP", none) spravovaný #abbr("ÚZIS", none). Praktická zkušenost ukázala, že samotné technické rozhraní ještě neznamená funkční integraci. Vedle klientského certifikátu bylo nutné řešit i přidělení externích identifikačních údajů a odpovídajících oprávnění na straně poskytovatele služby.
 
 Konkrétním integračním problémem bylo, že veřejně popsané #abbr("SOAP", none)/#abbr("WSDL", "Web Services Description Language") rozhraní neodpovídalo plně rozhraní, které bylo ve skutečnosti zpřístupněno pro provozní použití. V praxi se tak rozcházel očekávaný způsob napojení s reálně dostupnou vrstvou nad `InterSystems IRIS`, včetně konkrétních metod pro dotaz podle čísla pracovníka a rodného čísla. Součástí řešení proto bylo i doplnění potřebné #abbr("WSDL", none) popisné vrstvy a mapování metod na straně `IRIS`, aby bylo možné službu volat konzistentně a bez přenášení těchto odchylek do aplikační vrstvy. Přímé napojení backendu na generovaného #abbr("SOAP", none) klienta by totiž přeneslo nestabilitu integračního rozhraní do doménové logiky.

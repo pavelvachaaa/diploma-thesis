@@ -6,6 +6,7 @@
   faculty: "fm",
   document: "dp",
   lang: "cs",
+
   title: (
     cs: [Digitální transformace procesů náboru a adaptace pracovníků ve zdravotnické organizaci],
     en: [Digital transformation of recruitment and onboarding processes in a healthcare organization],
@@ -53,7 +54,7 @@ Analýza současného stavu procesů náboru a adaptace pracovníků v Krajské 
 = Implementace systému
 #include "chapters/implementation.typ"
 
-= Nasazení systému do cílového prostředí
+= Nasazení systému\ do cílového prostředí
 #include "chapters/deployment.typ"
 
 = Uživatelské testování a zpětná vazba

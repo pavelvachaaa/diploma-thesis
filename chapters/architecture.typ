@@ -1,7 +1,20 @@
+#import "@preview/vlna:0.1.1": *
+#show: apply-vlna
+
+#set text(
+  lang: "cs",
+  hyphenate: true,
+  costs: (
+    widow: 100%,
+    orphan: 100%,
+    runt: 100%,
+  ),
+)
+
 #import "../template/abbreviations.typ": abbr
 Při návrhu architektury bylo nutné řešit, jak digitalizovat nábor a adaptaci v prostředí, které je organizačně členité, regulatorně citlivé a zároveň omezené provozem na vlastní infrastruktuře. Návrh proto vycházel z konkrétních podmínek KZ a z požadavku, aby bylo řešení možné reálně provozovat a dlouhodobě udržovat.
 
-== Východiska návrhu a volba architektury
+== Východiska návrhu a volba\ architektury
 Architektonická rozhodnutí jsem odvozoval přímo z provozního kontextu #abbr("KZ", none). Organizace není nově vznikající podnik budovaný od nuly s jedním produktem a jedním týmem. Jde o organizaci se sedmi odštěpnými závody, regulovanými daty, různorodými uživatelskými rolemi a omezenými provozními kapacitami. Z toho plyne, že architektura musí být nejen technicky správná, ale i bezpečně provozovatelná a srozumitelná pro další rozvoj.
 
 Klíčovým architektonickým požadavkem je víceorganizační izolace dat (R1). Každý závod musí pracovat se svými daty, ale centrální vedení potřebuje průřezový pohled. Tento požadavek proto nelze řešit jen na úrovni oprávnění v uživatelském rozhraní. Musí být propsán do datového modelu, aplikačních služeb i do způsobu, jakým se vyhodnocují přístupová pravidla. Vedle toho musí systém pokrýt celý tok od zveřejnění pozice přes nábor a vstupní agendu až po adaptaci zaměstnance (R2–R4). Současně musí být připraven na napojení externích služeb (R5) a poskytovat data pro řízení procesu (R6).
@@ -123,7 +136,7 @@ Adaptace je v modelu oddělena jako vztah mezi obecnou šablonou postupu a konkr
 #figure(
   image(
     "../procesy/architecture/conceptual-data-model.svg",
-    width: 100%,
+    width: 98%,
   ),
   caption: [Zjednodušený konceptuální model hlavních entit a vztahů]
 ) <obr:er-diagram>

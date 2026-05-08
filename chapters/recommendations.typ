@@ -1,3 +1,16 @@
+#import "@preview/vlna:0.1.1": *
+#show: apply-vlna
+
+#set text(
+  lang: "cs",
+  hyphenate: true,
+  costs: (
+    widow: 100%,
+    orphan: 100%,
+    runt: 100%,
+  ),
+)
+
 #import "../template/abbreviations.typ": abbr
 
 Tato kapitola navazuje na výsledky analýzy, architektonického návrhu, implementace, nasazení i pilotního uživatelského ověření systému. Jejím cílem není navrhnout co největší množství nových funkcí, ale určit takové pořadí kroků, které udrží procesní přínos řešení pro #abbr("KZ", none), sníží provozní rizika a současně ponechá prostor pro další rozvoj bez zbytečného architektonického dluhu.

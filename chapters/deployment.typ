@@ -1,4 +1,16 @@
 #import "../template/abbreviations.typ": abbr
+#import "@preview/vlna:0.1.1": *
+#show: apply-vlna
+
+#set text(
+  lang: "cs",
+  hyphenate: true,
+  costs: (
+    widow: 100%,
+    orphan: 100%,
+    runt: 100%,
+  ),
+)
 
 Navržený systém má skutečnou hodnotu pouze tehdy, pokud je dlouhodobě provozně udržitelný v reálném prostředí, ve kterém bude nasazen. Klíčovou roli přitom hraje schopnost systém nejen jednorázově nasadit, ale opakovaně a spolehlivě reprodukovat jeho nasazení v různých prostředích. Stejně důležité je zavedení řízení změn, které umožňuje bezpečně provádět úpravy bez narušení stability provozu.
 

@@ -1,3 +1,16 @@
+#import "@preview/vlna:0.1.1": *
+#show: apply-vlna
+
+#set text(
+  lang: "cs",
+  hyphenate: true,
+  costs: (
+    widow: 100%,
+    orphan: 100%,
+    runt: 100%,
+  ),
+)
+
 Tato diplomová práce vycházela z praktického problému, který se v prostředí Krajské zdravotní, a.s. dlouhodobě projevoval jako roztříštěná správa náboru a adaptace pracovníků. Analytická část ukázala, že hlavním omezením není jediný nefunkční krok, ale souběh několika faktorů, mezi které patří rozptýlená data, ruční komunikace mezi rolemi, nízká transparentnost stavu náboru, chybějící auditní stopa a papírově vedená adaptace nových zaměstnanců. V organizaci s více odštěpnými závody a vysokou frekvencí nástupů se tyto slabiny navzájem zesilují a snižují propustnost celého procesu.
 
 Na základě zjištěného stavu jsem formuloval požadavky na cílové řešení a porovnal je s dostupnými komerčními produkty. Rešerše ukázala, že na trhu existují kvalitní dílčí nástroje pro správu náboru nebo onboarding, ale žádné z hodnocených řešení současně nenaplňuje požadavek na procesní kontinuitu, provoz na vlastní infrastruktuře, multi-tenantní členění organizace a vazbu na specifika českého zdravotnického prostředí. Tato zjištění vedla k návrhu vlastního řešení, které tyto požadavky spojuje v jednotném datovém a procesním modelu.
