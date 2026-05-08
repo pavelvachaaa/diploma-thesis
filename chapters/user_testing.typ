@@ -69,6 +69,8 @@ Testovací scénáře jsem navrhl tak, aby pokryly kritické průchody systémem
 
 Scénáře v @tab:user-test-scenarios záměrně nesledují jen izolované klikací úlohy, ale uzly, ve kterých se rozhoduje o průchodnosti celého procesu. Pokud se uživatel ztratí při změně stavu uchazeče, při převodu na zaměstnance nebo při práci s úkolem vstupní agendy, nevzniká pouze lokální nepohodlí v rozhraní, ale přímé zpomalení navazujících kroků.
 
+Přesné znění zadání, které účastníci při pilotním ověření obdrželi, je z důvodu přehlednosti uvedeno v #link(<scenariopage>)[příloze „Zadání scénářů pro pilotní uživatelské ověření“].
+
 Protože šlo o pilotní uživatelské ověření kvalitativního charakteru, nesoustředil jsem se na jedinou agregovanou metriku. Vhodnější bylo sledovat kombinaci ukazatelů, které společně vystihují, zda je proces pro uživatele čitelný, dokončitelný a provozně použitelný. Zajímalo mě zejména to, zda uživatel dosáhl cílového stavu, zda potřeboval zásah moderátora, kolik chybných kroků udělal a jak svůj postup následně slovně hodnotil.
 
 #figure(
