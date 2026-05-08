@@ -49,7 +49,7 @@ Hodnocení vychází z veřejně dostupné dokumentace výrobců, produktových 
 
 Pro účely rozhodnutí byla kritéria typu *Must* chápána jako diskvalifikační. Pokud řešení nesplní kterékoli kritérium K1–K5, není vhodné jako cílová platforma pro digitalizaci procesů #abbr("KZ", none), i když může být přínosné jako dílčí integrační komponenta.
 
-== Specializované náborové\ platformy
+== Specializované náborové platformy
 Specializované #abbr("ATS", none) nástroje jsou zaměřeny především na počáteční fázi náboru. Silné jsou zejména v oblasti správy pracovních pozic, evidence uchazečů, komunikace s nimi a zveřejňování pracovních nabídek. Pro účely této práce však není klíčové pouze to, jak efektivně dokážou nábor zahájit, ale zda na něj dokážou plynule navázat i v oblasti vstupní agendy a adaptačního procesu. Právě tyto fáze jsou v prostředí zdravotnické organizace výrazně složitější než v běžném komerčním náboru.
 
 === Teamio (Alma Career)
@@ -100,7 +100,7 @@ Oracle Fusion Cloud HCM je výrobcem prezentován jako kompletní cloudové ře�
 
 V případě #abbr("KZ", none) však i zde převažuje stejná bariéra: nesoulad s požadavkem na on-premise provoz a vysoká míra přizpůsobení nutná pro české zdravotnické procesy, zejména ve vazbě na národní registry a interní organizační členění holdingu.
 
-== Porovnání řešení vůči\ požadavkům organizace
+== Porovnání řešení vůči požadavkům organizace
 Následující tabulky shrnují vybraná řešení podle diskvalifikačních kritérií K1–K5 a doplňkových kritérií K6–K8 uvedených v @tab:research-kriteria. Hodnocení je provedeno kvalitativně ve škále *Ano / Částečně / Ne* na základě veřejně doložitelných informací.
 
 Pro @tab:porovnani-diskvalifikace platí: K1 = nábor, K2 = adaptace, K3 = multi-tenantní podpora, K4 = integrace/#abbr("API", none), K5 = on-premise provoz.
@@ -162,7 +162,7 @@ Z porovnání doplňkových kritérií vyplývá, že rozdíly mezi produkty se 
 
 Specifickým požadavkem zdravotnického prostředí je napojení na ověřování odborné způsobilosti zdravotnických pracovníků (#abbr("NRZP", none)), které je v českém eGovernment ekosystému dostupné jako samostatná služba @govNrzpOvereni2026.  Ve veřejné dokumentaci hodnocených komerčních produktů nebyla k datu rešerše doložena explicitní, hotová podpora tohoto procesu bez doplňkového vývoje nebo integrační nadstavby.
 
-== Identifikovaná omezení\ dostupných produktů a volba cílového přístupu
+== Identifikovaná omezení dostupných produktů a volba cílového přístupu
 Zjištění ukazují, že hlavní limit dostupných produktů neleží v absenci jednotlivých funkcí. Leží v nesouladu mezi jejich produktovou logikou a cílovou architekturou #abbr("KZ", none). První omezení představuje provozní model. Významná část funkčně robustních enterprise platforem je koncipována jako cloud-native služba, zatímco #abbr("KZ", none) vyžaduje provoz na vlastní infrastruktuře z důvodu interních pravidel řízení a správy IT (governance), bezpečnostních politik a provozní autonomie.
 
 Druhé omezení se týká procesní kontinuity. U specializovaných ATS řešení je často vysoká kvalita náborové části, avšak adaptační proces bývá realizován v odděleném nástroji. Vzniká tak architektura "best of breed", která je funkčně flexibilní, ale z pohledu provozu přináší rizika roztříštěnosti dat, složitější správu identit a vyšší náklady na dlouhodobé integrační testování.

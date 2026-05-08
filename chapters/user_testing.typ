@@ -27,7 +27,7 @@ Na základě těchto cílů jsem formuloval následující výzkumné otázky:
 4. Jaká zjištění mají nejvyšší prioritu pro další iteraci systému?
 
 
-== Metodický postup a výběr\ respondentů
+== Metodický postup a výběr respondentů
 Pilotní uživatelské ověření jsem vedl jako moderované scénářové ověření v průběhu školení zaměstnanců s vyvinutým systémem. Každý účastník procházel scénáře odpovídající jeho roli, pracoval s připravenými úlohami vycházejícími z reálného provozu a průběžně komentoval, jak rozumí jednotlivým krokům a stavům systému. Tento postup mi umožnil nesledovat pouze to, zda uživatel úkol dokončil, ale také proč se v určitém bodě zastavil a jak interpretoval význam zobrazených informací.
 
 Z metodického hlediska jsem kombinoval tři vzájemně se doplňující techniky. Základem bylo scénářové ověření s jednoznačně definovaným cílovým stavem a měřením doby dokončení. Druhou vrstvu tvořilo průběžné komentování postupu uživatelem, které pomohlo odlišit pouhou chybu od hlubší nejasnosti v terminologii nebo navigaci. Třetí vrstvou byl krátký rozhovor po dokončení scénáře, ve kterém jsem ověřoval, co bylo pro uživatele přínosné, co považoval za problematické a jaké změny by očekával před širším provozním rozšířením.

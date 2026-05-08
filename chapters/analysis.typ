@@ -21,7 +21,7 @@ V roce 2021 se struktura #abbr("KZ", none) dále rozšířila. Do společnosti b
 
 S více než jedenácti tisíci zaměstnanci patří #abbr("KZ", none) mezi největší zaměstnavatele v Ústeckém kraji. Pro tuto práci je podstatné zejména to, že značnou část personálu tvoří zdravotničtí pracovníci s regulovanou odbornou způsobilostí. Nábor a adaptace zde proto nejsou jen administrativní agendou, ale procesem, který musí současně splnit provozní, legislativní i odborné požadavky.
 
-=== Organizační struktura z pohledu\ řízení lidských zdrojů
+=== Organizační struktura z~pohledu řízení lidských zdrojů
 #abbr("KZ", none) je řízená centrálně, avšak jednotlivé nemocnice mají zároveň prostor samostatně řešit běžné provozní a personální záležitosti. Každý odštěpný závod má vlastní personální zázemí #abbr("HR", "Human Resources") pro operativní agendu, správu smluv, docházku i řízení adaptace, ale současně se řídí jednotnou metodikou a strategickými cíli společnosti.
 
 Z pohledu digitalizace je důležité, že systém nesmí uvažovat organizaci jako jeden homogenní celek. Musí respektovat samostatnost jednotlivých závodů a zároveň umožnit centrální dohled, reporting a správu pravidel. V architektonické terminologii jde o požadavek na _multi-tenantní_ řešení, ve kterém každý odštěpný závod vystupuje jako samostatný tenant sdílející společnou infrastrukturu i metodické řízení.
@@ -131,7 +131,7 @@ Celý proces v notaci #abbr("BPMN", none) přehledně shrnuje @obr:proces-p01 a 
 ) <obr:proces-p01>
 
 
-=== Proces příjmu a výběru\ potenciálních kandidátů
+=== Proces příjmu a výběru potenciálních kandidátů
 Přihlášky dnes přicházejí z různých zdrojů a náborář je musí ručně sjednocovat do tabulek a lokálně uložených příloh. Samotné získání přehledu o kandidátech je tak oddělenou administrativní činností, nikoli přirozenou součástí náborového systému. Výsledkem je nekonzistence dat mezi pracovišti a nízká dohledatelnost dokumentů.
 
 Prvotní třídění uchazečů probíhá převážně manuálně. U zdravotnických pozic to znamená vyhledávat v každém životopise údaje o vzdělání, odborné způsobilosti a další podmínky, které rozhodují o dalším postupu. Bez automatických filtrů a strukturovaných dat je tento krok pomalý a zároveň náchylný k přehlédnutí důležitých informací. Užší výběr se následně předává vedoucím oddělení znovu e-mailem, takže rozhodovací proces zůstává roztříštěný.
@@ -319,7 +319,7 @@ Z analytického pohledu lze problémy rozdělit do tří tematických oblastí. 
 
 Na základě dat, které poskytuje @tab:zavaznost-problemu, lze souhrnně konstatovat, že stávající procesní model již neodpovídá rozsahu organizace ani požadavkům na datově řízené rozhodování. Zjištění této kapitoly proto představují přímý vstup pro definici požadavků na cílové řešení.
 
-== Požadavky na digitalizaci\ procesů
+== Požadavky na digitalizaci procesů
 Na základě provedené analýzy procesů a identifikovaných problémů (@kapitola-identifikcea-problemu) lze formulovat klíčové požadavky na digitalizaci procesů náboru a adaptace. Každý požadavek je odůvodněn vazbou na identifikované problémy.
 
 Požadavky R1–R6 představují minimální funkční rámec cílového systému. Každý požadavek je formulován tak, aby byl implementovatelný, ověřitelný při testování a současně jednoznačně navázaný na problémy identifikované v předchozí sekci.

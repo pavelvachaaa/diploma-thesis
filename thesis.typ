@@ -36,7 +36,10 @@
 )
 
 = Úvod
-
+#show heading: it => {
+  set text(hyphenate: false)
+  it
+}
 #include "chapters/introduction.typ"
 
 = Analýza současného stavu
@@ -54,7 +57,7 @@ Analýza současného stavu procesů náboru a adaptace pracovníků v Krajské 
 = Implementace systému
 #include "chapters/implementation.typ"
 
-= Nasazení systému\ do cílového prostředí
+= Nasazení systému do~cílového prostředí
 #include "chapters/deployment.typ"
 
 = Uživatelské testování a zpětná vazba
