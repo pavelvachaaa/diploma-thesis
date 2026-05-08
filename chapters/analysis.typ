@@ -24,21 +24,21 @@ Rozdílné nároky se projevují už v samotné kategorizaci pracovníků. Zamě
     fill: (x, y) => if y == 0 { rgb("#eeeeee") } else { white },
     stroke: 0.5pt + gray,
 
-    [Kategorie (dle KS)], [Typické pozice v #abbr("KZ", none)], [Klíčová specifika pro #abbr("HR", none)],
+    [Kategorie], [Typické pozice v #abbr("KZ", none)], [Klíčová specifika pro #abbr("HR", none)],
 
     [#abbr("LZ", none)],
     [Atestovaní lékaři, lékaři v přípravě, farmaceuti],
-    [Sledování specializačního vzdělávání (atestace), IPVZ, evidence v ČLK.],
+    [Sledování specializačního vzdělávání (atestace) a evidence v #abbr("ČLK", "Česká lékařská komora").],
 
     [#abbr("NLZP", none)],
     [Všeobecné sestry, dětské sestry, porodní asistentky],
-    [Odborná a specializovaná způsobilost, vzdělávání pod NCONZO.],
+    [Odborná a specializovaná způsobilost, vzdělávání],
 
-    [Ostatní #abbr("NLZP", none) a JOP],
+    [Jiní odborní pracovníci],
     [Radiologičtí asistenti, fyzioterapeuti, sanitáři, kliničtí psychologové],
     [Certifikované kurzy, akreditované stáže, specifické nároky na praxi.],
 
-    [THP a Provoz],
+    [#abbr("THP", "Technicko-hospodářští pracovníci")],
     [Ekonomové, #abbr("IT", none) specialisté, údržba, stravovací provoz],
     [Zařazení dle Katalogu prací, standardní zákoník práce.],
   ),
@@ -47,7 +47,7 @@ Rozdílné nároky se projevují už v samotné kategorizaci pracovníků. Zamě
 
 Hlavním specifikem je právě práce v rámci *regulované odborné způsobilosti*. Základním pilířem HR procesů v #abbr("KZ", none) je soulad s legislativním rámcem pro výkon zdravotnických povolání. Nábor a následná správa zaměstnanců se zde opírají zejména o dvě normy:
 
-- Zákon č. 95/2004 Sb. - upravuje získávání odborné a specializované způsobilosti u lékařů, zubních lékařů a farmaceutů. Systém musí sledovat průběh předatestační přípravy, platnost členství v ČLK/ČSK a zařazení do specializačních oborů.
+- Zákon č. 95/2004 Sb. - upravuje získávání odborné a specializované způsobilosti u lékařů, zubních lékařů a farmaceutů. Systém musí sledovat průběh předatestační přípravy, platnost členství v #abbr("ČLK", none)/ČSK a zařazení do specializačních oborů.
 
 - Zákon č. 96/2004 Sb. - definuje podmínky pro #abbr("NLZP", none). Zde je kritické sledování odborné způsobilosti a schopnosti vykonávat povolání bez odborného dohledu (v souladu s aktuální metodikou Ministerstva zdravotnictví a #abbr("ÚZIS", "Ústav zdravotnických informací a statistiky ČR")).
 
@@ -71,7 +71,7 @@ Pro zajištění terminologické konzistence jsou v této kapitole používány 
 === Proces inzerce volných pozic
 Inzerce volných pracovních pozic je v současném stavu rozložena mezi několik nezávislých kanálů:
 
-- *Webové portály třetích stran* - jobs.cz, prace.cz (provozovatel LMC), portál provozující #abbr("MPSV", "Ministerstvo práce a sociálních věcí České republiky")
+- *Webové portály třetích stran* - jobs.cz, prace.cz (provozovatel LMC), portál Ministerstva práce a sociálních věcí
 - *Nemocniční nástěnky* - fyzické nástěnky v areálech nemocnic
 - *Webové stránky nemocnic* - statické stránky s omezenou aktualizací
 - *Sociální sítě* - LinkedIn
@@ -274,7 +274,7 @@ V současném stavu je však adaptace z velké části vedena papírově. To kom
 == Identifikace problémů a úzkých míst<kapitola-identifikcea-problemu>
 Na základě analýzy současného stavu procesů náboru a adaptace v KZ, konzultací s HR pracovníky jednotlivých nemocnic a pozorování reálného průběhu procesů jsem identifikoval následující klíčové problémy. Problémy jsou kategorizovány podle oblastí dopadu a doplněny o kvalitativní hodnocení závažnosti.
 
-Identifikované problémy mají kumulativní charakter a v provozní praxi se vzájemně zesilují. Situaci ovlivňuje také častá obměna zaměstnanců. Do organizace nastupuje v průměru 110 nových pracovníků měsíčně, přičemž v sezónních špičkách může jít až o 180 osob. Typická měsíční struktura nástupů přitom zahrnuje přibližně 10 pracovníků kategorie #abbr("LZ", none), 50 #abbr("NLZP", none) a 50 #abbr("THP", "technickohospodářských pracovníků")/dělnických profesí. V takovém objemu se manuální administrativa stává kritickým omezením propustnosti celého procesu.
+Identifikované problémy mají kumulativní charakter a v provozní praxi se vzájemně zesilují. Situaci ovlivňuje také častá obměna zaměstnanců. Do organizace nastupuje v průměru 110 nových pracovníků měsíčně, přičemž v sezónních špičkách může jít až o 180 osob. Typická měsíční struktura nástupů přitom zahrnuje přibližně 10 pracovníků kategorie #abbr("LZ", none), 50 #abbr("NLZP", none) a 50 #abbr("THP", none)/dělnických profesí. V takovém objemu se manuální administrativa stává kritickým omezením propustnosti celého procesu.
 
 Z analytického pohledu lze problémy rozdělit do tří tematických oblastí. První oblast představuje *datová fragmentace* (P1–P3), kdy jsou informace rozptýleny mezi e-mailovou komunikaci, lokální soubory a tabulkové přehledy jednotlivých závodů. Druhou oblast tvoří *procesní a řídicí nedostatky* (P4–P9), zejména chybějící auditní stopa, nízká standardizace rozhodování a slabá transparentnost stavu náboru i vstupní agendy. Třetí oblast je *digitálně nepodpořená adaptace* (P10), která omezuje možnost systematicky řídit zapracování nových zaměstnanců a vyhodnocovat jeho úspěšnost.
 
@@ -291,7 +291,7 @@ Z analytického pohledu lze problémy rozdělit do tří tematických oblastí. 
       [P1], [Tabulková a papírová agenda], [Vysoká], [Riziko ztráty dat, neefektivní práce],
       [P2], [Chybějící evidence uchazečů], [Vysoká], [Ztráta kandidátů, nemožnost analytiky],
       [P3], [Neexistující evidence zájemců], [Střední], [Ztráta potenciálních kandidátů],
-      [P4], [Absence auditní stopy], [Vysoká], [Právní rizika, GDPR, neschopnost auditu],
+      [P4], [Absence auditní stopy], [Vysoká], [Právní rizika, #abbr("GDPR", "General Data Protection Regulation"), neschopnost auditu],
       [P5], [Omezený reporting], [Střední], [Rozhodování bez datové opory],
       [P6], [Komunikační smyčka], [Vysoká], [Prodloužení doby obsazení pozice],
       [P7], [Manuální publikace], [Střední], [Časová náročnost, nekonzistence],
@@ -344,8 +344,8 @@ Požadavky R1–R6 představují minimální funkční rámec cílového systém
       [P1, P4, P5, P10],
 
       [R5],
-      [Integrace s NRZP],
-      [Automatizovat ověřování odborné způsobilosti zdravotnických pracovníků přes napojení na NRZP.],
+      [Integrace s #abbr("NRZP", "Národní registr zdravotnických pracovníků")],
+      [Automatizovat ověřování odborné způsobilosti zdravotnických pracovníků přes napojení na #abbr("NRZP", none).],
       [P1, P4],
 
       [R6],
@@ -477,7 +477,7 @@ Funkční požadavky definují konkrétní chování systému, tedy co systém m
       [R5],
 
       [F14],
-      [Systém upozorní náboráře, pokud uchazeč nemá platný záznam v NRZP nebo má omezenou způsobilost],
+      [Systém upozorní náboráře, pokud uchazeč nemá platný záznam v #abbr("NRZP", none) nebo má omezenou způsobilost],
       [Should],
       [R5],
 
@@ -586,11 +586,11 @@ Nefunkční požadavky definují kvalitativní vlastnosti systému, které nejso
 
       [NF01],
       [Bezpečnost],
-      [Systém musí zajistit ochranu osobních údajů uchazečů a zaměstnanců v souladu s GDPR (nařízení 2016/679) a zákonem č. 110/2019 Sb. o zpracování osobních údajů],
+      [Systém musí zajistit ochranu osobních údajů uchazečů a zaměstnanců v souladu s #abbr("GDPR", none) (nařízení 2016/679) a zákonem č. 110/2019 Sb. o zpracování osobních údajů],
 
       [NF02],
       [Bezpečnost],
-      [Autentizace uživatelů musí být zajištěna prostřednictvím OIDC nad OAuth 2.0 s integrací do existujícího SSO poskytovatele organizace],
+      [Autentizace uživatelů musí být zajištěna prostřednictvím #abbr("OIDC", "OpenID Connect") nad #abbr("OAuth", "Open Authorization") 2.0 s integrací do existujícího #abbr("SSO", "Single Sign-On")],
 
       [NF03],
       [Bezpečnost],
@@ -604,7 +604,7 @@ Nefunkční požadavky definují kvalitativní vlastnosti systému, které nejso
 
       [NF06],
       [Přístupnost],
-      [Kariérní portál musí být responzivní a navržený v souladu se zásadami WCAG 2.1 na úrovni AA],
+      [Kariérní portál musí být responzivní a navržený v souladu se zásadami #abbr("WCAG", "Web Content Accessibility Guidelines") 2.1 na úrovni AA],
 
       [NF07],
       [Nasaditelnost],
@@ -616,7 +616,7 @@ Nefunkční požadavky definují kvalitativní vlastnosti systému, které nejso
 
       [NF09],
       [Lokalizace],
-      [Veškerá uživatelská rozhraní musí být v českém jazyce, systém musí správně pracovat s českou diakritikou ve všech vrstvách (databáze, API, UI)],
+      [Celé uživatelské rozhraní musí být v češtině ],
 
       [NF10],
       [Kompatibilita],

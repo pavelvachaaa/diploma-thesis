@@ -26,7 +26,7 @@ Provozní model nejprve definuje vzájemné závislosti služeb (tedy které č�
       [Vrstva], [Komponenty], [Stav], [Expozice],
 
       [Veřejné portály], [`kariera.kzcr.eu`, `onboarding.kzcr.eu`], [Bezstavová], [Veřejná],
-      [Transakční API], [`hr-backend`, databázové migrace], [Převážně bezstavová], [Interní],
+      [Transakční #abbr("API", none)], [`hr-backend`, databázové migrace], [Převážně bezstavová], [Interní],
       [Integrační adaptéry], [`qualification-adapter`, `user-search-adapter`], [Bezstavová], [Interní],
       [Asynchronní zpracování], [outbox worker, auditní a analytické procesory], [Bezstavová], [Interní],
       [Stavové služby], [`PostgreSQL`, `SeaweedFS`, `RabbitMQ`, `Umami`], [Stavová], [Interní],
@@ -86,7 +86,7 @@ V této fázi lze část plánované údržby přesunout mimo měřené okno a n
 
 Současně je však nutné otevřeně pojmenovat, že `Docker Compose` neposkytuje ochranu proti výpadku celého hostu. Výpadek serveru s transakční částí znamená nedostupnost hlavního náborového toku, zatímco výpadek serveru s `cv_processor` a `job_processor` vede především k degradaci podpůrných analytických funkcí a k nárůstu fronty zpracování. Pokud by organizace požadovala vyšší dostupnost, menší toleranci k odstávkám nebo automatické zotavení mezi fyzickými uzly, stala by se tato architektonická mez zásadní.
 
-`Docker Compose` by přestal být přiměřenou volbou zejména při splnění některé z těchto podmínek. Požadavek na automaticky řízený běh přes více hostů, potřeba rolling nebo blue-green nasazení bez aplikační odstávky, zpřísnění dostupnosti nad rámec NF04 nebo rozšíření měřeného okna na 24/7, potřeba horizontálně škálovat veřejná API a workery podle zátěže, požadavek na centralizovanou správu tajných hodnot a síťových politik nebo rozšíření provozu na více týmů a prostředí se stejným standardem. V takovém okamžiku by migrace na `Kubernetes` nebyla technologickou preferencí, ale reakcí na změnu provozních požadavků. 
+`Docker Compose` by přestal být přiměřenou volbou zejména při splnění některé z těchto podmínek. Požadavek na automaticky řízený běh přes více hostů, potřeba rolling nebo blue-green nasazení bez aplikační odstávky, zpřísnění dostupnosti nad rámec NF04 nebo rozšíření měřeného okna na 24/7, potřeba horizontálně škálovat veřejná #abbr("API", none) a workery podle zátěže, požadavek na centralizovanou správu tajných hodnot a síťových politik nebo rozšíření provozu na více týmů a prostředí se stejným standardem. V takovém okamžiku by migrace na `Kubernetes` nebyla technologickou preferencí, ale reakcí na změnu provozních požadavků. 
 
 == Vydání, konfigurace a změnové řízení
 Nasazení vychází z jednotného toku vydání založeného na verzovaných obrazech. Nová verze je sestavena mimo cílový host, ověřena, uložena do interního registru a do cílového prostředí se přenáší pouze obraz a minimální nasazovací balíček. Tím se omezuje rozdíl mezi prostředím sestavení a prostředím provozu a současně vzniká dohledatelná vazba mezi verzí zdrojového kódu, obrazem a nasazenou instancí.
@@ -178,9 +178,9 @@ Dohledová vrstva je navržena tak, aby převáděla nefunkční požadavky do m
 Použité technologie jsou vidět v @tab:deployment-observability. Sběrný agent `Alloy` pro logy, metriky a trasy. Logy jsou ukládány do `Loki`, metriky do `Prometheus`, trasy do `Tempo` a jednotné rozhraní pro přehledy a alerty poskytuje `Grafana`.
 
 
-Z hlediska NF04 jsou důležité zejména signály vztahující se k dostupnosti a průchodnosti hlavních procesů. Dostupnost `/hrbackend/ready`, healthchecky integračních adaptérů, poměr HTTP odpovědí `5xx`, připravenost outbox workeru, stáří nejstarších položek v outboxu, dead-letter růst, počet konzumentů fronty a základní kapacitní ukazatele `PostgreSQL` a `SeaweedFS`. 
+Z hlediska NF04 jsou důležité zejména signály vztahující se k dostupnosti a průchodnosti hlavních procesů. Dostupnost `/hrbackend/ready`, healthchecky integračních adaptérů, poměr #abbr("HTTP", none) odpovědí `5xx`, připravenost outbox workeru, stáří nejstarších položek v outboxu, dead-letter růst, počet konzumentů fronty a základní kapacitní ukazatele `PostgreSQL` a `SeaweedFS`. 
 
-Požadavek NF05 je pokryt zejména měřením p95 odezvy HTTP rozhraní a saturace databázového poolu. První provozní měření v `Grafana` tak neslouží pouze jako technický dashboard, ale jako důkazní opora pro tvrzení, že zvolený model v aktuálním zatížení odpovídá požadavkům na dostupnost a výkon.
+Požadavek NF05 je pokryt zejména měřením p95 odezvy #abbr("HTTP", none) rozhraní a saturace databázového poolu. První provozní měření v `Grafana` tak neslouží pouze jako technický dashboard, ale jako důkazní opora pro tvrzení, že zvolený model v aktuálním zatížení odpovídá požadavkům na dostupnost a výkon.
 
 Dohledová vrstva současně slouží i k detekci odchylek, které mohou signalizovat bezpečnostní nebo integrační problém, například neobvyklý nárůst chybovosti, latence nebo zpoždění ve zpracování front.
 
