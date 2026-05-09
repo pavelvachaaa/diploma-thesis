@@ -146,23 +146,53 @@
     for (idx, attachment) in data.enumerate() {
       let attachment_type = attachment.at(0);
       if attachment_type == "content" {
+        if idx > 0 {
+          pagebreak();
+        }
+        let short_title = get_lang_item(language, "attachment") + " " + str(idx + 1);
+        let outline_title = short_title + ": " + attachment.at(2);
+        {
+          show heading.where(level: 2): it => {
+            none
+          }
+          heading(
+            level: 2,
+            outline_title,
+            numbering: none,
+            outlined: true,
+          );
+        }
         heading(
           level: 2,
-          get_lang_item(language, "attachment") + " " + str(idx + 1),
+          short_title,
           numbering: none,
           outlined: false,
         );
-        query(label(attachment.at(1))).at(0).value;
+        {
+          show heading: set heading(outlined: false);
+          query(label(attachment.at(1))).at(0).value;
+        }
       } else if attachment_type == "pdf" {
         import "./pdf.typ": embed_full
-        page(place(center + horizon, heading(
-          level: 2,
-          get_lang_item(language, "attachment") + " " +
-          str(idx + 1) + " " +
-          get_lang_item(language, "next_page_attachment"),
-          numbering: none,
-          outlined: false,
-        )), margin: 0em);
+        let short_title = get_lang_item(language, "attachment") + " " + str(idx + 1);
+        let outline_title = short_title + ": " + attachment.at(2) + " " + get_lang_item(language, "next_page_attachment");
+        page(place(center + horizon, {
+          show heading.where(level: 2): it => {
+            none
+          }
+          heading(
+            level: 2,
+            outline_title,
+            numbering: none,
+            outlined: true,
+          );
+          heading(
+            level: 2,
+            short_title,
+            numbering: none,
+            outlined: false,
+          );
+        }), margin: 0em);
         set page(margin: 0em);
         embed_full(read("../" + attachment.at(1), encoding: none));
       }

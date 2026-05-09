@@ -1,4 +1,5 @@
 #set text(size: 8pt)
+#show heading: set heading(numbering: none)
 
 Tato příloha zachycuje zadání, které bylo použito při pilotním uživatelském ověření, přesněji při školení náborářů. Zadání bylo formulováno tak, aby účastník znal cíl scénáře, ale nebyl veden po jednotlivých kliknutích. Smyslem bylo ověřit, zda je uživatel schopen v systému samostatně najít správný postup a porozumět cílovému stavu procesu.
 

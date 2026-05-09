@@ -74,7 +74,7 @@ Podpisem pracovní smlouvy končí práce náboráře a personálního oddělen�
 == Současný stav procesů náboru pracovníků<kapitola-soucasny-stav>
 Před zahájením digitalizace stála správa uchazečů v #abbr("KZ", none) převážně na sdílených tabulkách a e-mailové komunikaci, kterou doplňují lokální zvyklosti jednotlivých závodů. Takové řešení může fungovat efektivně v menší organizaci, ale v podmínkách #abbr("KZ",none) začíná postupně brzdit celý proces. Nábor zde pak nepůsobí jako jeden plynulý celek, ale jako řada navazujících administrativních kroků, mezi nimiž se informace ztrácejí nebo zbytečně přepisují.
 
-Pro účely analýzy jsem proto mapoval skutečný průběh procesů pomocí strukturovaných rozhovorů s vedoucím personálního oddělení a s náboráři jednotlivých odštěpných závodů. Vycházel jsem nejen z formálních metodických pokynů, ale i z popisu reálné praxe, tedy z toho, jak proces skutečně probíhá při běžném provozu, včetně neformálních dohod a obcházení chybějících nástrojů.
+Pro účely analýzy jsem proto mapoval skutečný průběh procesů pomocí strukturovaných rozhovorů (#link(<otazky-rozhovory>)[Příloha 4]) s vedoucím personálního oddělení a s náboráři jednotlivých odštěpných závodů. Vycházel jsem nejen z formálních metodických pokynů, ale i z popisu reálné praxe, tedy z toho, jak proces skutečně probíhá při běžném provozu, včetně neformálních dohod a obcházení chybějících nástrojů.
 
 Pro zajištění terminologické konzistence jsou v této kapitole používány následující pojmy:
 
@@ -92,7 +92,7 @@ Inzerce volných pracovních pozic je v současném stavu rozložena mezi někol
 
 Absence vlastního kariérního portálu znamená, že uchazeč nemá jednotný vstupní bod, ve kterém by našel aktuální nabídky všech závodů, základní informace o zaměstnavateli i možnost okamžitě reagovat na pozici. Už na této úrovni tedy vzniká roztříštěnost, kterou organizace dále přenáší i do interní práce s inzeráty.
 
-Proces začíná tím, že vedoucí oddělení identifikuje potřebu obsadit pozici a předává ji personálnímu oddělení. Vstupní informace však nejsou standardizované. Rozsah i kvalita zadání se liší podle konkrétního vedoucího, takže HR často nejprve doplňuje chybějící údaje a až poté připravuje text inzerátu. Samotné schvalování proto probíhá v několika e-mailových iteracích a místo plynulého procesu vzniká komunikační smyčka.
+Proces začíná tím, že vedoucí oddělení identifikuje potřebu obsadit pozici a předává ji personálnímu oddělení, pod které organizačně spadají náboráři. Vstupní informace však nejsou standardizované. Rozsah i kvalita zadání se liší podle konkrétního vedoucího, takže náborář často nejprve doplňuje chybějící údaje a až poté připravuje text inzerátu. Samotné schvalování proto probíhá v několika e-mailových iteracích a místo plynulého procesu vzniká komunikační smyčka.
 
 Po schválení textu následuje ruční publikace na jednotlivých platformách. Každý portál má vlastní formulář, vlastní strukturu dat i vlastní způsob následné aktualizace. Změna termínu nebo úprava požadavků proto neznamená jednu opravu v centrálním systému, ale opakování stejné práce na více místech. Důsledkem je nízká transparentnost, vyšší časová náročnost a slabý přehled vedoucích pracovníků o tom, kde se jejich pozice právě nachází a jaké reakce na ni přišly. Navíc se ukázalo, že publikace na webových stránkách organizace je závislá pouze na jedné osobě, což představuje významné provozní riziko a může vést ke zpožděním nebo omezení dostupnosti informací.
 
@@ -155,7 +155,7 @@ Kritickým nedostatkem je i absence systematické databáze uchazečů a zájemc
     [Technické prostředky:], [E-mail, telefon, tabulkový procesor, Webex],
     [Metrika:], [Rychlost od vystavení inzerátu po oslovení kandidáta],
     [Nedostatky:],
-    [Neexistence centrální databáze uchazečů o pozici, neexistence databáze potenciálních zájemců o zaměstnání v KZ],
+    [Chybějící centrální evidence uchazečů o pracovní pozice a potenciálních zájemců o zaměstnání v #abbr("KZ", none).],
   ),
   caption: [Proces P02 - Příjem a výběr kandidátů k oslovení],
 ) <tab:proces-p02>
@@ -187,7 +187,7 @@ Proces tak sice formálně vede k uzavření pracovní smlouvy, ale z provozníh
 
     [Identifikátor procesu:], [P03],
     [Název procesu:], [Pohovor a uzavření pracovního poměru],
-    [Zákazník:], [Vedoucí oddělení, PAM],
+    [Zákazník:], [Vedoucí oddělení, personální oddělení],
     [Vlastník procesu:], [Vedoucí oddělení, personální a mzdové oddělení],
     [Účel:], [Odborné posouzení kandidáta a splnění podmínek pro vznik pracovněprávního vztahu],
     [Produkt:], [Podepsaná pracovní smlouva],
@@ -226,7 +226,7 @@ Vedle technických přístupů probíhá i útvarová orientace nového zaměstn
     [Identifikátor procesu:], [P04],
     [Název procesu:], [Nástup zaměstnance a zajištění přístupových prostředků],
     [Zákazník:], [Nový zaměstnanec],
-    [Vlastník procesu:], [PAM, IT, vedoucí oddělení],
+    [Vlastník procesu:], [Personální oddělení, IT, vedoucí oddělení],
     [Účel:], [Zajištění připravenosti zaměstnance k výkonu práce],
     [Produkt:], [Zaměstnanec vybaven ID kartou, přístupy a případně tokenem],
     [Technické prostředky:], [ID karta, docházkový systém, autentizační token, interní IT systémy],
