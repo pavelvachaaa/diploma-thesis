@@ -1,0 +1,48 @@
+services:
+  express:
+    container_name: kariera_kzcr_eu
+    image: kariera-kzcr-eu:${APP_VERSION:-latest}
+    restart: unless-stopped
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    env_file:
+      - .env
+
+    environment:
+      NODE_ENV: production
+      APP_VERSION: ${APP_VERSION:-local}
+      NODE_OPTIONS: "--max-old-space-size=${NODE_MAX_OLD_SPACE_SIZE:-256}"
+      PORT: "3000"
+
+    ports:
+      - "${EXPRESS_BIND_HOST:-127.0.0.1}:${EXPRESS_PORT:-3010}:3000"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/health || wget -q --spider http://127.0.0.1:3000/api/health || wget -q --spider http://127.0.0.1:3000 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    security_opt:
+      - no-new-privileges:true
+
+    mem_limit: ${EXPRESS_MEMORY_LIMIT:-512m}
+    memswap_limit: ${EXPRESS_MEMORY_SWAP_LIMIT:-512m}
+
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    name: app-network
+    external: true

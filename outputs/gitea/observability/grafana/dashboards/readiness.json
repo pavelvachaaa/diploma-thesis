@@ -1,0 +1,88 @@
+{
+  "uid": "kz-readiness",
+  "title": "Readiness & dependencies",
+  "tags": ["kz", "readiness"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Scrape up — services",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 5 },
+      "targets": [
+        {
+          "expr": "up{job=~\"hiring-backend|qualification-adapter|user-search-adapter|postgres|rabbitmq|seaweedfs\"}",
+          "legendFormat": "{{job}}",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["last"], "fields": "", "values": false },
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "hiring-backend components",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "x": 0, "y": 5, "w": 24, "h": 5 },
+      "targets": [
+        {
+          "expr": "app_component_ready",
+          "legendFormat": "{{component}}",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "NOT READY", "color": "red" }, "1": { "text": "READY", "color": "green" } } }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["last"], "fields": "", "values": false },
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "pg pool — total / idle / waiting",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "x": 0, "y": 10, "w": 12, "h": 9 },
+      "targets": [
+        { "expr": "db_pool_total", "legendFormat": "total", "refId": "A" },
+        { "expr": "db_pool_idle", "legendFormat": "idle", "refId": "B" },
+        { "expr": "db_pool_waiting", "legendFormat": "waiting", "refId": "C" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "RabbitMQ consumers per queue",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "x": 12, "y": 10, "w": 12, "h": 9 },
+      "targets": [
+        { "expr": "rabbitmq_queue_consumers", "legendFormat": "{{queue}}", "refId": "A" }
+      ]
+    }
+  ]
+}

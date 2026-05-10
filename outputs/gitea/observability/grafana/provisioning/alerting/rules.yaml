@@ -1,0 +1,517 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: app-availability
+    folder: KZ Alerts
+    interval: 1m
+    rules:
+      - uid: kz-app-down
+        title: 'App down — Prometheus scrape failing'
+        condition: COND
+        for: 2m
+        noDataState: NoData
+        execErrState: Error
+        annotations:
+          summary: 'Aplikace {{ $labels.service }} přestala odpovídat na scrape /metrics.'
+          description: 'Cíl {{ $labels.job }} ({{ $labels.instance }}) je {{ $value }} (1=up, 0=down) déle než 2 minuty.'
+        labels:
+          severity: high
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: 'up{job=~"hiring-backend|qualification-adapter|user-search-adapter"}'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: lt, params: [1] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+      - uid: kz-readiness-degraded
+        title: 'hiring-backend ready endpoint degraded'
+        condition: COND
+        for: 3m
+        noDataState: NoData
+        execErrState: Error
+        annotations:
+          summary: 'Některá komponenta hiring-backend není ready (component={{ $labels.component }}).'
+          description: 'app_component_ready{component="{{ $labels.component }}"} = 0 déle než 3 minuty. Endpoint /hrbackend/ready vrací 503.'
+        labels:
+          severity: high
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: 'app_component_ready'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: lt, params: [1] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+  - orgId: 1
+    name: http-quality
+    folder: KZ Alerts
+    interval: 1m
+    rules:
+      - uid: kz-http-5xx-ratio
+        title: 'High 5xx ratio'
+        condition: COND
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 'Služba {{ $labels.service }} vrací více než 5 % 5xx odpovědí.'
+          description: 'Podíl 5xx za posledních 5 min překročil 5 % na službě {{ $labels.service }}. Zkontroluj logy a integrační vazby.'
+        labels:
+          severity: high
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: 'sum by (service) (rate(http_requests_total{status_code=~"5.."}[5m])) / sum by (service) (rate(http_requests_total[5m]))'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [0.05] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+      - uid: kz-http-latency-p95
+        title: 'HTTP p95 latency high'
+        condition: COND
+        for: 10m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 'p95 odezvy služby {{ $labels.service }} překročilo 2s.'
+          description: 'Pomalu odpovídající endpoint na službě {{ $labels.service }} — p95 > 2s déle než 10 minut.'
+        labels:
+          severity: warn
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: 'histogram_quantile(0.95, sum by (service, le) (rate(http_request_duration_seconds_bucket[5m])))'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [2] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+      - uid: kz-http-latency-degradation
+        title: 'HTTP latency degradation (p95 5m vs 1h > 2x)'
+        condition: COND
+        for: 15m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 'Služba {{ $labels.service }} se zpomaluje — p95 5m je více než 2× p95 1h.'
+          description: 'Detekováno postupné zpomalení služby {{ $labels.service }}.'
+        labels:
+          severity: warn
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3900, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: 'histogram_quantile(0.95, sum by (service, le) (rate(http_request_duration_seconds_bucket[5m]))) / on(service) histogram_quantile(0.95, sum by (service, le) (rate(http_request_duration_seconds_bucket[1h])))'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [2] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+  - orgId: 1
+    name: outbox-and-queue
+    folder: KZ Alerts
+    interval: 1m
+    rules:
+      - uid: kz-outbox-processing-age
+        title: 'Outbox: oldest processing too old'
+        condition: COND
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 'Nejstarší processing položka v outboxu visí > 10 min.'
+          description: 'outbox_oldest_processing_age_seconds = {{ $value }}.'
+        labels:
+          severity: high
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: 'max(outbox_oldest_processing_age_seconds)'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [600] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+      - uid: kz-outbox-dead-growth
+        title: 'Outbox: dead-letter growth'
+        condition: COND
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 'Roste počet dead položek v outboxu (event_type={{ $labels.event_type }}).'
+          description: 'Za 10 min přibylo > 50 dead položek typu {{ $labels.event_type }}.'
+        labels:
+          severity: high
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: 'increase(outbox_rows_by_status{status="dead"}[10m])'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [50] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+      - uid: kz-audit-queue-backlog
+        title: 'Audit queue backlog'
+        condition: COND
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 'Audit fronta {{ $labels.queue }} má více než 1000 nezpracovaných zpráv.'
+          description: 'audit_writer_processor pravděpodobně nestíhá nebo neběží.'
+        labels:
+          severity: high
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: 'rabbitmq_queue_messages_ready{queue=~"audit_writer.*"}'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [1000] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+      - uid: kz-audit-dead-letter
+        title: 'Audit dead-letter messages'
+        condition: COND
+        for: 1m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 'V audit dead-letter frontě jsou poison messages ({{ $value }}).'
+          description: 'Některé audit eventy nelze zpracovat — zkontroluj logy audit-writer-processor.'
+        labels:
+          severity: high
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: 'sum(rabbitmq_queue_messages{queue=~".*\\.dead$"})'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [0] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+      - uid: kz-rabbit-no-consumers
+        title: 'RabbitMQ queue without consumers'
+        condition: COND
+        for: 3m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 'Fronta {{ $labels.queue }} (vhost {{ $labels.vhost }}) nemá konzumenta.'
+          description: 'Konzumace zpráv na frontě {{ $labels.queue }} se zastavila déle než 3 min.'
+        labels:
+          severity: high
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: 'rabbitmq_queue_consumers'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: lt, params: [1] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+  - orgId: 1
+    name: capacity
+    folder: KZ Alerts
+    interval: 1m
+    rules:
+      - uid: kz-pg-connections-high
+        title: 'Postgres connection saturation'
+        condition: COND
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 'Postgres využívá > 80 % povolených spojení.'
+          description: 'pg_stat_activity_count / pg_settings_max_connections > 0.8.'
+        labels:
+          severity: warn
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: 'sum(pg_stat_activity_count) / max(pg_settings_max_connections)'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [0.8] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+      - uid: kz-db-pool-saturated
+        title: 'hiring-backend pg pool saturated'
+        condition: COND
+        for: 3m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 'pg pool v hiring-backend je saturovaný (idle=0 a klienti čekají).'
+          description: 'db_pool_idle == 0 AND db_pool_waiting > 0 déle než 3 min.'
+        labels:
+          severity: high
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: '(db_pool_waiting > 0) and (db_pool_idle == 0)'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [0] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+      - uid: kz-storage-disk-high
+        title: 'SeaweedFS volume disk usage > 85%'
+        condition: COND
+        for: 10m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 'SeaweedFS volume vytíženo na {{ $value | humanizePercentage }}.'
+          description: 'Brzy dojde místo na object storage. Zkontroluj růst attachmentů a nastavení retence.'
+        labels:
+          severity: warn
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: '1 - (SeaweedFS_volumeServer_disk_free_bytes / (SeaweedFS_volumeServer_disk_total_bytes > 0))'
+              instant: true
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [0.85] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query
+
+  - orgId: 1
+    name: error-spikes
+    folder: KZ Alerts
+    interval: 1m
+    rules:
+      - uid: kz-internal-error-spike
+        title: 'Spike of internal errors per service'
+        condition: COND
+        for: 10m
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 'Roste počet ERROR logů ve službě {{ $labels.service }}.'
+          description: 'rate ERROR logů > 0.5 / s za 10 min na službě {{ $labels.service }} — pravděpodobné selhání integrační vazby.'
+        labels:
+          severity: warn
+        notification_settings:
+          receiver: kz-ops-email
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              expr: 'sum by (service) (rate({service=~"hiring-backend|qualification-adapter|user-search-adapter", level="error"} [10m]))'
+              queryType: instant
+              editorMode: code
+          - refId: COND
+            datasourceUid: __expr__
+            model:
+              refId: COND
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [0.5] }
+                  operator: { type: and }
+                  query: { params: [COND] }
+                  reducer: { type: last, params: [] }
+                  type: query

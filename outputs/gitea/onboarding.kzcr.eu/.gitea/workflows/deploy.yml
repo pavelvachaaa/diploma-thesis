@@ -1,0 +1,225 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build_and_push:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          github-server-url: https://gitea.kzcr.eu
+
+      - name: Resolve release tag
+        id: release
+        env:
+          GITEA_REF: ${{ gitea.ref }}
+        run: |
+          set -eu
+          : "${GITEA_REF:?Missing gitea.ref context}"
+
+          TAG_NAME="${GITEA_REF#refs/tags/}"
+          if [ "$TAG_NAME" = "$GITEA_REF" ]; then
+            echo "Expected tag ref, got: $GITEA_REF" >&2
+            exit 1
+          fi
+
+          if ! printf '%s\n' "$TAG_NAME" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Invalid release tag: $TAG_NAME" >&2
+            exit 1
+          fi
+
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push release image
+        env:
+          TAG_NAME: ${{ steps.release.outputs.tag_name }}
+          REGISTRY_IMAGE: ${{ vars.REGISTRY_IMAGE }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          NEXT_PUBLIC_BASE_API_URL_PROD: ${{ vars.NEXT_PUBLIC_BASE_API_URL_PROD }}
+          NEXT_PUBLIC_REDIRECT_URI_PROD: ${{ vars.NEXT_PUBLIC_REDIRECT_URI_PROD }}
+          NEXT_PUBLIC_REGULAR_LOGIN_URL_PROD: ${{ vars.NEXT_PUBLIC_REGULAR_LOGIN_URL_PROD }}
+          NEXT_PUBLIC_BASE_PATH: ${{ vars.NEXT_PUBLIC_BASE_PATH }}
+        run: |
+          set -eu
+          : "${TAG_NAME:?Missing tag name}"
+          : "${REGISTRY_IMAGE:?Missing REGISTRY_IMAGE variable}"
+          : "${REGISTRY_USERNAME:?Missing REGISTRY_USERNAME secret}"
+          : "${REGISTRY_PASSWORD:?Missing REGISTRY_PASSWORD secret}"
+          : "${NEXT_PUBLIC_BASE_API_URL_PROD:?Missing NEXT_PUBLIC_BASE_API_URL_PROD variable}"
+          : "${NEXT_PUBLIC_REDIRECT_URI_PROD:?Missing NEXT_PUBLIC_REDIRECT_URI_PROD variable}"
+          : "${NEXT_PUBLIC_REGULAR_LOGIN_URL_PROD:?Missing NEXT_PUBLIC_REGULAR_LOGIN_URL_PROD variable}"
+
+          REGISTRY_HOST="${REGISTRY_IMAGE%%/*}"
+          if [ -z "$REGISTRY_HOST" ] || [ "$REGISTRY_HOST" = "$REGISTRY_IMAGE" ]; then
+            echo "REGISTRY_IMAGE must include a registry host prefix, got: $REGISTRY_IMAGE" >&2
+            exit 1
+          fi
+
+          printf '%s\n' "$REGISTRY_PASSWORD" | docker login "$REGISTRY_HOST" -u "$REGISTRY_USERNAME" --password-stdin
+
+          docker build \
+            --build-arg NEXT_PUBLIC_APP_VERSION="$TAG_NAME" \
+            --build-arg NEXT_PUBLIC_BASE_API_URL_PROD="$NEXT_PUBLIC_BASE_API_URL_PROD" \
+            --build-arg NEXT_PUBLIC_REDIRECT_URI_PROD="$NEXT_PUBLIC_REDIRECT_URI_PROD" \
+            --build-arg NEXT_PUBLIC_REGULAR_LOGIN_URL_PROD="$NEXT_PUBLIC_REGULAR_LOGIN_URL_PROD" \
+            --build-arg NEXT_PUBLIC_BASE_PATH="${NEXT_PUBLIC_BASE_PATH:-}" \
+            -t "${REGISTRY_IMAGE}:${TAG_NAME}" \
+            .
+
+          docker push "${REGISTRY_IMAGE}:${TAG_NAME}"
+
+  deploy:
+    name: Deploy from registry
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          github-server-url: https://gitea.kzcr.eu
+
+      - name: Ensure SSH client is available
+        run: |
+          set -eu
+          if command -v ssh >/dev/null 2>&1; then
+            exit 0
+          fi
+
+          apt-get update
+          apt-get install -y openssh-client
+
+      - name: Resolve release tag
+        id: release
+        env:
+          GITEA_REF: ${{ gitea.ref }}
+        run: |
+          set -eu
+          : "${GITEA_REF:?Missing gitea.ref context}"
+
+          TAG_NAME="${GITEA_REF#refs/tags/}"
+          if [ "$TAG_NAME" = "$GITEA_REF" ]; then
+            echo "Expected tag ref, got: $GITEA_REF" >&2
+            exit 1
+          fi
+
+          if ! printf '%s\n' "$TAG_NAME" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Invalid release tag: $TAG_NAME" >&2
+            exit 1
+          fi
+
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Configure SSH access
+        env:
+          DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+        run: |
+          set -eu
+          : "${DEPLOY_SSH_PRIVATE_KEY:?Missing DEPLOY_SSH_PRIVATE_KEY secret}"
+
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+
+      - name: Prepare deploy bundle
+        id: bundle
+        env:
+          TAG_NAME: ${{ steps.release.outputs.tag_name }}
+          REGISTRY_IMAGE: ${{ vars.REGISTRY_IMAGE }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          set -eu
+          : "${TAG_NAME:?Missing tag name}"
+          : "${REGISTRY_IMAGE:?Missing REGISTRY_IMAGE variable}"
+          : "${REGISTRY_USERNAME:?Missing REGISTRY_USERNAME secret}"
+          : "${REGISTRY_PASSWORD:?Missing REGISTRY_PASSWORD secret}"
+
+          REGISTRY_HOST="${REGISTRY_IMAGE%%/*}"
+          if [ -z "$REGISTRY_HOST" ] || [ "$REGISTRY_HOST" = "$REGISTRY_IMAGE" ]; then
+            echo "REGISTRY_IMAGE must include a registry host prefix, got: $REGISTRY_IMAGE" >&2
+            exit 1
+          fi
+
+          TMP_DIR="$(mktemp -d)"
+          cp deploy/compose.yaml "$TMP_DIR/compose.yaml"
+          cat > "$TMP_DIR/.env.deploy" <<EOF
+          REGISTRY_IMAGE=$REGISTRY_IMAGE
+          IMAGE_TAG=$TAG_NAME
+          EOF
+          printf '%s\n' "$REGISTRY_PASSWORD" > "$TMP_DIR/registry-password"
+          chmod 600 "$TMP_DIR/registry-password"
+
+          echo "tmp_dir=$TMP_DIR" >> "$GITHUB_OUTPUT"
+          echo "registry_host=$REGISTRY_HOST" >> "$GITHUB_OUTPUT"
+          echo "registry_username=$REGISTRY_USERNAME" >> "$GITHUB_OUTPUT"
+
+      - name: Upload deploy bundle
+        env:
+          TMP_DIR: ${{ steps.bundle.outputs.tmp_dir }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          set -eu
+          : "${TMP_DIR:?Missing temp dir}"
+          : "${DEPLOY_HOST:?Missing DEPLOY_HOST secret}"
+          : "${DEPLOY_USER:?Missing DEPLOY_USER secret}"
+          : "${DEPLOY_PATH:?Missing DEPLOY_PATH secret}"
+
+          ssh -i "$HOME/.ssh/id_ed25519" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=/dev/null \
+            -p "${DEPLOY_PORT:-22}" \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "mkdir -p \"${DEPLOY_PATH}\""
+
+          scp -i "$HOME/.ssh/id_ed25519" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -P "${DEPLOY_PORT:-22}" \
+            "$TMP_DIR/compose.yaml" \
+            "$TMP_DIR/.env.deploy" \
+            "$TMP_DIR/registry-password" \
+            "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
+
+      - name: Deploy on server
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          REGISTRY_HOST: ${{ steps.bundle.outputs.registry_host }}
+          REGISTRY_USERNAME: ${{ steps.bundle.outputs.registry_username }}
+        run: |
+          set -eu
+          : "${DEPLOY_HOST:?Missing DEPLOY_HOST secret}"
+          : "${DEPLOY_USER:?Missing DEPLOY_USER secret}"
+          : "${DEPLOY_PATH:?Missing DEPLOY_PATH secret}"
+          : "${REGISTRY_HOST:?Missing registry host}"
+          : "${REGISTRY_USERNAME:?Missing registry username}"
+
+          ssh -i "$HOME/.ssh/id_ed25519" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=/dev/null \
+            -p "${DEPLOY_PORT:-22}" \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" <<EOF
+          set -eu
+          cd "${DEPLOY_PATH}"
+          trap 'rm -f registry-password' EXIT
+          chmod 600 registry-password
+          docker login "${REGISTRY_HOST}" -u "${REGISTRY_USERNAME}" --password-stdin < registry-password
+          docker compose --env-file .env.deploy -f compose.yaml pull
+          docker compose --env-file .env.deploy -f compose.yaml up -d --remove-orphans
+          EOF

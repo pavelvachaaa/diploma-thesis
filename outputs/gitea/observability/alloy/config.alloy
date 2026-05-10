@@ -1,0 +1,163 @@
+// =============================================================================
+// Grafana Alloy — single agent for logs + metrics + traces
+// =============================================================================
+
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+// -----------------------------------------------------------------------------
+// LOGS: Docker container discovery + Loki push
+// -----------------------------------------------------------------------------
+
+discovery.docker "containers" {
+  host             = "unix:///var/run/docker.sock"
+  refresh_interval = "5s"
+
+  filter {
+    name   = "label"
+    values = ["logging=alloy"]
+  }
+}
+
+discovery.relabel "containers" {
+  targets = discovery.docker.containers.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.+)"
+    target_label  = "container"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
+    target_label  = "compose_project"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_id"]
+    target_label  = "container_id"
+  }
+}
+
+loki.source.docker "containers" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.relabel.containers.output
+  forward_to    = [loki.process.app_logs.receiver]
+  relabel_rules = discovery.relabel.containers.rules
+}
+
+loki.process "app_logs" {
+  forward_to = [loki.write.default.receiver]
+
+  // Parse Pino / adapter JSON envelope
+  stage.json {
+    expressions = {
+      level     = "level",
+      msg       = "msg",
+      time      = "time",
+      trace_id  = "data.trace_id",
+      span_id   = "data.span_id",
+      request_id = "data.request_id",
+      status_code = "data.status_code",
+    }
+  }
+
+  // Promote useful low-cardinality fields to labels
+  stage.labels {
+    values = {
+      level = "",
+    }
+  }
+
+  // Use the JSON time as the log timestamp when present
+  stage.timestamp {
+    source = "time"
+    format = "RFC3339Nano"
+    fallback_formats = ["RFC3339", "UnixMs"]
+    action_on_failure = "skip"
+  }
+
+  // Expose trace_id as structured metadata so Grafana can derive a Tempo link
+  stage.structured_metadata {
+    values = {
+      trace_id   = "",
+      span_id    = "",
+      request_id = "",
+    }
+  }
+}
+
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+// -----------------------------------------------------------------------------
+// METRICS: scrape app /metrics endpoints + stateful exporters
+// -----------------------------------------------------------------------------
+
+prometheus.scrape "apps" {
+  scrape_interval = "15s"
+  targets = [
+    { __address__ = "hr-backend:3322",          job = "hiring-backend",      service = "hiring-backend" },
+    { __address__ = "qualification-adapter:8088", job = "qualification-adapter", service = "qualification-adapter" },
+    { __address__ = "user-search-adapter:8089",   job = "user-search-adapter",   service = "user-search-adapter" },
+    { __address__ = "postgres-exporter:9187",   job = "postgres",            service = "postgres" },
+    { __address__ = "rabbitmq:15692",           job = "rabbitmq",            service = "rabbitmq" },
+    { __address__ = "seaweedfs:9091",           job = "seaweedfs",           service = "seaweedfs" },
+  ]
+  metrics_path = "/metrics"
+  // Surface exemplars + native histograms so Grafana can jump from a slow bucket → trace
+  enable_protobuf_negotiation = true
+  scrape_classic_histograms   = true
+  forward_to   = [prometheus.remote_write.default.receiver]
+}
+
+prometheus.remote_write "default" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+  }
+}
+
+// -----------------------------------------------------------------------------
+// TRACES: OTLP receiver from apps -> Tempo
+// -----------------------------------------------------------------------------
+
+otelcol.receiver.otlp "default" {
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+
+  output {
+    traces  = [otelcol.processor.batch.default.input]
+    metrics = [otelcol.processor.batch.default.input]
+  }
+}
+
+otelcol.processor.batch "default" {
+  output {
+    traces  = [otelcol.exporter.otlphttp.tempo.input]
+    metrics = [otelcol.exporter.prometheus.default.input]
+  }
+}
+
+otelcol.exporter.otlphttp "tempo" {
+  client {
+    endpoint = "http://tempo:4318"
+    tls {
+      insecure = true
+    }
+  }
+}
+
+otelcol.exporter.prometheus "default" {
+  forward_to = [prometheus.remote_write.default.receiver]
+}

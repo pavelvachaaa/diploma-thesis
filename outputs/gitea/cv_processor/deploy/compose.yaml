@@ -1,0 +1,31 @@
+services:
+  tika:
+    image: apache/tika:latest
+    container_name: tika
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1s bash -c ':> /dev/tcp/127.0.0.1/9998' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - kz
+
+  cv-processor:
+    image: ${CV_PROCESSOR_IMAGE}
+    container_name: cv-processor
+    env_file:
+      - .env.runtime
+      - .env.secrets
+    depends_on:
+      tika:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - kz
+
+networks:
+  kz:
+    name: kz
+    external: true

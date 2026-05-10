@@ -1,0 +1,457 @@
+services:
+  # Runs once and exits after successful DB migration
+  migration:
+    image: hr-backend:${APP_VERSION:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hr-migration
+    restart: "no"
+
+    env_file:
+      - .env
+
+    environment:
+      NODE_ENV: production
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS:-}
+
+    command: ["sh", "-c", "npm run db:migrate"]
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    networks:
+      - app-network
+
+    logging: &default-logging
+      driver: json-file
+      options:
+        max-size: "${LOG_MAX_SIZE:-10m}"
+        max-file: "${LOG_MAX_FILE:-3}"
+
+    security_opt: &default-security
+      - no-new-privileges:true
+
+  qualification-adapter:
+    image: qualification-adapter:${APP_VERSION:-latest}
+    build:
+      context: ./services/qualification-adapter
+      dockerfile: Dockerfile
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
+    container_name: qualification-adapter
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      NODE_ENV: production
+      QUAL_ADAPTER_PORT: ${QUAL_ADAPTER_PORT:-8088}
+      OTEL_SERVICE_NAME: qualification-adapter
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://alloy:4318}
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS:-}
+
+    expose:
+      - "${QUAL_ADAPTER_PORT:-8088}"
+
+    networks:
+      - adapter-internal
+      - monitoring_network
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:${QUAL_ADAPTER_PORT:-8088}/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+    labels:
+      logging: alloy
+      service: qualification-adapter
+
+    logging: *default-logging
+    security_opt: *default-security
+
+  user-search-adapter:
+    image: user-search-adapter:${APP_VERSION:-latest}
+    build:
+      context: ./services/user-search-adapter
+      dockerfile: Dockerfile
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
+    container_name: user-search-adapter
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      NODE_ENV: production
+      USER_SEARCH_ADAPTER_PORT: ${USER_SEARCH_ADAPTER_PORT:-8089}
+      OTEL_SERVICE_NAME: user-search-adapter
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://alloy:4318}
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS:-}
+
+    expose:
+      - "${USER_SEARCH_ADAPTER_PORT:-8089}"
+
+    networks:
+      - adapter-internal
+      - monitoring_network
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:${USER_SEARCH_ADAPTER_PORT:-8089}/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+    labels:
+      logging: alloy
+      service: user-search-adapter
+
+    logging: *default-logging
+    security_opt: *default-security
+
+  hr-backend:
+    image: hr-backend:${APP_VERSION:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hr-backend
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      NODE_ENV: production
+      APP_VERSION: ${APP_VERSION:-local}
+      INTERNAL_PORT: ${INTERNAL_PORT:-3000}
+      PORT: ${INTERNAL_PORT:-3000}
+      NODE_OPTIONS: "--max-old-space-size=${NODE_MAX_OLD_SPACE_SIZE:-512}"
+
+      OTEL_SERVICE_NAME: hiring-backend
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://alloy:4318}
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+
+      # Use this for internal/custom CA certificates instead of disabling TLS verification.
+      # Example value: /usr/local/share/ca-certificates/kz-root-ca.crt
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS:-}
+
+    command: ["sh", "-c", "node src/index.js"]
+
+    ports:
+      - "${BACKEND_BIND_HOST:-127.0.0.1}:${PORT:-3000}:${INTERNAL_PORT:-3000}"
+
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+      qualification-adapter:
+        condition: service_healthy
+      user-search-adapter:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+      seaweedfs:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+    networks:
+      - app-network
+      - adapter-internal
+      - monitoring_network
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:${INTERNAL_PORT:-3000}/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
+        ]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+    labels:
+      logging: alloy
+      service: hr-backend
+
+    logging: *default-logging
+    security_opt: *default-security
+
+    mem_limit: ${BACKEND_MEMORY_LIMIT:-1g}
+    memswap_limit: ${BACKEND_MEMORY_SWAP_LIMIT:-1g}
+
+  db:
+    image: pgvector/pgvector:${PGVECTOR_VERSION:-pg17}
+    container_name: postgres-db
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    ports:
+      - "${POSTGRES_BIND_HOST:-127.0.0.1}:${POSTGRES_LOCAL_PORT:-5432}:5432"
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+    networks:
+      - app-network
+      - monitoring_network
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    labels:
+      logging: alloy
+      service: postgres
+
+    logging: *default-logging
+    security_opt: *default-security
+
+  umami-db-init:
+    image: postgres:${POSTGRES_CLIENT_VERSION:-17-alpine}
+    container_name: umami-db-init
+    restart: "no"
+
+    env_file:
+      - .env
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    networks:
+      - app-network
+
+    command:
+      - sh
+      - -c
+      - |
+        export PGPASSWORD="$${POSTGRES_PASSWORD}"
+
+        psql -v ON_ERROR_STOP=1 -h db -U "$${POSTGRES_USER}" -d postgres <<SQL
+        DO \$\$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM pg_roles WHERE rolname = '$${UMAMI_POSTGRES_USER}'
+          ) THEN
+            CREATE ROLE "$${UMAMI_POSTGRES_USER}" LOGIN PASSWORD '$${UMAMI_POSTGRES_PASSWORD}';
+          ELSE
+            ALTER ROLE "$${UMAMI_POSTGRES_USER}" WITH LOGIN PASSWORD '$${UMAMI_POSTGRES_PASSWORD}';
+          END IF;
+        END
+        \$\$;
+
+        SELECT 'CREATE DATABASE "$${UMAMI_POSTGRES_DB}" OWNER "$${UMAMI_POSTGRES_USER}"'
+        WHERE NOT EXISTS (
+          SELECT 1 FROM pg_database WHERE datname = '$${UMAMI_POSTGRES_DB}'
+        )
+        \gexec
+
+        ALTER DATABASE "$${UMAMI_POSTGRES_DB}" OWNER TO "$${UMAMI_POSTGRES_USER}";
+        GRANT ALL PRIVILEGES ON DATABASE "$${UMAMI_POSTGRES_DB}" TO "$${UMAMI_POSTGRES_USER}";
+        SQL
+
+    logging: *default-logging
+    security_opt: *default-security
+
+  umami:
+    image: docker.umami.is/umami-software/umami:${UMAMI_VERSION:-postgresql-latest}
+    container_name: umami
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      DATABASE_URL: postgresql://${UMAMI_POSTGRES_USER}:${UMAMI_POSTGRES_PASSWORD}@db:5432/${UMAMI_POSTGRES_DB}
+      APP_SECRET: ${UMAMI_APP_SECRET}
+      TRACKER_SCRIPT_NAME: ${UMAMI_TRACKER_SCRIPT_NAME:-/kz.js}
+      COLLECT_API_ENDPOINT: ${UMAMI_COLLECT_API_ENDPOINT:-/api/kz}
+      DISABLE_TELEMETRY: "1"
+      DISABLE_UPDATES: "1"
+      PRIVATE_MODE: "1"
+      HOSTNAME: 0.0.0.0
+      PORT: "3000"
+
+    ports:
+      - "${UMAMI_BIND_HOST:-127.0.0.1}:${UMAMI_LOCAL_PORT:-3001}:3000"
+
+    depends_on:
+      umami-db-init:
+        condition: service_completed_successfully
+
+    networks:
+      - app-network
+      - monitoring_network
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+    labels:
+      logging: alloy
+      service: umami
+
+    logging: *default-logging
+    security_opt: *default-security
+
+  umami-bootstrap:
+    image: docker.umami.is/umami-software/umami:${UMAMI_VERSION:-postgresql-latest}
+    container_name: umami-bootstrap
+    restart: "no"
+
+    env_file:
+      - .env
+
+    environment:
+      UMAMI_INIT_BASE_URL: ${UMAMI_INIT_BASE_URL:-http://umami:3000}
+
+    entrypoint: ["node"]
+    working_dir: /workspace
+
+    volumes:
+      - ./scripts/umami-bootstrap.js:/workspace/scripts/umami-bootstrap.js:ro
+
+    depends_on:
+      umami:
+        condition: service_healthy
+
+    networks:
+      - app-network
+
+    command: ["scripts/umami-bootstrap.js"]
+
+    logging: *default-logging
+    security_opt: *default-security
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:${SEAWEEDFS_VERSION:-latest}
+    container_name: seaweedfs
+    restart: unless-stopped
+
+    command:
+      - server
+      - -s3
+      - -dir=/data
+      - -master.port=9333
+      - -volume.port=8080
+      - -filer
+      - -s3.port=8444
+      - -metricsPort=9091
+      - -ip=seaweedfs
+      - -s3.config=/etc/seaweedfs/s3.json
+
+    ports:
+      - "${SEAWEEDFS_S3_BIND_HOST:-127.0.0.1}:${SEAWEEDFS_S3_PORT:-8444}:8444"
+
+    expose:
+      - "9333"
+      - "8080"
+      - "9091"
+
+    volumes:
+      - seaweedfs_data:/data
+      - ./s3.json:/etc/seaweedfs/s3.json:ro
+
+    networks:
+      - app-network
+      - monitoring_network
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://127.0.0.1:9333/cluster/status || exit 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+    labels:
+      logging: alloy
+      service: seaweedfs
+
+    logging: *default-logging
+    security_opt: *default-security
+
+  rabbitmq:
+    image: rabbitmq:${RABBITMQ_VERSION:-3-management}
+    container_name: rabbitmq
+    restart: unless-stopped
+
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+      RABBITMQ_PLUGINS: rabbitmq_management rabbitmq_prometheus
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "+S ${RABBITMQ_SCHEDULERS:-2}:2"
+
+    ports:
+      - "${RABBITMQ_AMQP_BIND_HOST:-127.0.0.1}:${RABBITMQ_AMQP_PORT:-5672}:5672"
+      - "${RABBITMQ_MGMT_BIND_HOST:-127.0.0.1}:${RABBITMQ_MGMT_PORT:-15672}:15672"
+
+    expose:
+      - "15692"
+
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+    networks:
+      - app-network
+      - monitoring_network
+
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    labels:
+      logging: alloy
+      service: rabbitmq
+
+    logging: *default-logging
+    security_opt: *default-security
+
+volumes:
+  pgdata:
+  seaweedfs_data:
+  rabbitmq_data:
+
+networks:
+  app-network:
+    external: true
+
+  adapter-internal:
+    driver: bridge
+    internal: true
+
+  monitoring_network:
+    external: true

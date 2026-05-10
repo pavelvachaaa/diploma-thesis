@@ -1,0 +1,10 @@
+node_modules
+.env
+.env.production
+.env.local
+
+uploads
+
+s3.json
+reports
+.dev-local

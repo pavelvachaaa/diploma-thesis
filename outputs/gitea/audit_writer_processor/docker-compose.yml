@@ -1,0 +1,27 @@
+services:
+  audit-writer-processor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: audit-writer-processor
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - app-network
+      - monitoring_network
+    labels:
+      - "logging=alloy"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  app-network:
+    name: app-network
+    external: true
+  monitoring_network:
+    name: monitoring_network
+    external: true

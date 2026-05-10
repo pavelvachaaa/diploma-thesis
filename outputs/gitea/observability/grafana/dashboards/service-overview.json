@@ -1,0 +1,105 @@
+{
+  "uid": "kz-service-overview",
+  "title": "Service overview — uptime & avg latency",
+  "tags": ["kz", "overview", "sla"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Uptime % (over selected range)",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 1 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Uptime — per service",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "x": 0, "y": 1, "w": 24, "h": 6 },
+      "targets": [
+        {
+          "expr": "avg_over_time(up{job=~\"hiring-backend|qualification-adapter|user-search-adapter|postgres|rabbitmq|seaweedfs\"}[$__range]) * 100",
+          "legendFormat": "{{job}}",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 95 },
+              { "color": "yellow", "value": 99 },
+              { "color": "green", "value": 99.9 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "type": "row",
+      "title": "Average request time (over selected range)",
+      "gridPos": { "x": 0, "y": 7, "w": 24, "h": 1 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Avg HTTP latency — per service (excl. health & metrics)",
+      "description": "sum(rate(http_request_duration_seconds_sum)) / sum(rate(http_request_duration_seconds_count)) přes vybraný časový rozsah. Vyloučeno: /hrbackend/health, /healthz, /metrics a unmatched 404. Jen pro služby instrumentované HTTP histogramem.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "x": 0, "y": 8, "w": 24, "h": 6 },
+      "targets": [
+        {
+          "expr": "sum by (service) (rate(http_request_duration_seconds_sum{route!~\"/hrbackend/health|/healthz|/metrics|unmatched\"}[$__range])) / sum by (service) (rate(http_request_duration_seconds_count{route!~\"/hrbackend/health|/healthz|/metrics|unmatched\"}[$__range]))",
+          "legendFormat": "{{service}}",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 3,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.5 },
+              { "color": "orange", "value": 1 },
+              { "color": "red", "value": 2 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal"
+      }
+    }
+  ]
+}

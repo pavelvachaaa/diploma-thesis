@@ -1,0 +1,43 @@
+services:
+  job-processor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: job-processor:latest
+    container_name: job-processor
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      SERVICE_NAME: job-processor
+
+    ports:
+      - "${JOB_PROCESSOR_PORT:-8090}:8090"
+
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1s bash -c ':> /dev/tcp/127.0.0.1/8090' || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+      
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - kz
+
+networks:
+  kz:
+    name: kz
+    driver: bridge
+    external: true

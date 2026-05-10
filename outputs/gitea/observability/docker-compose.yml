@@ -1,0 +1,265 @@
+services:
+  alloy:
+    image: grafana/alloy:${ALLOY_VERSION:-latest}
+    container_name: alloy
+    restart: unless-stopped
+
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - alloy_data:/var/lib/alloy/data
+
+    ports:
+      - "${ALLOY_BIND_HOST:-127.0.0.1}:${ALLOY_UI_PORT:-12345}:12345"
+      - "${OTLP_BIND_HOST:-127.0.0.1}:${OTLP_HTTP_PORT:-4318}:4318"
+
+    depends_on:
+      loki:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy
+      tempo:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:12345/-/ready || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - monitoring_network
+      - app-network
+
+  loki:
+    image: grafana/loki:${LOKI_VERSION:-latest}
+    container_name: loki
+    restart: unless-stopped
+
+    command:
+      - -config.file=/etc/loki/loki-config.yaml
+
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - loki_data:/loki
+
+    ports:
+      - "${LOKI_BIND_HOST:-127.0.0.1}:${LOKI_PORT:-3100}:3100"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3100/ready || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - monitoring_network
+
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VERSION:-latest}
+    container_name: prometheus
+    restart: unless-stopped
+
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME:-90d}
+      - --storage.tsdb.retention.size=${PROMETHEUS_RETENTION_SIZE:-20GB}
+      - --web.enable-remote-write-receiver
+      - --web.enable-lifecycle
+      - --enable-feature=exemplar-storage
+      - --enable-feature=native-histograms
+
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prom_data:/prometheus
+
+    ports:
+      - "${PROMETHEUS_BIND_HOST:-127.0.0.1}:${PROMETHEUS_PORT:-9090}:9090"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:9090/-/ready || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - monitoring_network
+
+  tempo:
+    image: grafana/tempo:${TEMPO_VERSION:-2.7.1}
+    container_name: tempo
+    restart: unless-stopped
+
+    command:
+      - -config.file=/etc/tempo/tempo.yaml
+
+    volumes:
+      - ./tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+      - tempo_data:/var/tempo
+
+    ports:
+      - "${TEMPO_BIND_HOST:-127.0.0.1}:${TEMPO_PORT:-3200}:3200"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3200/ready || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - monitoring_network
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:${POSTGRES_EXPORTER_VERSION:-latest}
+    container_name: postgres-exporter
+    restart: unless-stopped
+
+    environment:
+      DATA_SOURCE_NAME: ${POSTGRES_EXPORTER_DSN}
+      PG_EXPORTER_AUTO_DISCOVER_DATABASES: "${PG_EXPORTER_AUTO_DISCOVER_DATABASES:-false}"
+      PG_EXPORTER_WEB_LISTEN_ADDRESS: ":9187"
+
+    expose:
+      - "9187"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:9187/metrics || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - monitoring_network
+      - app-network
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_VERSION:-latest}
+    container_name: grafana
+    restart: unless-stopped
+
+    environment:
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: ${GF_SERVER_ROOT_URL:-http://localhost:4000}
+
+      GF_FEATURE_TOGGLES_ENABLE: alertingSimplifiedRouting,alertingQueryAndExpressionsStepMode
+
+      GF_SMTP_ENABLED: "${GF_SMTP_ENABLED:-true}"
+      GF_SMTP_HOST: ${GF_SMTP_HOST:-posta.kzcr.eu:587}
+      GF_SMTP_USER: ${EMAIL_USER}
+      GF_SMTP_PASSWORD: ${EMAIL_PASSWORD}
+      GF_SMTP_FROM_ADDRESS: ${EMAIL_FROM}
+      GF_SMTP_FROM_NAME: ${GF_SMTP_FROM_NAME:-Grafana Alerts}
+      GF_SMTP_STARTTLS_POLICY: ${GF_SMTP_STARTTLS_POLICY:-OpportunisticStartTLS}
+
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+    ports:
+      - "${GRAFANA_BIND_HOST:-127.0.0.1}:${GRAFANA_LOCAL_PORT:-4000}:3000"
+
+    depends_on:
+      loki:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy
+      tempo:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - monitoring_network
+
+volumes:
+  alloy_data:
+  loki_data:
+  prom_data:
+  tempo_data:
+  grafana_data:
+
+networks:
+  monitoring_network:
+    external: true
+
+  app-network:
+    external: true
