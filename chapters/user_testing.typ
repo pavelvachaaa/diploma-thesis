@@ -81,7 +81,7 @@ Testovací scénáře jsem navrhl tak, aby pokryly kritické průchody systémem
   caption: [Sada testovacích scénářů]
 ) <tab:user-test-scenarios> 
 
-Scénáře v @tab:user-test-scenarios záměrně nesledují jen izolované klikací úlohy, ale uzly, ve kterých se rozhoduje o průchodnosti celého procesu. Pokud se uživatel ztratí při změně stavu uchazeče, při převodu na zaměstnance nebo při práci s úkolem vstupní agendy, nevzniká pouze lokální nepohodlí v rozhraní, ale přímé zpomalení navazujících kroků.
+Scénáře v #ref(<tab:user-test-scenarios>, supplement: [tabulce]) záměrně nesledují jen izolované klikací úlohy, ale uzly, ve kterých se rozhoduje o průchodnosti celého procesu. Pokud se uživatel ztratí při změně stavu uchazeče, při převodu na zaměstnance nebo při práci s úkolem vstupní agendy, nevzniká pouze lokální nepohodlí v rozhraní, ale přímé zpomalení navazujících kroků.
 
 Přesné znění zadání, které účastníci při pilotním ověření obdrželi, je z důvodu přehlednosti uvedeno v #link(<scenariopage>)[příloze „Zadání scénářů pro pilotní uživatelské ověření“].
 
@@ -136,7 +136,7 @@ Jako problematická se naopak ukázala místa, kde systém předpokládá vyšš
   caption: [Souhrn výsledků pilotního uživatelského ověření]
 ) <tab:user-test-results>
 
-Souhrn v @tab:user-test-results vychází z reálného měření průchodů pilotními scénáři během praktického školení a navazujícího ověření vybraných rolí. U každého scénáře jsem sledoval dosažení cílového stavu, potřebu asistence, orientační dobu dokončení, počet chybných kroků a následný komentář účastníka. Čas dokončení je proto uváděn jako medián naměřených průchodů scénářem a doplněn o rozsah nejkratšího a nejdelšího dokončeného průchodu. U scénáře S6 je rozsah tvořen jediným měřením, protože manažerský pohled reprezentoval jeden vedoucí zaměstnanec. Detailní anonymizovaný záznam jednotlivých průchodů je uveden v @tab:user-test-raw-data.
+Souhrn v #ref(<tab:user-test-results>, supplement: [tabulce]) vychází z reálného měření průchodů pilotními scénáři během praktického školení a navazujícího ověření vybraných rolí. U každého scénáře jsem sledoval dosažení cílového stavu, potřebu asistence, orientační dobu dokončení, počet chybných kroků a následný komentář účastníka. Čas dokončení je proto uváděn jako medián naměřených průchodů scénářem a doplněn o rozsah nejkratšího a nejdelšího dokončeného průchodu. U scénáře S6 je rozsah tvořen jediným měřením, protože manažerský pohled reprezentoval jeden vedoucí zaměstnanec. Detailní anonymizovaný záznam jednotlivých průchodů je uveden v #ref(<tab:user-test-raw-data>, supplement: [tabulce]).
 
 Výsledky zároveň ukazují, že digitalizace procesů již v pilotním provozu zrychlila průchod náborem. Operace, které byly v původním stavu závislé na kombinaci e-mailové komunikace, lokálních souborů a ručního předávání informací mezi rolemi, bylo možné ve sledovaných scénářích dokončit v řádu jednotek minut. Zvlášť patrné to bylo u založení a úpravy pracovní nabídky, změny stavu uchazeče, naplánování pohovoru a automatického vyvolání navazujících notifikací. Přínos tedy nespočívá pouze v nahrazení papírových nebo e-mailových kroků digitálním formulářem, ale především ve zkrácení prodlev mezi navazujícími činnostmi a ve vzniku jednoznačně dohledatelné historie procesu.
 

@@ -136,7 +136,7 @@ Typickými ověřovanými oblastmi jsou validace a normalizace vstupů, idempote
 === Implementace spolehlivé asynchronní komunikace
 Tato část popisuje realizaci spolehlivé komunikace mezi transakčním backendem, RabbitMQ a navazujícími konzumenty. Zaměřuje se zejména na implementaci vzoru Transactional Outbox v databázovém modelu a provozním workeru.
 
-Pro realizaci je využita tabulka `side_effect_outbox` a samostatný worker. Doménová služba v rámci jedné transakce zapisuje byznysovou změnu i požadavek na provedení vedlejšího efektu. Worker následně v pravidelných intervalech položky uzamyká a publikuje do RabbitMQ. Tím systém odděluje hlavní cestu požadavku od vedlejších efektů, aniž by ztratil vazbu mezi doménovou změnou a jejím následným zpracováním. Přehled konkrétních typů událostí a jejich implementačních efektů shrnuje @tab:impl-outbox-events níže.
+Pro realizaci je využita tabulka `side_effect_outbox` a samostatný worker. Doménová služba v rámci jedné transakce zapisuje byznysovou změnu i požadavek na provedení vedlejšího efektu. Worker následně v pravidelných intervalech položky uzamyká a publikuje do RabbitMQ. Tím systém odděluje hlavní cestu požadavku od vedlejších efektů, aniž by ztratil vazbu mezi doménovou změnou a jejím následným zpracováním. Přehled konkrétních typů událostí a jejich implementačních efektů je uveden níže v #ref(<tab:impl-outbox-events>, supplement: [tabulce]).
 
 Stav asynchronní vrstvy je sledován pomocí metrik outbox_lag a retry_count, které jsou vizualizovány v dohledovém dashboardu. Správnost toku je ověřována integračními testy simulujícími úspěšné doručení, dočasné selhání, opakované zpracování i přesun neobnovitelných chyb do chybového stavu.
 
@@ -204,7 +204,7 @@ Obě služby využívají lokálně provozovanou inferenční vrstvu `Ollama` (m
 
 Z hlediska ochrany osobních údajů je důležité, že dokumenty životopisů, extrahovaný text ani odvozené embeddingy nejsou předávány externí cloudové službě. Data se pohybují pouze mezi interním objektovým úložištěm, vrstvou zpráv, zpracovatelskými službami, lokálně provozovaným modelem a databází. Tím se snižuje riziko nekontrolovaného předání osobních údajů mimo organizaci.
 
-Návaznost mezi transakční operací, outboxem a zpracovatelskými službami je založena na tom, že backend po uložení dat zapíše požadavek na vedlejší zpracování do outboxu. Worker jej následně publikuje do RabbitMQ, odkud jej podle typu úlohy přebírá odpovídající služba. Tím je zachována konzistence mezi stavem procesu a požadavkem na navazující zpracování, aniž by hlavní cesta čekala na dokončení výpočetně náročných operací. Podrobnější schéma je uvedeno v příloze @obr:impl-outbox-ai.
+Návaznost mezi transakční operací, outboxem a zpracovatelskými službami je založena na tom, že backend po uložení dat zapíše požadavek na vedlejší zpracování do outboxu. Worker jej následně publikuje do RabbitMQ, odkud jej podle typu úlohy přebírá odpovídající služba. Tím je zachována konzistence mezi stavem procesu a požadavkem na navazující zpracování, aniž by hlavní cesta čekala na dokončení výpočetně náročných operací. Podrobnější schéma je uvedeno v přílohách jako #ref(<obr:impl-outbox-ai>, supplement: [obrázek]).
 
 == Implementace datové vrstvy
 Datová vrstva musí v jednom systému udržet konzistentní transakční agendu náboru, vstupní agendy, auditní stopy a zároveň podpůrné výstupy inteligentního zpracování dat. Alternativou bylo rozdělit relační data, dokumentová metadata a vektorové reprezentace do více specializovaných úložišť. To by sice přineslo vyšší specializaci jednotlivých databází, ale v on-premise prostředí #abbr("KZ", none) by to současně znamenalo více provozních komponent, složitější zálohování a riziko nekonzistence mezi systémy.
@@ -243,7 +243,7 @@ V multi-tenantním prostředí #abbr("KZ", none) by čisté RBAC založené pouz
 
 Implementace proto rozlišuje přihlášení prostřednictvím #abbr("SSO", none), globální roli a vazbu ke konkrétnímu zdroji. Přínosem je jemnější řízení přístupů a menší rozsah zpřístupnění osobních údajů (NF01). Nevýhodou zůstává vyšší složitost autorizačního modelu.
 
-Princip tohoto oddělení znázorňuje @obr:impl-auth-rebac-flow na příkladu vedoucího pracovníka, který si chce zobrazit životopis uchazeče. Přihlášení pouze potvrzuje jeho identitu a globální role určuje, že jde o oprávněný typ interního uživatele. Samotné zobrazení životopisu je však povoleno až tehdy, když má vedoucí vztah ke konkrétnímu inzerátu, k němuž uchazeč patří.
+Princip tohoto oddělení je znázorněn na #ref(<obr:impl-auth-rebac-flow>, supplement: [obrázku]) na příkladu vedoucího pracovníka, který si chce zobrazit životopis uchazeče. Přihlášení pouze potvrzuje jeho identitu a globální role určuje, že jde o oprávněný typ interního uživatele. Samotné zobrazení životopisu je však povoleno až tehdy, když má vedoucí vztah ke konkrétnímu inzerátu, k němuž uchazeč patří.
 
 #figure(
   image(
@@ -258,7 +258,7 @@ Dědění přístupu je v tomto modelu řešeno přes vztah k nadřazenému zdro
 == Implementace onboardingového portálu
 Onboardingový portál jsem implementoval jako samostatnou aplikaci oddělenou od veřejného kariérního portálu. Důvodem není pouze odlišné uživatelské rozhraní, ale jiná povaha celého procesu. Kariérní portál pracuje s anonymním nebo externím uchazečem, zatímco onboardingový portál obsluhuje interní vstupní agendu, konkrétního zaměstnance, jeho úkoly, dokumenty a odpovědnosti HR pracovníků.
 
-Na @obr:candidate-to-employee je vidět detail uchazeče. Náborář na první pohled vidí všechny identifikační údaje, má rychlý přístup k dokumentům, poznámkám a analytickým výstupům nad životopisem. Dále má možnost využít akce, které posouvají uchazeče v procesu, například odeslání e-mailu, naplánování pohovoru, zamítnutí nebo schválení a vytvoření zaměstnance.
+Na #ref(<obr:candidate-to-employee>, supplement: [obrázku]) je vidět detail uchazeče. Náborář na první pohled vidí všechny identifikační údaje, má rychlý přístup k dokumentům, poznámkám a analytickým výstupům nad životopisem. Dále má možnost využít akce, které posouvají uchazeče v procesu, například odeslání e-mailu, naplánování pohovoru, zamítnutí nebo schválení a vytvoření zaměstnance.
 
 #figure(
   image(
@@ -277,7 +277,7 @@ Na @obr:candidate-to-employee je vidět detail uchazeče. Náborář na první p
   caption: [Provozní přehled interního portálu s metrikami náboru a adaptace],
 ) <obr:onboarding-dashboard>
 
-Na @obr:onboarding-workflow-builder je zachycena správa adaptačního procesu pro konkrétní organizační kontext. Horní část obrazovky poskytuje souhrn postupu, například celkovou dobu, počet kroků a povinné položky. Samostatná část pro informační dokumenty odděluje obecné podklady od samotných úkolů. Seznam kroků pak pracuje s pořadím, typem kroku, povinností, instrukcemi a navázanými dokumenty. Rozhraní tím zviditelňuje rozdíl mezi administrací šablony a pozdějším plněním konkrétního onboardingového procesu zaměstnancem.
+Na #ref(<obr:onboarding-workflow-builder>, supplement: [obrázku]) je zachycena správa adaptačního procesu pro konkrétní organizační kontext. Horní část obrazovky poskytuje souhrn postupu, například celkovou dobu, počet kroků a povinné položky. Samostatná část pro informační dokumenty odděluje obecné podklady od samotných úkolů. Seznam kroků pak pracuje s pořadím, typem kroku, povinností, instrukcemi a navázanými dokumenty. Rozhraní tím zviditelňuje rozdíl mezi administrací šablony a pozdějším plněním konkrétního onboardingového procesu zaměstnancem.
 
 #figure(
   image(
@@ -301,7 +301,7 @@ Z pohledu uživatelské zkušenosti bylo důležité zachovat kontext při pohyb
 
 Vzhledem k tomu, že backend vrací popis pozice ve formátu #abbr("HTML", "HyperText Markup Language"), řešil jsem i bezpečné vykreslení obsahu. #abbr("HTML", none) proto před zobrazením sanitizuji, aby se do stránky nedostal neověřený nebo škodlivý obsah. Jde o zdánlivý detail, ale právě na podobných místech se láme důvěryhodnost veřejného portálu.
 
-Na @obr:career-portal-catalog je zachycen katalog volných pozic v desktopovém zobrazení po aplikaci fulltextového dotazu a kombinace filtrů. V levé části rozhraní jsou ovládací prvky pro zpřesnění výběru, konkrétně zařazení, lokalitu, pracovní roli a typ úvazku, zatímco pravá část je vyhrazena pro vyhledávací pole, souhrn výsledku a samotný seznam nabídek. Toto rozvržení jsem zvolil proto, aby uchazeč mohl opakovaně upravovat dotaz bez ztráty kontextu a současně průběžně sledovat, jak se změna filtru promítá do výsledné množiny pozic.
+Na #ref(<obr:career-portal-catalog>, supplement: [obrázku]) je zachycen katalog volných pozic v desktopovém zobrazení po aplikaci fulltextového dotazu a kombinace filtrů. V levé části rozhraní jsou ovládací prvky pro zpřesnění výběru, konkrétně zařazení, lokalitu, pracovní roli a typ úvazku, zatímco pravá část je vyhrazena pro vyhledávací pole, souhrn výsledku a samotný seznam nabídek. Toto rozvržení jsem zvolil proto, aby uchazeč mohl opakovaně upravovat dotaz bez ztráty kontextu a současně průběžně sledovat, jak se změna filtru promítá do výsledné množiny pozic.
 
 #figure(
   image(

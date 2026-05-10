@@ -18,7 +18,7 @@ Rozhodnutí o vlastním vývoji je obhajitelné pouze tehdy, pokud je zřejmé, 
 )
 
 == Metodika rešerše
-Rešerše byla provedena jako komparativní posouzení řešení ze tří kategorií: #abbr("ATS", "Applicant Tracking System"), platformy pro vstupní agendu (adaptaci) a #abbr("HCM", "Human Capital Management") systémy. Na základě analyzovaných požadavků vznikla kritéria pro hodnocení uvedená níže v @tab:research-kriteria.
+Rešerše byla provedena jako komparativní posouzení řešení ze tří kategorií: #abbr("ATS", "Applicant Tracking System"), platformy pro vstupní agendu (adaptaci) a #abbr("HCM", "Human Capital Management") systémy. Na základě analyzovaných požadavků vznikla kritéria pro hodnocení uvedená níže v #ref(<tab:research-kriteria>, supplement: [tabulce]).
 
 
 #figure(
@@ -101,9 +101,9 @@ Oracle Fusion Cloud HCM je výrobcem prezentován jako kompletní cloudové ře�
 V případě #abbr("KZ", none) však i zde převažuje stejná bariéra: nesoulad s požadavkem na on-premise provoz a vysoká míra přizpůsobení nutná pro české zdravotnické procesy, zejména ve vazbě na národní registry a interní organizační členění holdingu.
 
 == Porovnání řešení vůči požadavkům organizace
-Následující tabulky shrnují vybraná řešení podle diskvalifikačních kritérií K1–K5 a doplňkových kritérií K6–K8 uvedených v @tab:research-kriteria. Hodnocení je provedeno kvalitativně ve škále *Ano / Částečně / Ne* na základě veřejně doložitelných informací.
+Následující tabulky shrnují vybraná řešení podle diskvalifikačních kritérií K1–K5 a doplňkových kritérií K6–K8 uvedených v #ref(<tab:research-kriteria>, supplement: [tabulce]). Hodnocení je provedeno kvalitativně ve škále *Ano / Částečně / Ne* na základě veřejně doložitelných informací.
 
-Pro @tab:porovnani-diskvalifikace platí: K1 = nábor, K2 = adaptace, K3 = multi-tenantní podpora, K4 = integrace/#abbr("API", none), K5 = on-premise provoz.
+Pro #ref(<tab:porovnani-diskvalifikace>, supplement: [tabulku]) platí: K1 = nábor, K2 = adaptace, K3 = multi-tenantní podpora, K4 = integrace/#abbr("API", none), K5 = on-premise provoz.
 
 #figure(
   [
@@ -130,7 +130,7 @@ Pro @tab:porovnani-diskvalifikace platí: K1 = nábor, K2 = adaptace, K3 = multi
   caption: [Porovnání vybraných řešení podle diskvalifikačních kritérií]
 ) <tab:porovnani-diskvalifikace>
 
-A k tomu @tab:porovnani-doplnkova, která je uvedená níže s doplňkovými kriteriimi na reporting, lokalizaci systému a inzerci na externích portálech.
+Na ni navazuje #ref(<tab:porovnani-doplnkova>, supplement: [tabulka]), která je uvedená níže s doplňkovými kritérii na reporting, lokalizaci systému a inzerci na externích portálech.
 #figure(
   [
     #set par(justify: false)
@@ -156,7 +156,7 @@ A k tomu @tab:porovnani-doplnkova, která je uvedená níže s doplňkovými kri
   caption: [Porovnání vybraných řešení podle doplňkových kritérií K6-K8]
 ) <tab:porovnani-doplnkova>
 
-Interpretace výsledků v @tab:porovnani-diskvalifikace ukazuje, že žádný z hodnocených produktů nesplňuje současně všechna diskvalifikační kritéria K1–K5. Enterprise HCM platformy dosahují vysokého funkčního pokrytí náboru i adaptace, avšak jejich cloudová orientace je v přímém rozporu s provozními omezeními #abbr("KZ", none). Specializované ATS platformy naopak přinášejí vysokou efektivitu v akviziční části náboru, nicméně navazující adaptační proces obvykle pokrývají jen částečně nebo prostřednictvím odděleného nástroje.
+Interpretace výsledků v #ref(<tab:porovnani-diskvalifikace>, supplement: [tabulce]) ukazuje, že žádný z hodnocených produktů nesplňuje současně všechna diskvalifikační kritéria K1–K5. Enterprise HCM platformy dosahují vysokého funkčního pokrytí náboru i adaptace, avšak jejich cloudová orientace je v přímém rozporu s provozními omezeními #abbr("KZ", none). Specializované ATS platformy naopak přinášejí vysokou efektivitu v akviziční části náboru, nicméně navazující adaptační proces obvykle pokrývají jen částečně nebo prostřednictvím odděleného nástroje.
 
 Z porovnání doplňkových kritérií vyplývá, že rozdíly mezi produkty se zmenšují v oblastech reportingu a obecné lokalizace, které jsou v komerčních řešeních obvykle dobře pokryty. Rozhodující je proto schopnost naplnit specifické požadavky domény zdravotnictví a interní architektonická omezení organizace, nikoli pouze šíře standardních HR funkcí.
 

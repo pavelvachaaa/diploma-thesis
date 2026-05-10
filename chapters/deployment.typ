@@ -54,7 +54,7 @@ Rozhodnutí pro `Docker Compose` vychází z aktuálního rozsahu nasazení. Dva
 
 Transakční část systému a stavové služby jsou odděleny od výpočetně náročnější vrstvy inteligentního zpracování, kde `cv_processor`, `job_processor` a `Apache Tika` běží na druhém serveru vybaveném grafickou kartou `NVIDIA A10` s 22 GB paměti.
 
-Hodnoticí rámec v @tab:compose-kubernetes proto neporovnává technologie abstraktně, ale vzhledem k požadavkům této práce a k omezením cílového prostředí.
+Hodnoticí rámec v #ref(<tab:compose-kubernetes>, supplement: [tabulce]) proto neporovnává technologie abstraktně, ale vzhledem k požadavkům této práce a k omezením cílového prostředí.
 
 #figure(
   [
@@ -109,14 +109,14 @@ Nasazovací balíček obsahuje pouze provozní popis verze a konfigurace, nikoli
 
 Konfigurace je oddělena od obrazu aplikace. Netajné hodnoty potřebné už při sestavení klientských aplikací mohou být předány v build fázi, zatímco provozní a citlivé údaje, například přístupové údaje k databázi, integrační klíče nebo certifikáty, se připojují až v cílovém prostředí.
 
-Po nasazení nové verze je nutné sledovat readiness endpointy, chybovost, latenci a stav asynchronního zpracování. Návrat ke staršímu obrazu je možný, u změn databázového schématu však vyžaduje také kontrolu kompatibility dat. Podrobné schéma toku vydání je z důvodu čitelnosti přesunuto do přílohy @obr:deployment-flow.
+Po nasazení nové verze je nutné sledovat readiness endpointy, chybovost, latenci a stav asynchronního zpracování. Návrat ke staršímu obrazu je možný, u změn databázového schématu však vyžaduje také kontrolu kompatibility dat. Podrobné schéma toku vydání je z důvodu čitelnosti uvedeno v přílohách jako #ref(<obr:deployment-flow>, supplement: [obrázek]).
 
 == Modelování hrozeb
 Součástí dobré praxe při nasazení je i posouzení toho, jaké útoky nebo provozní chyby mohou překročit hranice mezi jednotlivými částmi systému. Modelování hrozeb zde používám v duchu Shostackova pojetí jako návrhovou aktivitu zaměřenou na hledání rizik a jejich mitigací už při návrhu systému @shostackThreatModeling2014. 
 
 V této kapitole jej používám zjednodušeně. Nejedná se o úplný bezpečnostní audit všech komponent, ale o praktické posouzení síťové segmentace a dopadu kompromitace jedné vrstvy na zbytek nasazení.
 
-Nasazení proto pracuje s oddělením veřejné vrstvy, aplikační sítě app-network, integrační sítě adapter-internal a dohledové sítě monitoring_network. Pro každou vrstvu tabulka @tab:deployment-threat-model uvádí hlavní hrozbu a odpovídající mitigaci. Segmentace zároveň snižuje množství vstupních bodů jednotlivých komponent a tím i možný vektor útoku. Důvěra mezi částmi systému není implicitní, ale je omezena pouze na nezbytné komunikační vazby.
+Nasazení proto pracuje s oddělením veřejné vrstvy, aplikační sítě app-network, integrační sítě adapter-internal a dohledové sítě monitoring_network. Pro každou vrstvu #ref(<tab:deployment-threat-model>, supplement: [tabulka]) uvádí hlavní hrozbu a odpovídající mitigaci. Segmentace zároveň snižuje množství vstupních bodů jednotlivých komponent a tím i možný vektor útoku. Důvěra mezi částmi systému není implicitní, ale je omezena pouze na nezbytné komunikační vazby.
 
 #figure(
   [
@@ -187,7 +187,7 @@ Dohledová vrstva je navržena tak, aby převáděla nefunkční požadavky do m
   caption: [Role komponent dohledové vrstvy],
 ) <tab:deployment-observability>
 
-Použité technologie jsou vidět v @tab:deployment-observability. Sběrný agent `Alloy` pro logy, metriky a trasy. Logy jsou ukládány do `Loki`, metriky do `Prometheus`, trasy do `Tempo` a jednotné rozhraní pro přehledy a alerty poskytuje `Grafana`.
+Použité technologie jsou vidět v #ref(<tab:deployment-observability>, supplement: [tabulce]). Sběrný agent `Alloy` pro logy, metriky a trasy. Logy jsou ukládány do `Loki`, metriky do `Prometheus`, trasy do `Tempo` a jednotné rozhraní pro přehledy a alerty poskytuje `Grafana`.
 
 
 Z hlediska NF04 jsou důležité zejména signály vztahující se k dostupnosti a průchodnosti hlavních procesů. Dostupnost `/hrbackend/ready`, healthchecky integračních adaptérů, poměr #abbr("HTTP", none) odpovědí `5xx`, připravenost outbox workeru, stáří nejstarších položek v outboxu, dead-letter růst, počet konzumentů fronty a základní kapacitní ukazatele `PostgreSQL` a `SeaweedFS`. 

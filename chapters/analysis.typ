@@ -96,7 +96,7 @@ Proces začíná tím, že vedoucí oddělení identifikuje potřebu obsadit poz
 
 Po schválení textu následuje ruční publikace na jednotlivých platformách. Každý portál má vlastní formulář, vlastní strukturu dat i vlastní způsob následné aktualizace. Změna termínu nebo úprava požadavků proto neznamená jednu opravu v centrálním systému, ale opakování stejné práce na více místech. Důsledkem je nízká transparentnost, vyšší časová náročnost a slabý přehled vedoucích pracovníků o tom, kde se jejich pozice právě nachází a jaké reakce na ni přišly. Navíc se ukázalo, že publikace na webových stránkách organizace je závislá pouze na jedné osobě, což představuje významné provozní riziko a může vést ke zpožděním nebo omezení dostupnosti informací.
 
-Celý proces v notaci #abbr("BPMN", none) přehledně shrnuje @obr:proces-p01 a doplňuje o identifikatory a metriky pro lepší orientaci @tab:proces-p01.
+Celý proces v notaci #abbr("BPMN", none) přehledně shrnuje #ref(<obr:proces-p01>, supplement: [obrázek]); identifikátory a metriky pro lepší orientaci uvádí #ref(<tab:proces-p01>, supplement: [tabulka]).
 #figure(
   table(
     columns: 2,
@@ -199,7 +199,7 @@ Proces tak sice formálně vede k uzavření pracovní smlouvy, ale z provozníh
 ) <tab:proces-p03>
 
 
-Celý proces je znázorněn na diagramu níže (viz obr. @obr:proces-p03), který zachycuje jednotlivé kroky od pohovoru až po podpis pracovní smlouvy. Diagram ukazuje návaznost činností mezi kandidátem, vedoucím oddělení a personálním oddělením. Zároveň je z obrázků hned patrná roztříštěnost procesu, zejména v oblasti předávání dokumentů a koordinace jednotlivých kroků.
+Celý proces je znázorněn na diagramu níže (viz #ref(<obr:proces-p03>, supplement: [obrázek])), který zachycuje jednotlivé kroky od pohovoru až po podpis pracovní smlouvy. Diagram ukazuje návaznost činností mezi kandidátem, vedoucím oddělení a personálním oddělením. Zároveň je z obrázku hned patrná roztříštěnost procesu, zejména v oblasti předávání dokumentů a koordinace jednotlivých kroků.
 
 #figure(
   image(
@@ -317,7 +317,7 @@ Z analytického pohledu lze problémy rozdělit do tří tematických oblastí. 
   caption: [Kvalitativní hodnocení závažnosti identifikovaných problémů],
 ) <tab:zavaznost-problemu>
 
-Na základě dat, které poskytuje @tab:zavaznost-problemu, lze souhrnně konstatovat, že stávající procesní model již neodpovídá rozsahu organizace ani požadavkům na datově řízené rozhodování. Zjištění této kapitoly proto představují přímý vstup pro definici požadavků na cílové řešení.
+Na základě dat uvedených v #ref(<tab:zavaznost-problemu>, supplement: [tabulce]) lze souhrnně konstatovat, že stávající procesní model již neodpovídá rozsahu organizace ani požadavkům na datově řízené rozhodování. Zjištění této kapitoly proto představují přímý vstup pro definici požadavků na cílové řešení.
 
 == Požadavky na digitalizaci procesů
 Na základě provedené analýzy procesů a identifikovaných problémů (@kapitola-identifikcea-problemu) lze formulovat klíčové požadavky na digitalizaci procesů náboru a adaptace. Každý požadavek je odůvodněn vazbou na identifikované problémy.
